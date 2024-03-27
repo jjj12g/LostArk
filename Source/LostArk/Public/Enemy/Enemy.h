@@ -3,11 +3,19 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
+#include "BaseCharacter.h" //에너미와 플레이어의 공통부모
+#include "CharacterTypes.h" // 캐릭터 죽음같은 애니메이션 동작넣을때 사용할것.
 #include "Enemy.generated.h"
 
+
+class UPawnSensingComponent; //폰 감지센서 전방선언
+
+
+
+
+
 UCLASS()
-class LOSTARK_API AEnemy : public ACharacter
+class LOSTARK_API AEnemy : public ABaseCharacter
 {
 	GENERATED_BODY()
 
@@ -15,6 +23,8 @@ public:
 	AEnemy();
 
 	virtual void Tick(float DeltaTime) override;
+	void CheckPatrolTarget();
+	void CheckCombatTarget();
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 
@@ -26,6 +36,21 @@ public:
 private:
 
 
+	/*
+	* Components
+	*/
+
+
+	UPROPERTY(VisibleAnywhere)
+	UPawnSensingComponent* PawnSensing; // 폰의 위치감지(시각, 청각) 컴포넌트 생성
+
+
+
+
+
+
+
+
 	// 대상
 	UPROPERTY()
 	AActor* CombatTarget;
@@ -33,6 +58,9 @@ private:
 	//이동속도
 	UPROPERTY(EditAnywhere)
 	double CombatRadius = 500.f; 
+
+	UPROPERTY(EditAnywhere)
+	double AttackRadius = 150.f;   // 공격 반경
 
 	/** 
 	*Navigation 
@@ -55,10 +83,18 @@ private:
 	FTimerHandle PatrolTimer;  // 순찰 타이머
 	void PatrolTimerFinished(); // 순찰 타이머가 끝나면 실행
 
+	
+	
+
+	// 최소순찰시간 최대순찰시간 배정
+	UPROPERTY(EditAnywhere, Category = "AI Navigation")
+	float WaitMin = 5.f;
+
+	UPROPERTY(EditAnywhere, Category = "AI Navigation")
+	float WaitMax = 10.f;
 
 
-
-
+	EEnemyState EnemyState = EEnemyState::EES_Patrolling; //애니메이션 순찰에들어감
 
 
 
@@ -70,6 +106,10 @@ protected:
 	bool InTargetRange(AActor* Target, double Radius);
 	void MoveToTarget(AActor* Target);   //순찰시간끝나면 이동
 	AActor* ChoosePatrolTarget(); //새 표적 선택하기
+
+
+	UFUNCTION()
+	void PawnSeen(APawn* SeenPawn); // 델리게이트
 
 
 
