@@ -11,7 +11,11 @@
 #include "NavigationData.h"  //NavPath참조
 #include "Navigation/PathFollowingComponent.h"
 #include "DrawDebugHelpers.h"
+#include "Kismet/KismetSystemLibrary.h"  // 디버그 화살표 그리기 가져오기
 
+
+
+#define	DRAW_SPHERE_COLOR(Location, Color) DrawDebugSphere(GetWorld(), Location, 8.f, 12, Color, false, 5.f);  // 디버그 구체
 
 
 AEnemy::AEnemy()
@@ -192,6 +196,35 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 }
+
+void AEnemy::GetHit(const FVector& ImpactPoint)
+{
+	DRAW_SPHERE_COLOR(ImpactPoint, FColor::Orange);
+	// PlayHitReactMontage(FName("FromLeft")); 데미지를 받았을시 나오는 애니메이션
+
+	const FVector Forward = GetActorForwardVector(); // 적의 전방 진로
+	const FVector ToHit = ImpactPoint - (GetActorLocation()).GetSafeNormal(); // 타격 지점, Normal = 뺄셈 결과 벡터를 가져와서 정규화한후 저장한걸 히트에 반환
+
+	// Forward * ToHit = |Forward||ToHit| * cos(theta)
+	// |Forward| = 1, |ToHit| = 1, so Forward * ToHit = cos(theta)
+	const double CosTheta = FVector::DotProduct(Forward, ToHit); //Dot Product는 백터 2개와 스칼라를 반환
+	// Take the inverse cosine (arc-cosine) of cos(theta) to get tgeta
+	 double Theta = FMath::Acos(CosTheta);  // 둘 사이의 각도 세타
+	// 단위를 라디안 각도로 얻으므로 라디안에서 각도를 변환해야함.
+	Theta = FMath::RadiansToDegrees(Theta); // 라디안은 세타와 라디안을 전환
+
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(1, 5.f, FColor::Green, FString::Printf(TEXT("Theta: %f"), Theta));
+	}
+	// 세타값 디버그
+	UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + Forward * 60.f, 5.f, FColor::Red, 5.f); // 최종위치 적의위치에 전방벡터더하고 곱하기60
+	UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + ToHit * 60.f, 5.f, FColor::Green, 5.f);
+}
+
+
+
+
 
 //float AEnemy::TakeDamege (적이 공격을 당했을시)
 // 체력 바 다는거 표시

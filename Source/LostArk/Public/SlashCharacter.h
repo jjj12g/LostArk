@@ -64,16 +64,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MySettings")
 	bool inputDir;
 
+	
 
 
 	private:   //나만 사용가능하다는 뜻 , 외부에서 호출할게 아니면 여기서 작성하는게 좋음
 
-		//카메라
-		UPROPERTY (VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-		class USpringArmComponent* CameraBoom;
-
-		UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-		class UCameraComponent* ViewCamera;
+		
 
 
 		//이동
@@ -89,10 +85,6 @@ public:
 
 
 	FVector targetPos;  // 마우스로 찍은 타겟위치 전방선언
-
-	
-
-
 	
 
 };

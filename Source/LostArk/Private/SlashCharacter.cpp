@@ -3,14 +3,16 @@
 
 #include "SlashCharacter.h"
 #include "Components/InputComponent.h"
-#include "GameFrameWork/SpringArmComponent.h" // 카메라 팔
-#include "Camera/CameraComponent.h" // 카메라
 #include "EnhancedInputComponent.h" // 이동
 #include "EnhancedInputSubsystems.h" // 이동
 #include "GameFramework/PlayerController.h" // 플레이어 컨트롤러
 #include <../../../../../../../Source/Runtime/Engine/Classes/GameFramework/Character.h>
 #include "Components/CapsuleComponent.h"  // 플레이어 캡슐 컴포넌트
 #include "GameFramework/CharacterMovementComponent.h" //캐릭터 이동
+#include "Tasks/AITask_MoveTo.h"
+#include <../../../../../../../Source/Runtime/Engine/Classes/Kismet/GameplayStatics.h>
+#include "followCameraActor.h"
+#include "EngineUtils.h"
 
 ASlashCharacter::ASlashCharacter()
 {
@@ -25,25 +27,15 @@ ASlashCharacter::ASlashCharacter()
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationRoll = false;
 	bUseControllerRotationYaw = false;
-
+	
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 640.0f, 0.0f); //마우스랑 다를경우 초당 640만큼회전
 	GetCharacterMovement()->bConstrainToPlane = true; // 캐릭터의 이동을 평면으로 고정
 	GetCharacterMovement()->bSnapToPlaneAtStart = true; // 캐릭터의 시작을 평면으로 시작되도록 고정
 
-
-		CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));  // 카메라암생성
-		CameraBoom->SetupAttachment(GetRootComponent()); // 루트로 설정
-		CameraBoom->SetUsingAbsoluteRotation(true); // 스프링암이 상위컴퍼넌트를 따르지않도록 설정
-		CameraBoom->TargetArmLength = 800.0f; // 타겟과의 거리
-		CameraBoom->SetRelativeRotation(FRotator(-60.0f, 45.0f, 0.0f));
+	
 		
 		
-
-		ViewCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("ViewCamera"));
-		ViewCamera->SetupAttachment(CameraBoom);
-		ViewCamera->bUsePawnControlRotation = false; // 플레이어 회전이 카메라 회전에 영향을 주지않게 설정
-
 		
 		
 
@@ -95,6 +87,14 @@ void ASlashCharacter::BeginPlay()
 
 	Tags.Add(FName("SlashCharacter")); // 캐릭터 태그이름
 	
+
+	// 월드상의 뷰 타겟을 자동으로 찾아서 실행시켜줌
+	for (TActorIterator<AfollowCameraActor> it(GetWorld()); it; ++it)
+	{
+		AfollowCameraActor* mainCam = *it; 
+		GetController<APlayerController>()->SetViewTarget(mainCam); // 뷰타겟을 찾음
+		break;
+	}
 }
 
 

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "BaseCharacter.h" //에너미와 플레이어의 공통부모
+#include "interfaces/HitInterface.h"
 #include "CharacterTypes.h" // 캐릭터 죽음같은 애니메이션 동작넣을때 사용할것.
 #include "Enemy.generated.h"
 
@@ -15,7 +16,7 @@ class UPawnSensingComponent; //폰 감지센서 전방선언
 
 
 UCLASS()
-class LOSTARK_API AEnemy : public ABaseCharacter
+class LOSTARK_API AEnemy : public ABaseCharacter, public IHitInterface
 {
 	GENERATED_BODY()
 
@@ -28,7 +29,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 
-
+	virtual void GetHit(const FVector& ImpactPoint) override;
 
 
 
