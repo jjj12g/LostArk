@@ -10,8 +10,13 @@
 #include "Perception/PawnSensingComponent.h" //폰 시각청각 컴포넌트
 #include "NavigationData.h"  //NavPath참조
 #include "Navigation/PathFollowingComponent.h"
+#include "NiagaraComponent.h" // 나이아가라 이펙트
+#include "NiagaraFunctionLibrary.h" // 나이아가라
 #include "DrawDebugHelpers.h"
 #include "Kismet/KismetSystemLibrary.h"  // 디버그 화살표 그리기 가져오기
+#include "Components/AttributeComponent.h"  // hp
+#include "HUD/HealthBarComponent.h" //hp 바
+
 
 
 
@@ -29,6 +34,20 @@ AEnemy::AEnemy()
 	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 	GetMesh()->SetGenerateOverlapEvents(true);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
+
+
+	Attributes = CreateDefaultSubobject<UAttributeComponent>(TEXT("Attributes"));
+	HealthBarWidget = CreateDefaultSubobject<UHealthBarComponent>(TEXT("HealthBar")); // 헬스바위젯
+	HealthBarWidget->SetupAttachment(GetRootComponent()); //헬스바위젯을 루트로
+
+
+
+	// 나이아가라
+
+
+
+	
+
 
 	// 캐릭터 움직임
 	GetCharacterMovement()->bOrientRotationToMovement = true; 
@@ -62,6 +81,7 @@ void AEnemy::BeginPlay()
 	{
 		PawnSensing->OnSeePawn.AddDynamic(this, &AEnemy::PawnSeen);
 	}
+
 	
 }
 
@@ -79,10 +99,12 @@ void AEnemy::MoveToTarget(AActor* Target)
 {
 	if (EnemyController == nullptr || Target == nullptr) return;
 	{
+		
 		FAIMoveRequest MoveRequest;
 		MoveRequest.SetGoalActor(Target);
-		MoveRequest.SetAcceptanceRadius(15.f);
+		MoveRequest.SetAcceptanceRadius(50.f);
 		EnemyController->MoveTo(MoveRequest);
+		
 		
 	}
 	
@@ -108,9 +130,49 @@ AActor* AEnemy::ChoosePatrolTarget()
 	{
 		const int32 TargetSelection = FMath::RandRange(0, NumPatrolTargets - 1);
 		 return ValidTargets[TargetSelection];
+		 UE_LOG(LogTemp, Warning, TEXT("patroller"));
 	}
 
 	return nullptr;
+}
+
+void AEnemy::Attack()
+{
+
+	Super::Attack();
+	PlayAttackMontage();
+	
+}
+
+void AEnemy::PlayAttackMontage()
+{
+
+	Super::PlayAttackMontage();
+	
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && AttackMontage)
+	{
+		AnimInstance->Montage_Play(AttackMontage);
+		const int32 Selection = FMath::RandRange(0,2);  // 공격 3개중한개 랜덤
+		FName SectionName = FName();
+		switch (Selection)
+		{
+		case 0:
+			SectionName = FName("Attack1");
+			break;
+		case 1:
+			SectionName = FName("Attack2");
+			break;
+		case 2:
+			SectionName = FName("Attack3");
+			break;
+		default:
+			break;
+		}
+		AnimInstance->Montage_JumpToSection(SectionName, AttackMontage);
+	}
+
+
 }
 
 void AEnemy::PawnSeen(APawn* SeenPawn) // 플레이어 추격
@@ -182,7 +244,8 @@ void AEnemy::CheckCombatTarget()
 		// 플레이어가 공격범위안에 있다면 공격
 		EnemyState = EEnemyState::EES_Attacking;  // 공격 모션 사용
 		// TODO: 어택모션
-		UE_LOG(LogTemp, Warning, TEXT("Attack"));
+		Attack();
+		//UE_LOG(LogTemp, Warning, TEXT("Attack"));
 	}
 		
 }
@@ -197,13 +260,17 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 }
 
+
+			// 히트 모션
 void AEnemy::GetHit(const FVector& ImpactPoint)
 {
 	DRAW_SPHERE_COLOR(ImpactPoint, FColor::Orange);
-	// PlayHitReactMontage(FName("FromLeft")); 데미지를 받았을시 나오는 애니메이션
+	 PlayHitReactMontage(FName("FromLeft")); //데미지를 받았을시 나오는 애니메이션
 
 	const FVector Forward = GetActorForwardVector(); // 적의 전방 진로
-	const FVector ToHit = ImpactPoint - (GetActorLocation()).GetSafeNormal(); // 타격 지점, Normal = 뺄셈 결과 벡터를 가져와서 정규화한후 저장한걸 히트에 반환
+	// 데미지를 받았을 때, 몸이 공중으로 올라가지 않도록
+	const FVector ImpactLowered(ImpactPoint.X, ImpactPoint.Y, GetActorLocation().Z);
+	const FVector ToHit = (ImpactLowered - GetActorLocation()).GetSafeNormal(); // 타격 지점, Normal = 뺄셈 결과 벡터를 가져와서 정규화한후 저장한걸 히트에 반환
 
 	// Forward * ToHit = |Forward||ToHit| * cos(theta)
 	// |Forward| = 1, |ToHit| = 1, so Forward * ToHit = cos(theta)
@@ -223,16 +290,30 @@ void AEnemy::GetHit(const FVector& ImpactPoint)
 }
 
 
+// 데미지 , 남은체력 계산
+float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigetor, AActor* DamageCauser)
+{
+	if (Attributes && HealthBarWidget)
+	{
+		Attributes->ReceiveDamage(DamageAmount);
+
+		HealthBarWidget->SetHealthPercent(Attributes->GetHealthPercent());
+		
+	}
+	return DamageAmount;
+}
 
 
 
-//float AEnemy::TakeDamege (적이 공격을 당했을시)
+
+
+//float AEnemy::TakeDamege //(적이 공격을 당했을시)
 // 체력 바 다는거 표시
-// 플레이어가 목표에 들어오지 않았을때도 플레이어 인식
+ //플레이어가 목표에 들어오지 않았을때도 플레이어 인식
 
-// CombatTarget = EventInstigator->GetPawn(); // 적의 위치를 추적
-// EnemyState == EEnemyState::EES_Chasing; // 타겟으로 이동상태로변경
-// GetCharacterMovement()->MaxWalkSpeed = 300.f; // 이동속도 300으로 설정
-// MoveToTarget (CombatTarget); //타겟에게 이동
-// return DamageAmount;
+ //CombatTarget = EventInstigator->GetPawn(); // 적의 위치를 추적
+ //EnemyState == EEnemyState::EES_Chasing; // 타겟으로 이동상태로변경
+ //GetCharacterMovement()->MaxWalkSpeed = 300.f; // 이동속도 300으로 설정
+ //MoveToTarget (CombatTarget); //타겟에게 이동
+ //return DamageAmount;
 

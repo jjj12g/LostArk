@@ -18,7 +18,10 @@ public:
 
 	AfollowCameraActor();
 
-	class actorlocal;
+	
+
+	
+	class ASlashCharacter* target;
 
 protected:
 
@@ -38,6 +41,7 @@ private:
 		//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 		//class UCameraComponent* ViewCamera;
 
-	FVector targetPlayer;
+
+	
 	
 };

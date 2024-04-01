@@ -145,7 +145,8 @@ void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		//enhancedInputComponent->BindAction(ia_move, ETriggerEvent::Completed, this, &ASlashCharacter::SetInputDirection); //컴플릿티드도 해줘야 누를때만 작동.
 		//this 는 현재 값을 말함.
 		// 다른클래스에서 똑같은 이름의 변수를 가져올 수 있으므로 파일명을 앞에 써주는게 좋음 AShootingPlayer::SetInputDirection처럼.
-		
+		enhancedInputComponent->BindAction(ia_Jump, ETriggerEvent::Triggered, this, &ASlashCharacter::SetInputJemp); // 일단 캐릭터 점프를 가져옴
+
 	}
 
 	
@@ -210,3 +211,39 @@ void ASlashCharacter::SetInputDirection(const FInputActionValue& value)
 
 	}
 
+void ASlashCharacter::SetInputJemp(const FInputActionValue& value)
+{	// 점프미완성
+	bool isPressed = value.Get<bool>();
+	if (isPressed)
+	{
+
+	}
+
+
+
+
+}
+
+	 // 장비 시스템
+	//OverlappingWeapon->SetOwner(this);  // 무기가 장착되면 소유자로 인식
+	//OverlappingWeapon->SetInstigator(this);
+
+
+	/*   void overlapEvent   데미지 시스템
+	* 
+	* 
+	* 
+	* 
+	*  UGamePlayStatics::ApplyDamage(
+	*		Box.Hit.GetActor(),
+	*		Damage,
+	*		GetInstigetor()->GetController(),
+	*		this,
+	*		UDamageType::StaticClass()
+	*		);
+	* 
+	*/
+
+
+	// CharacterState = ECharacterState::ECS_EquippedOneHandedWeapon;
+	// 캐릭터 전투상태 만들기 E키를 눌렀을때로 설정해줘야함

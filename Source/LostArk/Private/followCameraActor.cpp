@@ -5,7 +5,7 @@
 #include "GameFrameWork/SpringArmComponent.h" // 카메라 팔
 #include "Camera/CameraComponent.h" // 카메라
 #include "SlashCharacter.h" // 쫒아갈캐릭터 정보
-
+#include "EngineUtils.h"
 
 
 
@@ -28,14 +28,18 @@ AfollowCameraActor::AfollowCameraActor()
 	*/
 	
 	//AfollowCameraActor* GetActorRotation(0.0f, -45.0f, 0.0f) = SetActorRotation();
-
+	
+	
 
 }
 
 void AfollowCameraActor::BeginPlay()
 {
 	
-
+	for (TActorIterator<ASlashCharacter> it(GetWorld()); it; ++it)
+	{
+		target = *it; // 클래스의 경우 초기화가 불가능하므로 이 for문으로 클래스를 찾아서 함수를 초기화시킴.
+	}
 	
 
 
@@ -46,15 +50,26 @@ void AfollowCameraActor::Tick(float DeltaTime)
 {
 		Super::Tick(DeltaTime);
 
-		// 타겟의 위치를 구하고
-		ASlashCharacter* GetActorLocation();
-		
-		// 그만큼 떨어진 위치에 배치
-		
-			
-		//AActor->SetActorLocation<ASlashCharacter>->GetComponentLocation(0, -60, 180));
-		//AActor->SetActorRotation<ASlashCharacter>->GetComponentRotation(0, -45, 0));
 		
 
-	
+		// 타겟의 위치를 구하고
+		
+		/*FVector ACtordir = target->GetActorLocation();
+		FVector dir = ACtordir - GetActorLocation();
+		dir.Normalize();
+		SetActorLocation(GetActorLocation() + dir * 1000.0f * DeltaTime);*/
+
+
+		// 그만큼 떨어진 위치에 배치
+		//if (target != nullptr)
+		//{ 
+		FVector targetloc = target->GetActorLocation();  // 액터의 좌표를 타겟 loc로 받음
+		
+		target->SetActorLocation(FVector(1,1,1), false); // 타겟의 로케이션값을 바꿈
+		UE_LOG(LogTemp, Warning, TEXT("%.1f, %.1f, %.1f"),targetloc.X, targetloc.Y, targetloc.Z);
+		//}
+
+
+		
+
 }

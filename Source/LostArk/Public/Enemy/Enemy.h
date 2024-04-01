@@ -10,8 +10,10 @@
 
 
 class UPawnSensingComponent; //폰 감지센서 전방선언
+class UAttributeComponent; // hp
+class UHealthBarComponent; // hp 바
 
-
+class UAnimMontage;
 
 
 
@@ -23,6 +25,10 @@ class LOSTARK_API AEnemy : public ABaseCharacter, public IHitInterface
 public:
 	AEnemy();
 
+	
+
+
+
 	virtual void Tick(float DeltaTime) override;
 	void CheckPatrolTarget();
 	void CheckCombatTarget();
@@ -30,12 +36,18 @@ public:
 
 
 	virtual void GetHit(const FVector& ImpactPoint) override;
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigetor, AActor* DamageCauser) override; // 데미지시스템
 
 
 
 	
 private:
+	
+	UPROPERTY(VisibleAnywhere)
+	UAttributeComponent* Attributes; // hp
 
+	UPROPERTY(VisibleAnywhere)
+	UHealthBarComponent* HealthBarWidget; //hp 바
 
 	/*
 	* Components
@@ -43,7 +55,9 @@ private:
 
 
 	UPROPERTY(VisibleAnywhere)
-	UPawnSensingComponent* PawnSensing; // 폰의 위치감지(시각, 청각) 컴포넌트 생성
+	UPawnSensingComponent* PawnSensing; // 폰의 위치감지(시각, 청각) 컴포넌트 생성a
+
+	
 
 
 
@@ -61,7 +75,7 @@ private:
 	double CombatRadius = 500.f; 
 
 	UPROPERTY(EditAnywhere)
-	double AttackRadius = 150.f;   // 공격 반경
+	double AttackRadius = 300.f;   // 공격 반경
 
 	/** 
 	*Navigation 
@@ -94,8 +108,7 @@ private:
 	UPROPERTY(EditAnywhere, Category = "AI Navigation")
 	float WaitMax = 10.f;
 
-
-	EEnemyState EnemyState = EEnemyState::EES_Patrolling; //애니메이션 순찰에들어감
+	
 
 
 
@@ -107,12 +120,20 @@ protected:
 	bool InTargetRange(AActor* Target, double Radius);
 	void MoveToTarget(AActor* Target);   //순찰시간끝나면 이동
 	AActor* ChoosePatrolTarget(); //새 표적 선택하기
+	virtual void Attack() override;  // 공격
+	virtual void PlayAttackMontage() override; // 공격모션
 
 
 	UFUNCTION()
 	void PawnSeen(APawn* SeenPawn); // 델리게이트
 
+	//UPROPERTY(BlueprintReadOnly)
+	//EDeathPose DeathPose = EDeathPose::EDP_Alive;
 
+	UPROPERTY(BlueprintReadOnly)
+	EEnemyState EnemyState = EEnemyState::EES_Patrolling; //애니메이션 순찰에들어감
+
+	
 
 
 

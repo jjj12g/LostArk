@@ -28,9 +28,34 @@ void ABaseCharacter::Attack() // 공격
 
 }
 
+void ABaseCharacter::Die() // 죽음
+{
+
+}
+
+
+
+
+
+void ABaseCharacter::DirectionalHitReact(const FVector& ImpactPoint) // 지향성 타격 반응
+{
+
+}
+
 void ABaseCharacter::PlayAttackMontage()  // 공격모션
 {
 
+}
+
+// 데미지 받았을때 몽타주
+void ABaseCharacter::PlayHitReactMontage(const FName& SectionName)
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && HitReactMontage)
+	{
+		AnimInstance->Montage_Play(HitReactMontage);
+		AnimInstance->Montage_JumpToSection(SectionName, HitReactMontage);
+	}
 }
 
 bool ABaseCharacter::CanAttack()
