@@ -65,7 +65,7 @@ void AfollowCameraActor::Tick(float DeltaTime)
 		//{ 
 		FVector targetloc = target->GetActorLocation();  // 액터의 좌표를 타겟 loc로 받음
 		
-		target->SetActorLocation(FVector(1,1,1), false); // 타겟의 로케이션값을 바꿈
+		 target->SetActorLocation(FVector(1,1,1), true); // 타겟의 로케이션값을 바꿈
 		UE_LOG(LogTemp, Warning, TEXT("%.1f, %.1f, %.1f"),targetloc.X, targetloc.Y, targetloc.Z);
 		//}
 

@@ -162,7 +162,9 @@ void AEnemy::PlayAttackMontage()
 			break;
 		case 1:
 			SectionName = FName("Attack2");
+			NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAttached(NI_Bossskill1,NiagaraComp,NAME_None,FVector(GetActorLocation()),FRotator(0.f),EAttachLocation::Type::KeepRelativeOffset,true);
 			break;
+			
 		case 2:
 			SectionName = FName("Attack3");
 			break;

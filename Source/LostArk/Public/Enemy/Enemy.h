@@ -26,7 +26,9 @@ public:
 	AEnemy();
 
 	
-
+	class UNiagaraSystem* NI_Bossskill1;
+	USceneComponent* NiagaraSceneComp;
+	class UNiagaraComponent* NiagaraComp;
 
 
 	virtual void Tick(float DeltaTime) override;
@@ -109,7 +111,7 @@ private:
 	float WaitMax = 10.f;
 
 	
-
+	
 
 
 
@@ -122,6 +124,7 @@ protected:
 	AActor* ChoosePatrolTarget(); //새 표적 선택하기
 	virtual void Attack() override;  // 공격
 	virtual void PlayAttackMontage() override; // 공격모션
+	
 
 
 	UFUNCTION()
