@@ -25,8 +25,10 @@ class LOSTARK_API AEnemy : public ABaseCharacter, public IHitInterface
 public:
 	AEnemy();
 
-	
+	UPROPERTY(EditAnywhere)
 	class UNiagaraSystem* NI_Bossskill1;
+
+
 	USceneComponent* NiagaraSceneComp;
 	class UNiagaraComponent* NiagaraComp;
 
@@ -40,7 +42,7 @@ public:
 	virtual void GetHit(const FVector& ImpactPoint) override;
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigetor, AActor* DamageCauser) override; // 데미지시스템
 
-
+	
 
 	
 private:

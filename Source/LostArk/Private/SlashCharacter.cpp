@@ -216,6 +216,7 @@ void ASlashCharacter::SetInputJemp(const FInputActionValue& value)
 	bool isPressed = value.Get<bool>();
 	if (isPressed)
 	{
+		//FVector SetActorLocation() = GetActorLocation() + FVector(-500, 100, 600);
 
 	}
 
