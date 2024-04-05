@@ -66,7 +66,7 @@ void AfollowCameraActor::Tick(float DeltaTime)
 	 //그만큼 떨어진 위치에 배치
 	if (target != nullptr)
 	{ 
-	FVector CamaraLoc = target-> GetActorLocation() + FVector(-500,100,600);  // 액터의 좌표를 타겟 loc로 받음
+	FVector CamaraLoc = target-> GetActorLocation() + FVector(-500,100,800);  // 액터의 좌표를 타겟 loc로 받음
 
 	SetActorLocation(FVector(CamaraLoc)); // 타겟의 로케이션값을 바꿈
 	//UE_LOG(LogTemp, Warning, TEXT("%.1f, %.1f, %.1f"), CamaraLoc.X, CamaraLoc.Y, CamaraLoc.Z);

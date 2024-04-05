@@ -12,10 +12,12 @@
 
 class USpringArmComponent;
 class UCameraComponent;
-
-
+class UGroomComponent;
+class AItem;
+class UAnimMontage;
 class UInputMappingContext;
 class UInputAction;
+class AMaactor;
 
 // 데미지 관련 슬래쉬캐릭터 h 와 cpp에 일단 주석으로 넣어둠
 
@@ -64,18 +66,37 @@ public:
 	UPROPERTY(EditAnywhere, Category="MySettings")
 	class UInputAction* ia_Jump; 
 
+	UPROPERTY(EditAnywhere, Category="MySettings")
+	class UInputAction* ia_attack;
+
 	UPROPERTY(EditAnywhere, Category = "MySettings")
 	float speed = 500.0f; // 스피드
-
+	
+	FVector targetPos; // 마우스로 찍은 타겟위치 전방선언
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MySettings")
 	bool inputDir;
 
 	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState;} // 캐릭터애니메이션쪽에서 캐릭터상태를 가져가기위한세팅
 
+	UFUNCTION() 
+	void SetInputDirection(const FInputActionValue& value);
 	
 
+	// 공격 모션 만들기
+	UPROPERTY(EditAnywhere, Category = "Mysettings")
+	UNiagaraSystem* NI_BASIC;
+	
+	UPROPERTY(EditDefaultsOnly)
+		TSubclassOf<AMaactor> Attackclass;
 
+	UPROPERTY()
+	AMaactor* Attack;
+
+		//공격
+	UFUNCTION()
+	void shoot(const FInputActionValue& value);
+	
 private:   //나만 사용가능하다는 뜻 , 외부에서 호출할게 아니면 여기서 작성하는게 좋음
 
 	ECharacterState CharacterState = ECharacterState::ECS_Unequipped; // 캐릭터상태 평상시
@@ -84,6 +105,9 @@ private:   //나만 사용가능하다는 뜻 , 외부에서 호출할게 아니면 여기서 작성하는게
 		
 		//UPROPERTY(EditAnyWhere, Category = "Damage)
 		//float Damage = 20.f;
+
+	
+		
 
 		
 
@@ -94,13 +118,12 @@ private:   //나만 사용가능하다는 뜻 , 외부에서 호출할게 아니면 여기서 작성하는게
 
 
 
-	UFUNCTION() 
-	void SetInputDirection(const FInputActionValue& value); //입력값을 받기위해 만든 함수 매개변수는 꼭 저 자료형으로 해줘야함.
+	 //입력값을 받기위해 만든 함수 매개변수는 꼭 저 자료형으로 해줘야함.
 	// 바인딩할거는 앞에 꼭 UFUNCTION()을 붙여주기. 이 함수가 있다는걸 언리얼 에디터에서 미리 알아야 하므로.
 	UFUNCTION()
 	void SetInputJemp(const FInputActionValue& value); // 점프 미완성
 
-	FVector targetPos;  // 마우스로 찍은 타겟위치 전방선언
+	 
 	
 
 };

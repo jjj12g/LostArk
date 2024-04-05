@@ -7,7 +7,8 @@
 #include "Components/SphereComponent.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/KismetSystemLibrary.h" // 다른물체랑 충돌
-
+#include "interfaces/HitInterface.h"
+#include "NiagaraComponent.h"
 
 
 
@@ -55,7 +56,7 @@ void AWeapon::AttachMeshToSocket(USceneComponent* Inparent, const FName& InSocke
 
 void AWeapon::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-
+	
 
 }
 
@@ -86,16 +87,24 @@ void AWeapon::OnBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 			BoxHit,
 			true  //자신을 무시
 		);
-		}
+
+		
+
+		
+
+		
+		
 }
 
 
 
 
 
-	// 무기에 히트되면 데미지 입히기
 
-	/*
+/*
+	
+	// 무기에 히트되면 데미지 입히기
+	
 	if (BoxHit.GetActor())
 	{
 		
@@ -117,11 +126,10 @@ void AWeapon::OnBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 		CrateFields(BoxHit.ImpactPoint);
 
 		
-
+		*/
 
 
 
 	}
 	
-}
-*/
+

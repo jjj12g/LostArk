@@ -9,11 +9,13 @@
 #include "Enemy.generated.h"
 
 
-class UPawnSensingComponent; //폰 감지센서 전방선언
-class UAttributeComponent; // hp
-class UHealthBarComponent; // hp 바
 
-class UAnimMontage;
+
+class UHealthBarComponent; // hp 바
+class UPawnSensingComponent; //폰 감지센서 전방선언
+
+
+
 
 
 
@@ -40,6 +42,7 @@ public:
 
 
 	virtual void GetHit(const FVector& ImpactPoint) override;
+	//virtual void GetHit_Implementation(const FVector& ImpactPoint) override;
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigetor, AActor* DamageCauser) override; // 데미지시스템
 
 	
@@ -47,36 +50,35 @@ public:
 	
 private:
 	
-	UPROPERTY(VisibleAnywhere)
-	UAttributeComponent* Attributes; // hp
+
 
 	UPROPERTY(VisibleAnywhere)
 	UHealthBarComponent* HealthBarWidget; //hp 바
 
+
+	UPROPERTY(VisibleAnywhere)
+	UPawnSensingComponent* PawnSensing; // 폰의 위치감지(시각, 청각) 컴포넌트 생성
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AWeapon> WeaponClass;
+
+
+
 	/*
 	* Components
 	*/
-
-
-	UPROPERTY(VisibleAnywhere)
-	UPawnSensingComponent* PawnSensing; // 폰의 위치감지(시각, 청각) 컴포넌트 생성a
-
 	
-
-
-
-
-
-
+	
 
 
 	// 대상
 	UPROPERTY()
 	AActor* CombatTarget;
 
+
 	//이동속도
 	UPROPERTY(EditAnywhere)
-	double CombatRadius = 500.f; 
+	double CombatRadius = 1000.f; 
 
 	UPROPERTY(EditAnywhere)
 	double AttackRadius = 300.f;   // 공격 반경
@@ -120,6 +122,10 @@ private:
 protected:
 	virtual void BeginPlay() override;
 
+	void Die();
+
+	void PlayHitReactMontage(const FName& SectionName);
+
 	// 타깃이 범위내에 있다면 true값 반환     수용반경
 	bool InTargetRange(AActor* Target, double Radius);
 	void MoveToTarget(AActor* Target);   //순찰시간끝나면 이동
@@ -132,8 +138,8 @@ protected:
 	UFUNCTION()
 	void PawnSeen(APawn* SeenPawn); // 델리게이트
 
-	//UPROPERTY(BlueprintReadOnly)
-	//EDeathPose DeathPose = EDeathPose::EDP_Alive;
+	UPROPERTY(BlueprintReadOnly)
+	EDeathPose DeathPose = EDeathPose::EDP_Alive; // 적이 죽을때마다 설정 가능
 
 	UPROPERTY(BlueprintReadOnly)
 	EEnemyState EnemyState = EEnemyState::EES_Patrolling; //애니메이션 순찰에들어감

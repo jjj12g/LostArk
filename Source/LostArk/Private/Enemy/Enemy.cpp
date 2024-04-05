@@ -13,6 +13,7 @@
 #include "NiagaraComponent.h" // 나이아가라 이펙트
 #include "NiagaraFunctionLibrary.h" // 나이아가라
 #include "DrawDebugHelpers.h"
+#include "items/Weapons/Weapon.h"
 #include "Kismet/KismetSystemLibrary.h"  // 디버그 화살표 그리기 가져오기
 #include "Components/AttributeComponent.h"  // hp
 #include "HUD/HealthBarComponent.h" //hp 바
@@ -36,7 +37,7 @@ AEnemy::AEnemy()
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 
 
-	Attributes = CreateDefaultSubobject<UAttributeComponent>(TEXT("Attributes"));
+	
 	HealthBarWidget = CreateDefaultSubobject<UHealthBarComponent>(TEXT("HealthBar")); // 헬스바위젯
 	HealthBarWidget->SetupAttachment(GetRootComponent()); //헬스바위젯을 루트로
 
@@ -71,6 +72,12 @@ void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 
+	if (HealthBarWidget)
+	{
+		HealthBarWidget->SetVisibility(false);    // 체력바 숨기기
+	}
+	
+
 	//에너미 순찰경로지정
 
 	EnemyController = Cast<AAIController>(GetController());  //AI 컨트롤러로 캐스트해줌  
@@ -82,7 +89,63 @@ void AEnemy::BeginPlay()
 		PawnSensing->OnSeePawn.AddDynamic(this, &AEnemy::PawnSeen);
 	}
 
+
+	UWorld* World = GetWorld();
+	if (World && WeaponClass)
+	{
+		AWeapon* DefaultWeapon = World->SpawnActor<AWeapon>(WeaponClass);
+		//DefaultWeapon->Equip(GetMesh(), FName("RightHandSocket"), this, this);
+		//EquippedWeapon = DefaultWeapon;
+	}
 	
+}
+
+void AEnemy::Die()
+{
+	// TODO: Play Death Montage
+	UAnimInstance* Animinstance = GetMesh()->GetAnimInstance();
+	if (Animinstance && DeathMontage)
+	{
+		Animinstance->Montage_Play(DeathMontage);
+
+		const int32 Selection = FMath::RandRange(0,1);  
+		FName SectionName = FName();
+		switch (Selection)
+		{
+		case 0:
+			SectionName = FName("Death1");
+			DeathPose = EDeathPose::EDP_Death1;
+			break;
+		case 1:
+			SectionName = FName("Death2");
+			DeathPose = EDeathPose::EDP_Death1;
+			break;
+		default:
+			break;
+		}
+		Animinstance->Montage_JumpToSection(SectionName, DeathMontage);
+	}
+	// 죽으면 체력바 위젯 안보이게 설정
+	if (HealthBarWidget)
+	{
+		HealthBarWidget->SetVisibility(false);
+	}
+
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision); // 에너미가 죽엇을때 콜리전을 사라지게 함.
+	SetLifeSpan(7.f); // 에너미가 죽으면 3초뒤에 사라짐
+
+
+}
+
+void AEnemy::PlayHitReactMontage(const FName& SectionName)
+{
+	UAnimInstance* Animinstance = GetMesh()->GetAnimInstance();
+	if (Animinstance && HitReactMontage)
+	{
+		Animinstance->Montage_Play(HitReactMontage);
+		Animinstance->Montage_JumpToSection(SectionName, HitReactMontage);
+	}
+
 }
 
 
@@ -201,6 +264,23 @@ void AEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	//  전투타겟이 널포인터인지 확인
+
+	if (CombatTarget)
+	{
+		const double DistanceToTarget = (CombatTarget->GetActorLocation() - GetActorLocation()).Size(); // 전투목표까지의 백터
+		if (DistanceToTarget > CombatRadius)
+		{
+			CombatTarget = nullptr;
+			if (HealthBarWidget)
+			{
+				HealthBarWidget->SetVisibility(false);
+			}
+		}
+	}
+
+
+
 	if (EnemyState > EEnemyState::EES_Patrolling) //순찰을 넘어서는 상황이 되면 전투대상 확인
 	{
 		CheckCombatTarget();  //전투표적확인 상황에 필요한 일 하기.
@@ -230,6 +310,12 @@ void AEnemy::CheckCombatTarget()
 	{
 		// 플레이어가 전투반경 밖에있으면 전투표적을 없앰(널표시)
 		CombatTarget = nullptr;
+		if (HealthBarWidget)
+		{
+			HealthBarWidget->SetVisibility(false); // 건강표시기 위젯을 숨기고 다시순찰
+		}
+
+
 		EnemyState = EEnemyState::EES_Patrolling; // 다시 순찰모션으로 변경
 		GetCharacterMovement()->MaxWalkSpeed = 125.f; // 그 후 다시 속도를 125로함.
 		MoveToTarget(PatrolTarget); // 순찰
@@ -266,7 +352,26 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 			// 히트 모션
 void AEnemy::GetHit(const FVector& ImpactPoint)
 {
-	DRAW_SPHERE_COLOR(ImpactPoint, FColor::Orange);
+	//DRAW_SPHERE_COLOR(ImpactPoint, FColor::Orange);
+
+	
+
+	if (HealthBarWidget)
+	{
+		HealthBarWidget->SetVisibility(true); // 체력바 보이게 설정
+	}
+	// 살아있다면 히트몽타주
+	if (Attributes && Attributes->IsAlive())
+	{
+		DirectionalHitReact(ImpactPoint);
+	}
+	// 그게아니면 데스모션
+	else
+	{
+		Die();
+	}
+
+
 	 PlayHitReactMontage(FName("FromLeft")); //데미지를 받았을시 나오는 애니메이션
 
 	const FVector Forward = GetActorForwardVector(); // 적의 전방 진로
@@ -302,6 +407,10 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 		HealthBarWidget->SetHealthPercent(Attributes->GetHealthPercent());
 		
 	}
+	CombatTarget = EventInstigetor->GetPawn(); // 적이 피해를 입는 즉시 전투목표 설정
+	EnemyState = EEnemyState::EES_Chasing;
+	GetCharacterMovement()->MaxWalkSpeed = 300.f;
+	MoveToTarget(CombatTarget);
 	return DamageAmount;
 }
 

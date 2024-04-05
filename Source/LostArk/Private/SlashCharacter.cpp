@@ -13,6 +13,8 @@
 #include <../../../../../../../Source/Runtime/Engine/Classes/Kismet/GameplayStatics.h>
 #include "followCameraActor.h"
 #include "EngineUtils.h"
+#include "Maactor.h"
+#include <../../../../../../../Plugins/FX/Niagara/Source/Niagara/Public/NiagaraFunctionLibrary.h>
 
 ASlashCharacter::ASlashCharacter()
 {
@@ -95,6 +97,12 @@ void ASlashCharacter::BeginPlay()
 		GetController<APlayerController>()->SetViewTarget(mainCam); // 뷰타겟을 찾음
 		break;
 	}
+
+	// 지팡이 붙이기
+	Attack=GetWorld()->SpawnActor<AMaactor>(Attackclass);
+	GetMesh()->HideBoneByName(TEXT("Attack"),EPhysBodyOp::PBO_None);
+	Attack->AttachToComponent(GetMesh(),FAttachmentTransformRules::KeepRelativeTransform, TEXT("Attack"));
+	Attack->SetOwner(this);
 }
 
 
@@ -146,7 +154,7 @@ void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		//this 는 현재 값을 말함.
 		// 다른클래스에서 똑같은 이름의 변수를 가져올 수 있으므로 파일명을 앞에 써주는게 좋음 AShootingPlayer::SetInputDirection처럼.
 		enhancedInputComponent->BindAction(ia_Jump, ETriggerEvent::Triggered, this, &ASlashCharacter::SetInputJemp); // 일단 캐릭터 점프를 가져옴
-
+		enhancedInputComponent->BindAction(ia_attack, ETriggerEvent::Started, this,&ASlashCharacter::shoot);
 	}
 
 	
@@ -187,7 +195,7 @@ void ASlashCharacter::SetInputDirection(const FInputActionValue& value)
 			
 
 			// 좌표 설정 확인
-			//DrawDebugSphere(GetWorld(), hitInfo.ImpactPoint, 10.0f, 15, FColor::Red, false, 3, 1, 1);
+			DrawDebugSphere(GetWorld(), hitInfo.ImpactPoint, 10.0f, 15, FColor::Red, false, 3, 1, 1);
 			//UE_LOG(LogTemp, Warning, TEXT("%.1f, %.1f, %.1f"), hitInfo.ImpactPoint.X, hitInfo.ImpactPoint.Y, hitInfo.ImpactPoint.Z);
 			
 		}
@@ -224,6 +232,20 @@ void ASlashCharacter::SetInputJemp(const FInputActionValue& value)
 
 
 }
+
+void ASlashCharacter::shoot(const FInputActionValue& value)
+{
+
+	
+	Attack->PullTrigger();
+	//UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NI_BASIC, SetInputDirection(true), GetActorRotation());
+
+}
+
+
+
+
+
 
 	 // 장비 시스템
 	//OverlappingWeapon->SetOwner(this);  // 무기가 장착되면 소유자로 인식

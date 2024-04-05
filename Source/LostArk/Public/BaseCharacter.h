@@ -8,8 +8,9 @@
 #include "BaseCharacter.generated.h"
 
 
- //class AWeapon;   무기
-
+class AWeapon;  // 무기
+class UAttributeComponent;
+class UAnimMontage;
 
 
 UCLASS()
@@ -62,5 +63,25 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Montages")
 	UAnimMontage* HitReactMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category = Montages)
+	UAnimMontage* DeathMontage;
+
+
+	/**
+	 * Components
+	 */
+
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UAttributeComponent* Attributes; // hp
+
+	UPROPERTY(EditAnywhere, Category = Sounds) // 사운드
+	USoundBase* HitSound;
+
+	UPROPERTY(EditAnywhere, Category = VisualEffects) // 파티클
+	UParticleSystem* HitParticles;
+
+
 
 };

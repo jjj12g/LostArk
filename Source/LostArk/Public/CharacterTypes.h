@@ -18,6 +18,17 @@ enum class ECharacterState : uint8 // 캐릭터의 현 상태에 따라 행동이 달라짐, 앞�
 
 
 
+
+UENUM(BlueprintType)
+enum class EDeathPose : uint8
+{
+	EDP_Alive UMETA(DisplayName = "Alive"), // 살아있음
+	EDP_Death1 UMETA(DisplayName = "Death1"), // 데스포즈 1
+	
+};
+
+
+
 // 에너미
 UENUM(BlueprintType)
 enum class EEnemyState : uint8

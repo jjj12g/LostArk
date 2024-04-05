@@ -3,7 +3,8 @@
 
 #include "BaseCharacter.h"
 #include "Components/BoxComponent.h" //박스컴포넌트
-//#include "Items/Weapons/Weapon.h" 무기
+#include "Items/Weapons/Weapon.h" //무기
+#include "Components/AttributeComponent.h"  // hp
 
 
 
@@ -13,6 +14,8 @@ ABaseCharacter::ABaseCharacter()
 {
 
 	PrimaryActorTick.bCanEverTick = true;
+
+	Attributes = CreateDefaultSubobject<UAttributeComponent>(TEXT("Attributes"));
 
 }
 
@@ -25,7 +28,7 @@ void ABaseCharacter::BeginPlay()
 
 void ABaseCharacter::Attack() // 공격
 {
-
+	
 }
 
 void ABaseCharacter::Die() // 죽음
