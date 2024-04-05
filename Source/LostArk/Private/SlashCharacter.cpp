@@ -13,40 +13,38 @@
 #include <../../../../../../../Source/Runtime/Engine/Classes/Kismet/GameplayStatics.h>
 #include "followCameraActor.h"
 #include "EngineUtils.h"
-#include "Maactor.h"
-#include <../../../../../../../Plugins/FX/Niagara/Source/Niagara/Public/NiagaraFunctionLibrary.h>
+#include <../../../../../../../Source/Runtime/Engine/Classes/GameFramework/SpringArmComponent.h>
+#include <../../../../../../../Source/Runtime/Engine/Classes/Camera/CameraComponent.h>
 
 ASlashCharacter::ASlashCharacter()
 {
- 	
-	PrimaryActorTick.bCanEverTick = true;
-	
-		
 
 	GetCapsuleComponent()->InitCapsuleSize(42.0f, 96.0f); //플레이어 캡슐컴포넌트 크기설정
 
-	//캐릭터가 카메라에 따라 회전하지않게조절
+	// 캐릭터가 카메라에 따라 회전하지않게조절
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationRoll = false;
 	bUseControllerRotationYaw = false;
-	
+
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 640.0f, 0.0f); //마우스랑 다를경우 초당 640만큼회전
 	GetCharacterMovement()->bConstrainToPlane = true; // 캐릭터의 이동을 평면으로 고정
 	GetCharacterMovement()->bSnapToPlaneAtStart = true; // 캐릭터의 시작을 평면으로 시작되도록 고정
 
-	
-		
-		
-		
-		
+	springArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
+	springArmComp->SetupAttachment(RootComponent);
+	springArmComp->SetUsingAbsoluteRotation(true); // Don't want arm to rotate when character does
+	springArmComp->TargetArmLength = 800.f;
+	springArmComp->SetRelativeRotation(FRotator(-60.f, 0.f, 0.f));
+	springArmComp->bDoCollisionTest = false; // Don't want to pull camera in when it collides with level
 
-		
-	
+	cameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("TopDownCamera"));
+	cameraComp->SetupAttachment(springArmComp, USpringArmComponent::SocketName);
+	cameraComp->bUsePawnControlRotation = false; // Camera does not rotate relative to arm	
 
-		
+	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bStartWithTickEnabled = true;
 }
-
 
 
 void ASlashCharacter::BeginPlay()
@@ -81,46 +79,28 @@ void ASlashCharacter::BeginPlay()
 	}
 	// ::은 스태틱함수를 의미함. 포인터를 따로 만들지않고 이름을 불러오는 것. 클래스파일로부터 직접함수를 불러올때 사용
 	// ->은 포인터 변수로부터 불러올때
-	
-	
+
+
 	targetPos = GetActorLocation();  // 일단 캐릭터의 위치에서부터 이동
 
 
 
 	Tags.Add(FName("SlashCharacter")); // 캐릭터 태그이름
-	
+
 
 	// 월드상의 뷰 타겟을 자동으로 찾아서 실행시켜줌
 	for (TActorIterator<AfollowCameraActor> it(GetWorld()); it; ++it)
 	{
-		AfollowCameraActor* mainCam = *it; 
+		AfollowCameraActor* mainCam = *it;
 		GetController<APlayerController>()->SetViewTarget(mainCam); // 뷰타겟을 찾음
 		break;
 	}
-
-	// 지팡이 붙이기
-	Attack=GetWorld()->SpawnActor<AMaactor>(Attackclass);
-	GetMesh()->HideBoneByName(TEXT("Attack"),EPhysBodyOp::PBO_None);
-	Attack->AttachToComponent(GetMesh(),FAttachmentTransformRules::KeepRelativeTransform, TEXT("Attack"));
-	Attack->SetOwner(this);
 }
-
-
-
-
-
-
-
-
-
-
 
 
 void ASlashCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	
 
 	//사용자가 입력한 방향대로 이동을 하고 싶다.
 	//FVector moveDir = FVector(); //.도 ->와 비슷한것 ->는 변수가 포인터일때, .는 그냥 클래스가 인스턴스 일때 사용.
@@ -132,7 +112,7 @@ void ASlashCharacter::Tick(float DeltaTime)
 		AddMovementInput(dir.GetSafeNormal());  // 마우스가 찍은 위치로
 	}
 	// 회전 값 주기
-	
+
 
 }
 
@@ -142,9 +122,8 @@ void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	UEnhancedInputComponent* enhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent);
-	
 
+	UEnhancedInputComponent* enhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent);
 
 	if (enhancedInputComponent != nullptr)
 	{
@@ -153,27 +132,32 @@ void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		//enhancedInputComponent->BindAction(ia_move, ETriggerEvent::Completed, this, &ASlashCharacter::SetInputDirection); //컴플릿티드도 해줘야 누를때만 작동.
 		//this 는 현재 값을 말함.
 		// 다른클래스에서 똑같은 이름의 변수를 가져올 수 있으므로 파일명을 앞에 써주는게 좋음 AShootingPlayer::SetInputDirection처럼.
-		enhancedInputComponent->BindAction(ia_Jump, ETriggerEvent::Triggered, this, &ASlashCharacter::SetInputJemp); // 일단 캐릭터 점프를 가져옴
-		enhancedInputComponent->BindAction(ia_attack, ETriggerEvent::Started, this,&ASlashCharacter::shoot);
-	}
+		enhancedInputComponent->BindAction(ia_Jump, ETriggerEvent::Triggered, this, &ASlashCharacter::SetInputJump); // 일단 캐릭터 점프를 가져옴
 
-	
-		
+	}
 }
+
+
+
+
+
+
+
+
 void ASlashCharacter::Move(FVector direction, float deltaTime)
 {
 	// direction의 방향으로 이동한다.
 	// 이동 구성 요소: 방향, 속력, 시간 
 	FVector prevLocation = GetActorLocation(); // 현재위치값을 브리뷰 로케이션에 담는다. 원본에는 지장을주지않음.
 	FVector nextLocation = prevLocation + direction * speed * deltaTime;
-	SetActorLocation(nextLocation, true);  // bSweep은 바닥을 쓸다라는 뜻으로 기본값 flase가 되어있음. true로 바꿔주면 앞에 뭐가있는지 체크를 하면서 이동함.
+	SetActorLocation(nextLocation, true);  // bSweep은 바닥을 쓸다라는 뜻으로 기본값 false가 되어있음. true로 바꿔주면 앞에 뭐가있는지 체크를 하면서 이동함.
 
 	//SetActorLocation(GetActorLocation() + direction * speed * deltaTime); 위에를 줄여쓰면 이렇게 사용가능.
-
 }
+
 void ASlashCharacter::SetInputDirection(const FInputActionValue& value)
 {
-	
+
 	bool isPressed = value.Get<bool>();   // .이 캐스트의 의미 , 개발자가 어떻게 만들지 예측할 수 없어서 이런식으로 작성
 	if (isPressed)
 	{
@@ -192,81 +176,43 @@ void ASlashCharacter::SetInputDirection(const FInputActionValue& value)
 		{
 			targetPos = hitInfo.ImpactPoint;    //히트된 좌표
 			targetPos.Z = GetActorLocation().Z;   //z 좌표를 플레이어의 좌표로 설정
-			
-
 			// 좌표 설정 확인
-			DrawDebugSphere(GetWorld(), hitInfo.ImpactPoint, 10.0f, 15, FColor::Red, false, 3, 1, 1);
+			//DrawDebugSphere(GetWorld(), hitInfo.ImpactPoint, 10.0f, 15, FColor::Red, false, 3, 1, 1);
 			//UE_LOG(LogTemp, Warning, TEXT("%.1f, %.1f, %.1f"), hitInfo.ImpactPoint.X, hitInfo.ImpactPoint.Y, hitInfo.ImpactPoint.Z);
-			
 		}
 
 		//DrawDebugSphere(GetWorld(), mousePos, 1.0f, 5, FColor::Red, false, -1, 1, 1);
-
 		// 월드 포지션z를 캐릭터캡슐컬리전으로 두고
-
-		
-		
-
-		
-		
-		
-		
-
-
-
-
 	}
+}
 
-	}
-
-void ASlashCharacter::SetInputJemp(const FInputActionValue& value)
+void ASlashCharacter::SetInputJump(const FInputActionValue& value)
 {	// 점프미완성
 	bool isPressed = value.Get<bool>();
 	if (isPressed)
 	{
 		//FVector SetActorLocation() = GetActorLocation() + FVector(-500, 100, 600);
-
 	}
-
-
-
-
 }
-
-void ASlashCharacter::shoot(const FInputActionValue& value)
-{
-
-	
-	Attack->PullTrigger();
-	//UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NI_BASIC, SetInputDirection(true), GetActorRotation());
-
-}
+*/
 
 
+// 장비 시스템
+//OverlappingWeapon->SetOwner(this);  // 무기가 장착되면 소유자로 인식
+//OverlappingWeapon->SetInstigator(this);
 
 
+/*   void overlapEvent   데미지 시스템*
+*
+*  UGamePlayStatics::ApplyDamage(
+*		Box.Hit.GetActor(),
+*		Damage,
+*		GetInstigetor()->GetController(),
+*		this,
+*		UDamageType::StaticClass()
+*		);
+*/
 
 
-	 // 장비 시스템
-	//OverlappingWeapon->SetOwner(this);  // 무기가 장착되면 소유자로 인식
-	//OverlappingWeapon->SetInstigator(this);
-
-
-	/*   void overlapEvent   데미지 시스템
-	* 
-	* 
-	* 
-	* 
-	*  UGamePlayStatics::ApplyDamage(
-	*		Box.Hit.GetActor(),
-	*		Damage,
-	*		GetInstigetor()->GetController(),
-	*		this,
-	*		UDamageType::StaticClass()
-	*		);
-	* 
-	*/
-
-
-	// CharacterState = ECharacterState::ECS_EquippedOneHandedWeapon;
-	// 캐릭터 전투상태 만들기 E키를 눌렀을때로 설정해줘야함
+// CharacterState = ECharacterState::ECS_EquippedOneHandedWeapon;
+// 캐릭터 전투상태 만들기 E키를 눌렀을때로 설정해줘야함
