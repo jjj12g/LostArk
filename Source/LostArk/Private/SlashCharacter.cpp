@@ -14,8 +14,11 @@
 #include "followCameraActor.h"
 #include "EngineUtils.h"
 #include "Maactor.h"
+#include <../../../../../../../Source/Runtime/Engine/Classes/GameFramework/SpringArmComponent.h>
+#include <../../../../../../../Source/Runtime/Engine/Classes/Camera/CameraComponent.h>
 #include <../../../../../../../Plugins/FX/Niagara/Source/Niagara/Public/NiagaraFunctionLibrary.h>
 #include "MybulletActor.h"
+#include "PlayerAnimInstance.h"
 
 
 ASlashCharacter::ASlashCharacter()
@@ -37,13 +40,27 @@ ASlashCharacter::ASlashCharacter()
 	GetCharacterMovement()->bConstrainToPlane = true; // 캐릭터의 이동을 평면으로 고정
 	GetCharacterMovement()->bSnapToPlaneAtStart = true; // 캐릭터의 시작을 평면으로 시작되도록 고정
 
-	
+
+	springArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
+	springArmComp->SetupAttachment(RootComponent);
+	springArmComp->SetUsingAbsoluteRotation(true); // Don't want arm to rotate when character does
+	springArmComp->TargetArmLength = 1000.0f;
+	springArmComp->SetRelativeRotation(FRotator(-60.f, 350.f, 0.f));
+	springArmComp->bDoCollisionTest = false; // Don't want to pull camera in when it collides with level
+
+	cameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("TopDownCamera"));
+	cameraComp->SetupAttachment(springArmComp, USpringArmComponent::SocketName);
+	cameraComp->bUsePawnControlRotation = false; // Camera does not rotate relative to arm	
+	cameraComp->SetRelativeLocation(FVector(30, 0, -550));
+	cameraComp->SetRelativeRotation(FRotator(37, 0, 0));
+
+
+	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bStartWithTickEnabled = true;
 		
 		
 	SpawnLocation = CreateDefaultSubobject<USceneComponent>(TEXT("bullet spawn point"));
 	SpawnLocation->SetupAttachment(GetMesh());
-
-		
 	
 
 		
@@ -92,7 +109,7 @@ void ASlashCharacter::BeginPlay()
 
 	Tags.Add(FName("SlashCharacter")); // 캐릭터 태그이름
 	
-
+	/*
 	// 월드상의 뷰 타겟을 자동으로 찾아서 실행시켜줌
 	for (TActorIterator<AfollowCameraActor> it(GetWorld()); it; ++it)
 	{
@@ -100,6 +117,7 @@ void ASlashCharacter::BeginPlay()
 		GetController<APlayerController>()->SetViewTarget(mainCam); // 뷰타겟을 찾음
 		break;
 	}
+	*/
 
 	// 지팡이 붙이기
 	Attack=GetWorld()->SpawnActor<AMaactor>(Attackclass);
@@ -120,18 +138,6 @@ AActor* ASlashCharacter::ShootBullet()
 	return SpawandActor;
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 // 데미지 시스템
 float ASlashCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -166,8 +172,10 @@ void ASlashCharacter::Tick(float DeltaTime)
 	}
 	// 회전 값 주기
 
-	
-	
+	else {
+		playerAnim = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
+		playerAnim->bRunMotionOn = false;
+	}
 
 }
 

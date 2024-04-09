@@ -77,7 +77,12 @@ public:
 
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	// 카메라 관련 변수 선언
+	UPROPERTY(VisibleAnywhere, Category="MySettings|Components")
+	class UCameraComponent* cameraComp;
 
+	UPROPERTY(VisibleAnywhere, Category="MySettings|Components")
+	class USpringArmComponent* springArmComp;
 	// 캐릭터 움직임 구현
 	UPROPERTY(EditAnywhere, Category = "MySettings")
 	class UInputMappingContext* imc_myMapping;
@@ -121,35 +126,31 @@ public:
 		//공격
 	UFUNCTION()
 	void Shoot(const FInputActionValue& value);
+
+	UPROPERTY(EditAnywhere, Category="MySettings|Animations")
+	class UAnimMontage* move_montage;
+
+
 	
 private:   //나만 사용가능하다는 뜻 , 외부에서 호출할게 아니면 여기서 작성하는게 좋음
 
 	ECharacterState CharacterState = ECharacterState::ECS_Unequipped; // 캐릭터상태 평상시
-
-
 		
 		//UPROPERTY(EditAnyWhere, Category = "Damage)
-		//float Damage = 20.f;
-
-	
-		
-
-		
+		//float Damage = 20.f;				
 
 		//이동
 	UFUNCTION(BlueprintCallable)
 	void Move(FVector direction, float deltaTime);    // 첫번째 매개변수는 값을 지정해주지 못함
 
 
-
-
 	 //입력값을 받기위해 만든 함수 매개변수는 꼭 저 자료형으로 해줘야함.
 	// 바인딩할거는 앞에 꼭 UFUNCTION()을 붙여주기. 이 함수가 있다는걸 언리얼 에디터에서 미리 알아야 하므로.
 	UFUNCTION()
-	void SetInputJemp(const FInputActionValue& value); // 점프 미완성
-
-	 
+	void SetInputJemp(const FInputActionValue& value); // 점프 미완성	 
 	
+	UPROPERTY()
+	class UPlayerAnimInstance* playerAnim;
 
 };
 
