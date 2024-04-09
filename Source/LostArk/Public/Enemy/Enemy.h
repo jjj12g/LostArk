@@ -24,37 +24,74 @@ class LOSTARK_API AEnemy : public ABaseCharacter, public IHitInterface
 {
 	GENERATED_BODY()
 
+
 public:
 	AEnemy();
 
-	UPROPERTY(EditAnywhere)
-	class UNiagaraSystem* NI_Bossskill1;
-
-
-	USceneComponent* NiagaraSceneComp;
-	class UNiagaraComponent* NiagaraComp;
-
-
+	/** <AActor> */
 	virtual void Tick(float DeltaTime) override;
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigetor, AActor* DamageCauser) override; // 데미지시스템
+	//virtual void Destroyed() override;
+	/** </AActor> */
+
+
+	/** <IHitInterface>  */
+	virtual void GetHit_Implementation(const FVector& ImpactPoint) override;
+	/** </IHitInterface>  */
+
+protected:
+	/** <AActor> */
+	virtual void BeginPlay() override;
+	/** </AActor> */
+
+	/** <ABaseCharacter> */
+	virtual void Die() override;
+	virtual void Attack() override;  // 공격
+	virtual bool CanAttack() override;
+	virtual void AttackEnd() override;
+	virtual void HandleDamage(float DamageAmount) override;
+	virtual int32 PlayDeathMontage() override;
+	/** </ABaseCharacter> */
+
+	UPROPERTY(BlueprintReadOnly)
+	TEnumAsByte <EDeathPose> DeathPose; // 죽음 모션
+
+	UPROPERTY(BlueprintReadOnly)
+	EEnemyState EnemyState = EEnemyState::EES_Patrolling; //애니메이션 순찰에들어감
+
+	//void PlayHitReactMontage(const FName& SectionName);
+
+private:
+	/** AI behavior(행동) */
+	void InitializeEnemy(); // 비긴플레이에서 실행할 초기화함수
 	void CheckPatrolTarget();
 	void CheckCombatTarget();
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-
-	virtual void GetHit(const FVector& ImpactPoint) override;
-	//virtual void GetHit_Implementation(const FVector& ImpactPoint) override;
-	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigetor, AActor* DamageCauser) override; // 데미지시스템
-
+	void PatrolTimerFinished(); // 순찰 타이머가 끝나면 실행
+	void HideHealthBar();
+	void ShowHealthBar();
+	void LoseInterest();
+	void StartPatrolling();  // 순찰시작
+	void ChaseTarget();
+	bool IsOutsideCombatRadius(); // 공격범위에 아무도없어서 순찰
+	bool IsOutsideAttackRadius(); // 공격범위 밖 타겟 추격
+	bool IsInsideAttackRadius();
+	bool IsChasing();
+	bool IsAttacking();
+	bool IsDead();
+	bool IsEngaged();
+	void ClearPatrolTimer(); // 순찰시간
+	void StartAttackTimer(); /** Combat */
+	void ClearAttackTimer(); /** Combat */
+	bool InTargetRange(AActor* Target, double Radius); // 타깃이 범위내에 있다면 true값 반환     수용반경
+	void MoveToTarget(AActor* Target);   //순찰시간끝나면 이동
+	AActor* ChoosePatrolTarget(); //새 표적 선택하기
 	
 
-	
-private:
-	
-
+	UFUNCTION()
+	void PawnSeen(APawn* SeenPawn); // Callback for OnPawnSeen in UPawnSensingComponent
 
 	UPROPERTY(VisibleAnywhere)
 	UHealthBarComponent* HealthBarWidget; //hp 바
-
 
 	UPROPERTY(VisibleAnywhere)
 	UPawnSensingComponent* PawnSensing; // 폰의 위치감지(시각, 청각) 컴포넌트 생성
@@ -62,37 +99,22 @@ private:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class AWeapon> WeaponClass;
 
-
-
-	/*
-	* Components
-	*/
-	
-	
-
-
-	// 대상
 	UPROPERTY()
 	AActor* CombatTarget;
 
-
 	//이동속도
 	UPROPERTY(EditAnywhere)
-	double CombatRadius = 1000.f; 
+	double CombatRadius = 1000.f;
 
 	UPROPERTY(EditAnywhere)
 	double AttackRadius = 300.f;   // 공격 반경
-
-	/** 
-	*Navigation 
-	*/
 
 	UPROPERTY()
 	class AAIController* EnemyController;  //액터가 지시사항 전달 컨트롤러에 변수설정
 
 	// 현재 순찰 대상, 배열로 갖게될것임
 	UPROPERTY(EditInstanceOnly, Category = "AI Navigation")
-	AActor* PatrolTarget;  
+	AActor* PatrolTarget;
 
 	UPROPERTY(EditInstanceOnly, Category = "AI Navigation")
 	TArray<AActor*> PatrolTargets;
@@ -102,55 +124,30 @@ private:
 	double PatrolRadius = 200.f;
 
 	FTimerHandle PatrolTimer;  // 순찰 타이머
-	void PatrolTimerFinished(); // 순찰 타이머가 끝나면 실행
-
 	
-	
-
 	// 최소순찰시간 최대순찰시간 배정
 	UPROPERTY(EditAnywhere, Category = "AI Navigation")
-	float WaitMin = 5.f;
+	float PatrolWaitMin = 5.f;
 
 	UPROPERTY(EditAnywhere, Category = "AI Navigation")
-	float WaitMax = 10.f;
+	float PatrolWaitMax = 10.f;
 
+	// 순찰 속도
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	float patrollingSpeed = 125.f;
 	
+	FTimerHandle AttackTimer;
 	
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	float AttackMin = 0.5f;
 
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	float AttackMax = 1.0f;
 
-
-protected:
-	virtual void BeginPlay() override;
-
-	void Die();
-
-	void PlayHitReactMontage(const FName& SectionName);
-
-	// 타깃이 범위내에 있다면 true값 반환     수용반경
-	bool InTargetRange(AActor* Target, double Radius);
-	void MoveToTarget(AActor* Target);   //순찰시간끝나면 이동
-	AActor* ChoosePatrolTarget(); //새 표적 선택하기
-	virtual void Attack() override;  // 공격
-	virtual void PlayAttackMontage() override; // 공격모션
+	// 순찰 타겟발견했을때의 속도
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	float ChasingSpeed = 300.f;
 	
-
-
-	UFUNCTION()
-	void PawnSeen(APawn* SeenPawn); // 델리게이트
-
-	UPROPERTY(BlueprintReadOnly)
-	EDeathPose DeathPose = EDeathPose::EDP_Alive; // 적이 죽을때마다 설정 가능
-
-	UPROPERTY(BlueprintReadOnly)
-	EEnemyState EnemyState = EEnemyState::EES_Patrolling; //애니메이션 순찰에들어감
-
-	
-
-
-
-public:	
-	
-	
-
-
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	float DeathLifeSpan = 8.0f;
 };

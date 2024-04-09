@@ -22,7 +22,7 @@ class LOSTARK_API IHitInterface
 
 	
 public:
-	virtual void GetHit(const FVector& ImpactPoint) = 0;
+	virtual void GetHit_Implementation(const FVector& ImpactPoint) = 0;
 
 
 

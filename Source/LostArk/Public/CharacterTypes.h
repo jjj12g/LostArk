@@ -19,12 +19,16 @@ enum class ECharacterState : uint8 // 캐릭터의 현 상태에 따라 행동이 달라짐, 앞�
 
 
 
+
+
+// 데스포즈 
 UENUM(BlueprintType)
-enum class EDeathPose : uint8
+enum EDeathPose 
 {
-	EDP_Alive UMETA(DisplayName = "Alive"), // 살아있음
-	EDP_Death1 UMETA(DisplayName = "Death1"), // 데스포즈 1
+	EDP_Death1 UMETA(DisplayName = "Death1"), // 정수임 첫번째니 0 밑에서부터 1
+	EDP_Death2 UMETA(DisplayName = "Death2"), 
 	
+	EDP_MAX UMETA(DisplayName = "DefaultMAX"), // 여러가지값이 한번에 나오는 것 방지 , 열핵상수 범위를 벗어나지않도록
 };
 
 
@@ -37,6 +41,7 @@ enum class EEnemyState : uint8
 	EES_Patrolling UMETA(DisplayName = "Patrolling"), // 순찰
 	EES_Chasing UMETA(DisplayName = "Chasing"),  // 추격
 	EES_Attacking UMETA(DisplayName = "Attacking"), //공격
-	EES_Engaged UMETA(DisplayName = "Engaged"),
-
+	EES_Engaged UMETA(DisplayName = "Engaged"), // 더 공격적
+	
+	EES_NoState UMETA(DisplayName = "NoState"),
 };

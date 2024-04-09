@@ -194,7 +194,7 @@ void ASlashCharacter::SetInputJump(const FInputActionValue& value)
 		//FVector SetActorLocation() = GetActorLocation() + FVector(-500, 100, 600);
 	}
 }
-*/
+
 
 
 // 장비 시스템
