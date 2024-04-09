@@ -25,7 +25,6 @@ ASlashCharacter::ASlashCharacter()
 {
  	
 	PrimaryActorTick.bCanEverTick = true;
-	
 		
 
 	GetCapsuleComponent()->InitCapsuleSize(42.0f, 96.0f); //플레이어 캡슐컴포넌트 크기설정
@@ -40,7 +39,6 @@ ASlashCharacter::ASlashCharacter()
 	GetCharacterMovement()->bConstrainToPlane = true; // 캐릭터의 이동을 평면으로 고정
 	GetCharacterMovement()->bSnapToPlaneAtStart = true; // 캐릭터의 시작을 평면으로 시작되도록 고정
 
-
 	springArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	springArmComp->SetupAttachment(RootComponent);
 	springArmComp->SetUsingAbsoluteRotation(true); // Don't want arm to rotate when character does
@@ -51,19 +49,18 @@ ASlashCharacter::ASlashCharacter()
 	cameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("TopDownCamera"));
 	cameraComp->SetupAttachment(springArmComp, USpringArmComponent::SocketName);
 	cameraComp->bUsePawnControlRotation = false; // Camera does not rotate relative to arm	
-	cameraComp->SetRelativeLocation(FVector(30, 0, -550));
-	cameraComp->SetRelativeRotation(FRotator(37, 0, 0));
-
+	cameraComp->SetRelativeLocation(FVector(-427, 0, -295));
+	cameraComp->SetRelativeRotation(FRotator(9.5, 0, 0));
 
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
-		
-		
-	SpawnLocation = CreateDefaultSubobject<USceneComponent>(TEXT("bullet spawn point"));
-	SpawnLocation->SetupAttachment(GetMesh());
 	
+	staffMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Staff Mesh"));
+	staffMeshComp->SetupAttachment(GetMesh(), FName("StaffSocket"));
 
 		
+	SpawnLocation = CreateDefaultSubobject<USceneComponent>(TEXT("bullet spawn point"));
+	SpawnLocation->SetupAttachment(GetMesh());		
 }
 
 
@@ -100,15 +97,11 @@ void ASlashCharacter::BeginPlay()
 		UE_LOG(LogTemp, Error, TEXT("PlayerController is Null !"));
 	}
 	// ::은 스태틱함수를 의미함. 포인터를 따로 만들지않고 이름을 불러오는 것. 클래스파일로부터 직접함수를 불러올때 사용
-	// ->은 포인터 변수로부터 불러올때
-	
+	// ->은 포인터 변수로부터 불러올때	
 	
 	targetPos = GetActorLocation();  // 일단 캐릭터의 위치에서부터 이동
 
-
-
-	Tags.Add(FName("SlashCharacter")); // 캐릭터 태그이름
-	
+	Tags.Add(FName("SlashCharacter")); // 캐릭터 태그이름	
 	/*
 	// 월드상의 뷰 타겟을 자동으로 찾아서 실행시켜줌
 	for (TActorIterator<AfollowCameraActor> it(GetWorld()); it; ++it)
@@ -127,8 +120,7 @@ void ASlashCharacter::BeginPlay()
 }
 
 AActor* ASlashCharacter::ShootBullet()
-{
-	
+{	
 	FVector toward = targetPos - GetActorLocation();
 
 	FActorSpawnParameters SpawnParams;
@@ -136,7 +128,6 @@ AActor* ASlashCharacter::ShootBullet()
 	//AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn, SpawnLocation->GetComponentLocation(), toward.Rotation(), SpawnParams);
 	AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn, SpawnLocation->GetComponentLocation(), GetActorRotation(), SpawnParams);
 	return SpawandActor;
-
 }
 
 // 데미지 시스템
@@ -149,6 +140,7 @@ float ASlashCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 	}
 	return DamageAmount;
 }
+
 //입력바인딩 통해 발사
 void ASlashCharacter::FireBullet(const FInputActionValue& value)
 {
@@ -157,9 +149,7 @@ void ASlashCharacter::FireBullet(const FInputActionValue& value)
 
 void ASlashCharacter::Tick(float DeltaTime)
 {
-	Super::Tick(DeltaTime);
-
-	
+	Super::Tick(DeltaTime);	
 
 	//사용자가 입력한 방향대로 이동을 하고 싶다.
 	//FVector moveDir = FVector(); //.도 ->와 비슷한것 ->는 변수가 포인터일때, .는 그냥 클래스가 인스턴스 일때 사용.
@@ -168,15 +158,15 @@ void ASlashCharacter::Tick(float DeltaTime)
 
 	if (dir.Length() > 100)   // 플레이어의 컬리전이 1미터쯤되니 1미터이상일때만 움직이도록
 	{
-		AddMovementInput(dir.GetSafeNormal());  // 마우스가 찍은 위치로
+		AddMovementInput(dir.GetSafeNormal());  // 마우스가 찍은 위치로		
 	}
 	// 회전 값 주기
 
-	else {
+	else 
+	{
 		playerAnim = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
 		playerAnim->bRunMotionOn = false;
 	}
-
 }
 
 
@@ -185,8 +175,7 @@ void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	UEnhancedInputComponent* enhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent);
-	
+	UEnhancedInputComponent* enhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent);	
 
 
 	if (enhancedInputComponent != nullptr)
@@ -196,14 +185,21 @@ void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		//enhancedInputComponent->BindAction(ia_move, ETriggerEvent::Completed, this, &ASlashCharacter::SetInputDirection); //컴플릿티드도 해줘야 누를때만 작동.
 		//this 는 현재 값을 말함.
 		// 다른클래스에서 똑같은 이름의 변수를 가져올 수 있으므로 파일명을 앞에 써주는게 좋음 AShootingPlayer::SetInputDirection처럼.
-		enhancedInputComponent->BindAction(ia_Jump, ETriggerEvent::Triggered, this, &ASlashCharacter::SetInputJemp); // 일단 캐릭터 점프를 가져옴
+		enhancedInputComponent->BindAction(ia_Jump, ETriggerEvent::Triggered, this, &ASlashCharacter::SetInputJump); // 일단 캐릭터 점프를 가져옴
 		enhancedInputComponent->BindAction(ia_attack, ETriggerEvent::Started, this,&ASlashCharacter::Shoot);
 		enhancedInputComponent->BindAction(ia_Fire, ETriggerEvent::Triggered, this, &ASlashCharacter::FireBullet);
-	}
 
-	
-		
+		enhancedInputComponent->BindAction(ia_Q, ETriggerEvent::Triggered, this, &ASlashCharacter::Q);
+		enhancedInputComponent->BindAction(ia_W, ETriggerEvent::Triggered, this, &ASlashCharacter::W);
+		enhancedInputComponent->BindAction(ia_E, ETriggerEvent::Triggered, this, &ASlashCharacter::E);
+		enhancedInputComponent->BindAction(ia_R, ETriggerEvent::Triggered, this, &ASlashCharacter::R);
+		enhancedInputComponent->BindAction(ia_A, ETriggerEvent::Triggered, this, &ASlashCharacter::A);
+		enhancedInputComponent->BindAction(ia_S, ETriggerEvent::Triggered, this, &ASlashCharacter::S);
+		enhancedInputComponent->BindAction(ia_D, ETriggerEvent::Triggered, this, &ASlashCharacter::D);
+		enhancedInputComponent->BindAction(ia_F, ETriggerEvent::Triggered, this, &ASlashCharacter::F);
+	}		
 }
+
 void ASlashCharacter::Move(FVector direction, float deltaTime)
 {
 	// direction의 방향으로 이동한다.
@@ -213,11 +209,10 @@ void ASlashCharacter::Move(FVector direction, float deltaTime)
 	SetActorLocation(nextLocation, true);  // bSweep은 바닥을 쓸다라는 뜻으로 기본값 flase가 되어있음. true로 바꿔주면 앞에 뭐가있는지 체크를 하면서 이동함.
 
 	//SetActorLocation(GetActorLocation() + direction * speed * deltaTime); 위에를 줄여쓰면 이렇게 사용가능.
-
 }
+
 void ASlashCharacter::SetInputDirection(const FInputActionValue& value)
-{
-	
+{	
 	bool isPressed = value.Get<bool>();   // .이 캐스트의 의미 , 개발자가 어떻게 만들지 예측할 수 없어서 이런식으로 작성
 	if (isPressed)
 	{
@@ -235,47 +230,70 @@ void ASlashCharacter::SetInputDirection(const FInputActionValue& value)
 		if (GetWorld()->LineTraceSingleByChannel(hitInfo, WorldPosition, WorldPosition + WorldDirection * 10000, ECC_Visibility))
 		{
 			targetPos = hitInfo.ImpactPoint;    //히트된 좌표
-			targetPos.Z = GetActorLocation().Z;   //z 좌표를 플레이어의 좌표로 설정
-			
+			targetPos.Z = GetActorLocation().Z;   //z 좌표를 플레이어의 좌표로 설정		
 
 			// 좌표 설정 확인
 			DrawDebugSphere(GetWorld(), hitInfo.ImpactPoint, 10.0f, 15, FColor::Red, false, 3, 1, 1);
-			//UE_LOG(LogTemp, Warning, TEXT("%.1f, %.1f, %.1f"), hitInfo.ImpactPoint.X, hitInfo.ImpactPoint.Y, hitInfo.ImpactPoint.Z);
-			
+			//UE_LOG(LogTemp, Warning, TEXT("%.1f, %.1f, %.1f"), hitInfo.ImpactPoint.X, hitInfo.ImpactPoint.Y, hitInfo.ImpactPoint.Z);			
 		}
 
 		//DrawDebugSphere(GetWorld(), mousePos, 1.0f, 5, FColor::Red, false, -1, 1, 1);
 
 		// 월드 포지션z를 캐릭터캡슐컬리전으로 두고
 
-		
-		
-
-		
-		
-		
-		
-
-
-
-
+		playerAnim = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
+		playerAnim->bRunMotionOn = true;
 	}
-
-	}
-
+}
 
 
-void ASlashCharacter::SetInputJemp(const FInputActionValue& value)
+
+void ASlashCharacter::SetInputJump(const FInputActionValue& value)
 {	// 점프미완성
 	bool isPressed = value.Get<bool>();
 	if (isPressed)
 	{
 		//FVector SetActorLocation() = GetActorLocation() + FVector(-500, 100, 600);
-
 	}
+}
 
+void ASlashCharacter::Q(const FInputActionValue& value)
+{
 
+}
 
+void ASlashCharacter::W(const FInputActionValue& value)
+{
+
+}
+
+void ASlashCharacter::E(const FInputActionValue& value)
+{
+
+}
+
+void ASlashCharacter::R(const FInputActionValue& value)
+{
+
+}
+
+void ASlashCharacter::A(const FInputActionValue& value)
+{
+
+}
+
+void ASlashCharacter::S(const FInputActionValue& value)
+{
+
+}
+
+void ASlashCharacter::D(const FInputActionValue& value)
+{
+
+}
+
+void ASlashCharacter::F(const FInputActionValue& value)
+{
 
 }
 
