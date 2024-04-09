@@ -13,7 +13,7 @@ class LOSTARK_API AMaactor : public AActor
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
+	
 	AMaactor();
 	class ASlashCharacter* Playermouse;
 
@@ -22,11 +22,19 @@ public:
 	
 
 protected:
-	// Called when the game starts or when spawned
+	
 	virtual void BeginPlay() override;
 
+	UPROPERTY(EditDefaultsOnly, Category = "mysettings")
+	float Damage;
+
+	void WeaponShoot();
+
+	//UFUNCTION(BlueprintPure)
+	//float calculateDamage(float Damage, float Mutiplier);
+
 public:	
-	// Called every frame
+	
 	virtual void Tick(float DeltaTime) override;
 	
 

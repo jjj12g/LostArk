@@ -26,7 +26,7 @@ AMaactor::AMaactor()
 void AMaactor::PullTrigger()
 {
 	
-	
+
 	FVector mouse = player->targetPos;
 	FVector toward = mouse - player->GetActorLocation();
 
@@ -44,6 +44,15 @@ void AMaactor::BeginPlay()
 		player = *it;
 	}
 }
+
+void AMaactor::WeaponShoot()
+{
+}
+/*
+float AMaactor::calculateDamage(float Damage, float Mutiplier)
+{
+	return Damage* Mutiplier;
+}*/
 
 // Called every frame
 void AMaactor::Tick(float DeltaTime)
