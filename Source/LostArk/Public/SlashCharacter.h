@@ -83,6 +83,10 @@ public:
 
 	UPROPERTY(VisibleAnywhere, Category="MySettings|Components")
 	class USpringArmComponent* springArmComp;
+
+	UPROPERTY(VisibleAnywhere, Category="MySettings|Components")
+	class UStaticMeshComponent* staffMeshComp;
+
 	// 캐릭터 움직임 구현
 	UPROPERTY(EditAnywhere, Category = "MySettings")
 	class UInputMappingContext* imc_myMapping;
@@ -96,8 +100,32 @@ public:
 	UPROPERTY(EditAnywhere, Category="MySettings")
 	class UInputAction* ia_attack;
 
-	UPROPERTY(EditAnywhere, Category="MySettings")
+	UPROPERTY(EditAnywhere, Category = "MySettings")
 	class UInputAction* ia_Fire;
+
+	UPROPERTY(EditAnywhere, Category = "MySettings\Skills")
+	class UInputAction* ia_Q;
+
+	UPROPERTY(EditAnywhere, Category = "MySettings\Skills")
+	class UInputAction* ia_W;
+
+	UPROPERTY(EditAnywhere, Category = "MySettings\Skills")
+	class UInputAction* ia_E;
+
+	UPROPERTY(EditAnywhere, Category = "MySettings\Skills")
+	class UInputAction* ia_R;
+
+	UPROPERTY(EditAnywhere, Category = "MySettings\Skills")
+	class UInputAction* ia_A;
+
+	UPROPERTY(EditAnywhere, Category = "MySettings\Skills")
+	class UInputAction* ia_S;
+
+	UPROPERTY(EditAnywhere, Category = "MySettings\Skills")
+	class UInputAction* ia_D;
+
+	UPROPERTY(EditAnywhere, Category = "MySettings\Skills")
+	class UInputAction* ia_F;
 
 	UPROPERTY(EditAnywhere, Category = "MySettings")
 	float speed = 500.0f; // 스피드
@@ -110,8 +138,7 @@ public:
 	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState;} // 캐릭터애니메이션쪽에서 캐릭터상태를 가져가기위한세팅
 
 	UFUNCTION() 
-	void SetInputDirection(const FInputActionValue& value);
-	
+	void SetInputDirection(const FInputActionValue& value);	
 
 	// 공격 모션 만들기
 	UPROPERTY(EditAnywhere, Category = "Mysettings")
@@ -123,7 +150,7 @@ public:
 	UPROPERTY()
 	AMaactor* Attack;
 
-		//공격
+	//공격
 	UFUNCTION()
 	void Shoot(const FInputActionValue& value);
 
@@ -143,15 +170,37 @@ private:   //나만 사용가능하다는 뜻 , 외부에서 호출할게 아니면 여기서 작성하는게
 	UFUNCTION(BlueprintCallable)
 	void Move(FVector direction, float deltaTime);    // 첫번째 매개변수는 값을 지정해주지 못함
 
-
 	 //입력값을 받기위해 만든 함수 매개변수는 꼭 저 자료형으로 해줘야함.
 	// 바인딩할거는 앞에 꼭 UFUNCTION()을 붙여주기. 이 함수가 있다는걸 언리얼 에디터에서 미리 알아야 하므로.
 	UFUNCTION()
-	void SetInputJemp(const FInputActionValue& value); // 점프 미완성	 
+	void SetInputJump(const FInputActionValue& value); // 점프 미완성	 
 	
 	UPROPERTY()
 	class UPlayerAnimInstance* playerAnim;
 
+	UFUNCTION()
+	void Q(const FInputActionValue& value);
+
+	UFUNCTION()
+	void W(const FInputActionValue& value);
+
+	UFUNCTION()
+	void E(const FInputActionValue& value);
+
+	UFUNCTION()
+	void R(const FInputActionValue& value);
+
+	UFUNCTION()
+	void A(const FInputActionValue& value);
+
+	UFUNCTION()
+	void S(const FInputActionValue& value);
+
+	UFUNCTION()
+	void D(const FInputActionValue& value);
+
+	UFUNCTION()
+	void F(const FInputActionValue& value);
 };
 
 
