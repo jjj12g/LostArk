@@ -198,12 +198,32 @@ void ASlashCharacter::Tick(float DeltaTime)
 	}
 	// 회전 값 주기
 
-	else {
+	else
+	{
 		playerAnim = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
 		playerAnim->bRunMotionOn = false;
 	}
 
 	//PlayerCharacter->SetActorRotation(ShootRot);
+
+
+
+	if (bPlayerIsInvisible) // 플레이어가 쉬프트 투명 상태라면,
+	{
+		// targetPos 목표 위치에 도달했을 때
+		if (dir.Length() < 30)
+		{
+			// targetPos으로 플레이어의 위치를 설정하고
+			SetActorLocation(targetPos);
+			// Set Visibility를 true로 설정하여 플레이어의 모습을 다시 나타낸다.
+			GetMesh()->SetVisibility(true, true);
+			// 플레이어 이동속도 원상복귀
+			GetCharacterMovement()->MaxWalkSpeed = 600;
+			GetCharacterMovement()->MaxAcceleration = 2048;
+			// 투명 상태 여부 초기화
+			bPlayerIsInvisible = false;
+		}
+	}
 }
 
 
@@ -226,6 +246,8 @@ void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		enhancedInputComponent->BindAction(ia_Jump, ETriggerEvent::Triggered, this, &ASlashCharacter::SetInputJemp); // 일단 캐릭터 점프를 가져옴
 		enhancedInputComponent->BindAction(ia_attack, ETriggerEvent::Started, this, &ASlashCharacter::Shoot);
 		enhancedInputComponent->BindAction(ia_Fire, ETriggerEvent::Started, this, &ASlashCharacter::FireBullet);
+
+		enhancedInputComponent->BindAction(ia_shift, ETriggerEvent::Started, this, &ASlashCharacter::ShiftStarted);
 	}
 
 
@@ -240,8 +262,28 @@ void ASlashCharacter::Move(FVector direction, float deltaTime)
 	SetActorLocation(nextLocation, true);  // bSweep은 바닥을 쓸다라는 뜻으로 기본값 flase가 되어있음. true로 바꿔주면 앞에 뭐가있는지 체크를 하면서 이동함.
 
 	//SetActorLocation(GetActorLocation() + direction * speed * deltaTime); 위에를 줄여쓰면 이렇게 사용가능.
-
 }
+
+void ASlashCharacter::ShiftStarted(const FInputActionValue& value)
+{
+	// 스페이스바 입력이 들어오면
+	UE_LOG(LogTemp, Warning, (TEXT("spacebar")));
+
+	// 플레이어 위치와 목표 좌표의 거리가 100이상일 때
+	FVector distance = targetPos - GetActorLocation();
+	if (distance.Length() > 100.0f && GetCharacterMovement()->GetLastUpdateVelocity().Length() > 0)
+	{
+		// Set Visibility를 false로 설정하여 플레이어의 모습을 감춘다.
+		GetMesh()->SetVisibility(false, true);
+		// 모습이 감춰져 있는 동안 이동 속도를 평상시보다 더 빠르게 설정한다.
+		GetCharacterMovement()->MaxWalkSpeed = 1800;
+		GetCharacterMovement()->MaxAcceleration = 6000;
+		// 플레이어는 투명상태 : true로 설정
+		bPlayerIsInvisible = true;
+	}
+}
+
+
 void ASlashCharacter::SetInputDirection(const FInputActionValue& value)
 {
 

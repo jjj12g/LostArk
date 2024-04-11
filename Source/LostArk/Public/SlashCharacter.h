@@ -114,6 +114,9 @@ public:
 	class UInputAction* ia_attack;
 
 	UPROPERTY(EditAnywhere, Category="MySettings")
+	class UInputAction* ia_shift;
+
+	UPROPERTY(EditAnywhere, Category="MySettings")
 	class UInputAction* ia_Fire;
 
 	UPROPERTY(EditAnywhere, Category = "MySettings")
@@ -160,6 +163,8 @@ private:   //나만 사용가능하다는 뜻 , 외부에서 호출할게 아니면 여기서 작성하는게
 	UFUNCTION(BlueprintCallable)
 	void Move(FVector direction, float deltaTime);    // 첫번째 매개변수는 값을 지정해주지 못함
 
+	UFUNCTION()
+	void ShiftStarted(const FInputActionValue& value); // 스페이스바 인풋 액션으로 쉬프트 함수 실행하기
 
 	 //입력값을 받기위해 만든 함수 매개변수는 꼭 저 자료형으로 해줘야함.
 	// 바인딩할거는 앞에 꼭 UFUNCTION()을 붙여주기. 이 함수가 있다는걸 언리얼 에디터에서 미리 알아야 하므로.
@@ -169,6 +174,8 @@ private:   //나만 사용가능하다는 뜻 , 외부에서 호출할게 아니면 여기서 작성하는게
 	UPROPERTY()
 	class UPlayerAnimInstance* playerAnim;
 
+	UPROPERTY()
+	bool bPlayerIsInvisible=false;
 };
 
 
