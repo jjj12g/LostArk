@@ -143,6 +143,20 @@ AActor* ASlashCharacter::ShootBullet()
 
 }
 
+AActor* ASlashCharacter::ShootBullet2()
+{
+
+	FVector toward = targetPos - GetActorLocation();
+	FVector loc = GetActorLocation();
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Instigator = this;
+	//AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn, SpawnLocation->GetComponentLocation(), toward.Rotation(), SpawnParams);
+	AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn2, SpawnLocation->GetComponentLocation(), GetActorRotation(), SpawnParams);
+	return SpawandActor;
+
+}
+
 // 데미지 시스템
 float ASlashCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
@@ -252,7 +266,7 @@ void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		enhancedInputComponent->BindAction(ia_shift, ETriggerEvent::Started, this, &ASlashCharacter::ShiftStarted);
 		enhancedInputComponent->BindAction(ia_q, ETriggerEvent::Started, this, &ASlashCharacter::Q);
 		enhancedInputComponent->BindAction(ia_w, ETriggerEvent::Started, this, &ASlashCharacter::W);
-		enhancedInputComponent->BindAction(ia_e, ETriggerEvent::Started, this, &ASlashCharacter::E);
+		enhancedInputComponent->BindAction(ia_e, ETriggerEvent::Started, this, &ASlashCharacter::FireBullet2);
 		enhancedInputComponent->BindAction(ia_r, ETriggerEvent::Started, this, &ASlashCharacter::R);
 		enhancedInputComponent->BindAction(ia_a, ETriggerEvent::Started, this, &ASlashCharacter::A);
 		enhancedInputComponent->BindAction(ia_s, ETriggerEvent::Started, this, &ASlashCharacter::S);
@@ -304,9 +318,9 @@ void ASlashCharacter::W(const FInputActionValue& value)
 	UE_LOG(LogTemp, Warning, TEXT("W"));
 }
 
-void ASlashCharacter::E(const FInputActionValue& value)
+void ASlashCharacter::FireBullet2(const FInputActionValue& value)
 {
-	UE_LOG(LogTemp, Warning, TEXT("E"));
+	ShootBullet2();
 }
 
 void ASlashCharacter::R(const FInputActionValue& value)

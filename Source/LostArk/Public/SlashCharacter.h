@@ -47,11 +47,15 @@ protected:
 	virtual void BeginPlay() override;
 	// 총알 발사 관련
 	AActor* ShootBullet();
+	AActor* ShootBullet2();
 
 	
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AMybulletActor> bullettospawn;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AMybulletActor> bullettospawn2;
 
 	UPROPERTY(EditAnywhere)
 	float HP = 50;
@@ -68,6 +72,7 @@ protected:
 	USceneComponent* SpawnLocation;
 	
 	void FireBullet(const FInputActionValue& value);
+
 
 	class ASlashCharacter* PlayerCharacter;
 
@@ -197,7 +202,7 @@ private:   //나만 사용가능하다는 뜻 , 외부에서 호출할게 아니면 여기서 작성하는게
 	void W(const FInputActionValue& value);
 
 	UFUNCTION()
-	void E(const FInputActionValue& value);
+	void FireBullet2(const FInputActionValue& value);
 
 	UFUNCTION()
 	void R(const FInputActionValue& value);
