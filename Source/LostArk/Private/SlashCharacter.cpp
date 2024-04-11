@@ -37,6 +37,7 @@ ASlashCharacter::ASlashCharacter()
 	GetCharacterMovement()->bSnapToPlaneAtStart = true; // 캐릭터의 시작을 평면으로 시작되도록 고정
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 	springArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	springArmComp->SetupAttachment(RootComponent);
 	springArmComp->SetUsingAbsoluteRotation(true); // Don't want arm to rotate when character does
@@ -53,11 +54,19 @@ ASlashCharacter::ASlashCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
 =======
+=======
+>>>>>>> parent of ab17368 (jj)
 	
 		
 		
 	SpawnLocation = CreateDefaultSubobject<USceneComponent>(TEXT("bullet spawn point"));
 	SpawnLocation->SetupAttachment(GetMesh());
+<<<<<<< HEAD
+=======
+
+		
+	
+>>>>>>> parent of ab17368 (jj)
 
 		
 >>>>>>> parent of ab17368 (jj)
@@ -117,6 +126,9 @@ void ASlashCharacter::BeginPlay()
 	Tags.Add(FName("SlashCharacter")); // 캐릭터 태그이름
 	
 
+<<<<<<< HEAD
+>>>>>>> parent of ab17368 (jj)
+=======
 >>>>>>> parent of ab17368 (jj)
 	// 월드상의 뷰 타겟을 자동으로 찾아서 실행시켜줌
 	for (TActorIterator<AfollowCameraActor> it(GetWorld()); it; ++it)
@@ -189,12 +201,15 @@ void ASlashCharacter::Tick(float DeltaTime)
 	// 회전 값 주기
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 	else 
 	{
 		playerAnim = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
 		playerAnim->bRunMotionOn = false;
 	}
 =======
+=======
+>>>>>>> parent of ab17368 (jj)
 	
 	
 

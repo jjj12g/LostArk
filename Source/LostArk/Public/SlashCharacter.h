@@ -79,12 +79,15 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 	UPROPERTY(VisibleAnywhere, Category="MySettings|Components")
 	class USpringArmComponent* springArmComp;
 
 	UPROPERTY(VisibleAnywhere, Category="MySettings|Components")
 	class UStaticMeshComponent* staffMeshComp;
 
+=======
+>>>>>>> parent of ab17368 (jj)
 =======
 >>>>>>> parent of ab17368 (jj)
 	// 캐릭터 움직임 구현
@@ -181,10 +184,18 @@ private:   //나만 사용가능하다는 뜻 , 외부에서 호출할게 아니면 여기서 작성하는게
 
 
 
+
+
 	 //입력값을 받기위해 만든 함수 매개변수는 꼭 저 자료형으로 해줘야함.
 	// 바인딩할거는 앞에 꼭 UFUNCTION()을 붙여주기. 이 함수가 있다는걸 언리얼 에디터에서 미리 알아야 하므로.
 	UFUNCTION()
 	void SetInputJemp(const FInputActionValue& value); // 점프 미완성
+<<<<<<< HEAD
+=======
+
+	 
+	
+>>>>>>> parent of ab17368 (jj)
 
 	 
 >>>>>>> parent of ab17368 (jj)
