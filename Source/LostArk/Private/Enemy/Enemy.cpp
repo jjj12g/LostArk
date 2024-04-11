@@ -137,12 +137,125 @@ void AEnemy::Die()
 
 void AEnemy::Attack()
 {
-
 	EnemyState = EEnemyState::EES_Engaged;
-	Super::Attack();
-	//PlayAttackMontage();
-	PlayRandomMontageSection(AttackMontage, AttackMontageSections);
 
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && AttackMontage)
+	{
+		AnimInstance->Montage_Play(AttackMontage);
+		const int32 Selection = FMath::RandRange(0, 9); // 0~2까지가 3개
+		FName SectionName = FName();
+		switch (Selection)
+		{
+		case 0:
+			AttackMontage1();
+			break;
+		case 1:
+			AttackMontage2();
+			break;
+		case 2:
+			AttackMontage3();
+			break;
+		case 3:
+			AttackMontage4();
+			break;
+		case 4:
+			AttackMontage5();
+			break;
+		case 5:
+			AttackMontage6();
+			break;
+		case 6:
+			AttackMontage7();
+			break;
+		case 7:
+			AttackMontage8();
+			break;
+		case 8:
+			AttackMontage9();
+			break;
+		default:
+			AttackMontage10();
+			break;
+		}
+
+
+	}
+	//PlayAttackMontage();
+	//PlayRandomMontageSection(AttackMontage,AttackMontageSections);
+	//if (PlayRandomMontageSection)
+	//{
+	//	UE_LOG(LogTemp, Warning, TEXT("1 !"));
+	//}
+}
+
+void AEnemy::AttackMontage1()
+{
+	UE_LOG(LogTemp, Warning, TEXT("attack1"));
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	AnimInstance->Montage_JumpToSection(FName("Attack1"), AttackMontage);
+}
+
+void AEnemy::AttackMontage2()
+{
+	UE_LOG(LogTemp, Warning, TEXT("attack2"));
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	AnimInstance->Montage_JumpToSection(FName("Attack2"), AttackMontage);
+}
+
+void AEnemy::AttackMontage3()
+{
+	UE_LOG(LogTemp, Warning, TEXT("attack3"));
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	AnimInstance->Montage_JumpToSection(FName("Attack3"), AttackMontage);
+}
+
+void AEnemy::AttackMontage4()
+{
+	UE_LOG(LogTemp, Warning, TEXT("attack4"));
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	AnimInstance->Montage_JumpToSection(FName("Attack4"), AttackMontage);
+}
+
+void AEnemy::AttackMontage5()
+{
+	UE_LOG(LogTemp, Warning, TEXT("attack5"));
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	AnimInstance->Montage_JumpToSection(FName("Attack5"), AttackMontage);
+}
+
+void AEnemy::AttackMontage6()
+{
+	UE_LOG(LogTemp, Warning, TEXT("attack6"));
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	AnimInstance->Montage_JumpToSection(FName("Attack6"), AttackMontage);
+}
+
+void AEnemy::AttackMontage7()
+{
+	UE_LOG(LogTemp, Warning, TEXT("attack7"));
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	AnimInstance->Montage_JumpToSection(FName("Attack7"), AttackMontage);
+}
+
+void AEnemy::AttackMontage8()
+{
+	UE_LOG(LogTemp, Warning, TEXT("attack8"));
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	AnimInstance->Montage_JumpToSection(FName("Attack8"), AttackMontage);
+}
+
+void AEnemy::AttackMontage9()
+{
+	UE_LOG(LogTemp, Warning, TEXT("attack9"));
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	AnimInstance->Montage_JumpToSection(FName("Attack9"), AttackMontage);
+}
+void AEnemy::AttackMontage10()
+{
+	UE_LOG(LogTemp, Warning, TEXT("attack10"));
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	AnimInstance->Montage_JumpToSection(FName("Attack10"), AttackMontage);
 }
 
 bool AEnemy::CanAttack()

@@ -53,6 +53,18 @@ protected:
 	virtual int32 PlayDeathMontage() override;
 	/** </ABaseCharacter> */
 
+	// 공격 모션 함수
+	void AttackMontage1();
+	void AttackMontage2();
+	void AttackMontage3();
+	void AttackMontage4();
+	void AttackMontage5();
+	void AttackMontage6();
+	void AttackMontage7();
+	void AttackMontage8();
+	void AttackMontage9();
+	void AttackMontage10();
+
 	// 요한 TAKE 데미지
 	virtual float TakeDamage
 	(
