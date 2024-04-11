@@ -210,8 +210,10 @@ void ASlashCharacter::Tick(float DeltaTime)
 
 	if (bPlayerIsInvisible) // 플레이어가 쉬프트 투명 상태라면,
 	{
+		float dist = dir.Length();
+		UE_LOG(LogTemp, Warning, TEXT("distance: %.2f"), dist);
 		// targetPos 목표 위치에 도달했을 때
-		if (dir.Length() < 30)
+		if (dir.Length() < 50)
 		{
 			// targetPos으로 플레이어의 위치를 설정하고
 			SetActorLocation(targetPos);
@@ -248,6 +250,14 @@ void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		enhancedInputComponent->BindAction(ia_Fire, ETriggerEvent::Started, this, &ASlashCharacter::FireBullet);
 
 		enhancedInputComponent->BindAction(ia_shift, ETriggerEvent::Started, this, &ASlashCharacter::ShiftStarted);
+		enhancedInputComponent->BindAction(ia_q, ETriggerEvent::Started, this, &ASlashCharacter::Q);
+		enhancedInputComponent->BindAction(ia_w, ETriggerEvent::Started, this, &ASlashCharacter::W);
+		enhancedInputComponent->BindAction(ia_e, ETriggerEvent::Started, this, &ASlashCharacter::E);
+		enhancedInputComponent->BindAction(ia_r, ETriggerEvent::Started, this, &ASlashCharacter::R);
+		enhancedInputComponent->BindAction(ia_a, ETriggerEvent::Started, this, &ASlashCharacter::A);
+		enhancedInputComponent->BindAction(ia_s, ETriggerEvent::Started, this, &ASlashCharacter::S);
+		enhancedInputComponent->BindAction(ia_d, ETriggerEvent::Started, this, &ASlashCharacter::D);
+		enhancedInputComponent->BindAction(ia_f, ETriggerEvent::Started, this, &ASlashCharacter::F);
 	}
 
 
@@ -271,18 +281,58 @@ void ASlashCharacter::ShiftStarted(const FInputActionValue& value)
 
 	// 플레이어 위치와 목표 좌표의 거리가 100이상일 때
 	FVector distance = targetPos - GetActorLocation();
-	if (distance.Length() > 100.0f && GetCharacterMovement()->GetLastUpdateVelocity().Length() > 0)
+	if (distance.Length() > 80.0f && GetCharacterMovement()->GetLastUpdateVelocity().Length() > 0)
 	{
 		// Set Visibility를 false로 설정하여 플레이어의 모습을 감춘다.
 		GetMesh()->SetVisibility(false, true);
 		// 모습이 감춰져 있는 동안 이동 속도를 평상시보다 더 빠르게 설정한다.
-		GetCharacterMovement()->MaxWalkSpeed = 1800;
-		GetCharacterMovement()->MaxAcceleration = 6000;
+		GetCharacterMovement()->MaxWalkSpeed = 1500;
+		GetCharacterMovement()->MaxAcceleration = 4000;
 		// 플레이어는 투명상태 : true로 설정
 		bPlayerIsInvisible = true;
 	}
 }
 
+
+void ASlashCharacter::Q(const FInputActionValue& value)
+{
+	UE_LOG(LogTemp,Warning,TEXT("Q"));
+}
+
+void ASlashCharacter::W(const FInputActionValue& value)
+{
+	UE_LOG(LogTemp, Warning, TEXT("W"));
+}
+
+void ASlashCharacter::E(const FInputActionValue& value)
+{
+	UE_LOG(LogTemp, Warning, TEXT("E"));
+}
+
+void ASlashCharacter::R(const FInputActionValue& value)
+{
+	UE_LOG(LogTemp, Warning, TEXT("R"));
+}
+
+void ASlashCharacter::A(const FInputActionValue& value)
+{
+	UE_LOG(LogTemp, Warning, TEXT("A"));
+}
+
+void ASlashCharacter::S(const FInputActionValue& value)
+{
+	UE_LOG(LogTemp, Warning, TEXT("S"));
+}
+
+void ASlashCharacter::D(const FInputActionValue& value)
+{
+	UE_LOG(LogTemp, Warning, TEXT("D"));
+}
+
+void ASlashCharacter::F(const FInputActionValue& value)
+{
+	UE_LOG(LogTemp, Warning, TEXT("F"));
+}
 
 void ASlashCharacter::SetInputDirection(const FInputActionValue& value)
 {
@@ -318,17 +368,6 @@ void ASlashCharacter::SetInputDirection(const FInputActionValue& value)
 		// 월드 포지션z를 캐릭터캡슐컬리전으로 두고
 		playerAnim = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
 		playerAnim->bRunMotionOn = true;
-
-
-
-
-
-
-
-
-
-
-
 	}
 
 }
@@ -343,10 +382,6 @@ void ASlashCharacter::SetInputJemp(const FInputActionValue& value)
 		//FVector SetActorLocation() = GetActorLocation() + FVector(-500, 100, 600);
 
 	}
-
-
-
-
 }
 
 void ASlashCharacter::Shoot(const FInputActionValue& value)

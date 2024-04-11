@@ -116,6 +116,30 @@ public:
 	UPROPERTY(EditAnywhere, Category="MySettings")
 	class UInputAction* ia_shift;
 
+	UPROPERTY(EditAnywhere, Category="MySettings\Skills")
+	class UInputAction* ia_q;
+
+	UPROPERTY(EditAnywhere, Category="MySettings\Skills")
+	class UInputAction* ia_w;
+
+	UPROPERTY(EditAnywhere, Category="MySettings\Skills")
+	class UInputAction* ia_e;
+
+	UPROPERTY(EditAnywhere, Category="MySettings\Skills")
+	class UInputAction* ia_r;
+
+	UPROPERTY(EditAnywhere, Category="MySettings\Skills")
+	class UInputAction* ia_a;
+
+	UPROPERTY(EditAnywhere, Category="MySettings\Skills")
+	class UInputAction* ia_s;
+
+	UPROPERTY(EditAnywhere, Category="MySettings\Skills")
+	class UInputAction* ia_d;
+
+	UPROPERTY(EditAnywhere, Category="MySettings\Skills")
+	class UInputAction* ia_f;
+
 	UPROPERTY(EditAnywhere, Category="MySettings")
 	class UInputAction* ia_Fire;
 
@@ -165,6 +189,30 @@ private:   //나만 사용가능하다는 뜻 , 외부에서 호출할게 아니면 여기서 작성하는게
 
 	UFUNCTION()
 	void ShiftStarted(const FInputActionValue& value); // 스페이스바 인풋 액션으로 쉬프트 함수 실행하기
+
+	UFUNCTION()
+	void Q(const FInputActionValue& value);
+
+	UFUNCTION()
+	void W(const FInputActionValue& value);
+
+	UFUNCTION()
+	void E(const FInputActionValue& value);
+
+	UFUNCTION()
+	void R(const FInputActionValue& value);
+
+	UFUNCTION()
+	void A(const FInputActionValue& value);
+
+	UFUNCTION()
+	void S(const FInputActionValue& value);
+
+	UFUNCTION()
+	void D(const FInputActionValue& value);
+
+	UFUNCTION()
+	void F(const FInputActionValue& value);
 
 	 //입력값을 받기위해 만든 함수 매개변수는 꼭 저 자료형으로 해줘야함.
 	// 바인딩할거는 앞에 꼭 UFUNCTION()을 붙여주기. 이 함수가 있다는걸 언리얼 에디터에서 미리 알아야 하므로.
