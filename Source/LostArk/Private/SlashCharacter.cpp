@@ -41,6 +41,10 @@ ASlashCharacter::ASlashCharacter()
 	GetCharacterMovement()->bSnapToPlaneAtStart = true; // 캐릭터의 시작을 평면으로 시작되도록 고정
 
 
+	staffMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Staff Mesh"));
+	staffMeshComp->SetupAttachment(GetMesh(), FName("StaffSocket"));
+
+
 	springArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	springArmComp->SetupAttachment(RootComponent);
 	springArmComp->SetUsingAbsoluteRotation(true); // Don't want arm to rotate when character does
@@ -51,8 +55,8 @@ ASlashCharacter::ASlashCharacter()
 	cameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("TopDownCamera"));
 	cameraComp->SetupAttachment(springArmComp, USpringArmComponent::SocketName);
 	cameraComp->bUsePawnControlRotation = false; // Camera does not rotate relative to arm	
-	cameraComp->SetRelativeLocation(FVector(30, 0, -550));
-	cameraComp->SetRelativeRotation(FRotator(37, 0, 0));
+	cameraComp->SetRelativeLocation(FVector(-427, 0, -295));
+	cameraComp->SetRelativeRotation(FRotator(9.5, 0, 0));
 
 
 	PrimaryActorTick.bCanEverTick = true;
@@ -120,10 +124,10 @@ void ASlashCharacter::BeginPlay()
 	*/
 
 	// 지팡이 붙이기
-	Attack=GetWorld()->SpawnActor<AMaactor>(Attackclass);
+	/*Attack=GetWorld()->SpawnActor<AMaactor>(Attackclass);
 	GetMesh()->HideBoneByName(TEXT("Attack"),EPhysBodyOp::PBO_None);
 	Attack->AttachToComponent(GetMesh(),FAttachmentTransformRules::KeepRelativeTransform, TEXT("Attack"));
-	Attack->SetOwner(this);
+	Attack->SetOwner(this);*/
 }
 
 AActor* ASlashCharacter::ShootBullet()
@@ -249,7 +253,8 @@ void ASlashCharacter::SetInputDirection(const FInputActionValue& value)
 		// 월드 포지션z를 캐릭터캡슐컬리전으로 두고
 
 		
-		
+		playerAnim = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
+		playerAnim->bRunMotionOn = true;
 
 		
 		

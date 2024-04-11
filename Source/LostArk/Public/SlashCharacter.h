@@ -77,6 +77,10 @@ public:
 
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	UPROPERTY(VisibleAnywhere, Category = "MySettings|Components")
+	class UStaticMeshComponent* staffMeshComp;
+
 	// 카메라 관련 변수 선언
 	UPROPERTY(VisibleAnywhere, Category="MySettings|Components")
 	class UCameraComponent* cameraComp;
