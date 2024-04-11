@@ -38,6 +38,7 @@ ASlashCharacter::ASlashCharacter()
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 	springArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	springArmComp->SetupAttachment(RootComponent);
 	springArmComp->SetUsingAbsoluteRotation(true); // Don't want arm to rotate when character does
@@ -56,13 +57,21 @@ ASlashCharacter::ASlashCharacter()
 =======
 =======
 >>>>>>> parent of ab17368 (jj)
+=======
+>>>>>>> parent of ab17368 (jj)
 	
 		
 		
 	SpawnLocation = CreateDefaultSubobject<USceneComponent>(TEXT("bullet spawn point"));
 	SpawnLocation->SetupAttachment(GetMesh());
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+
+		
+	
+>>>>>>> parent of ab17368 (jj)
 
 		
 	
@@ -127,6 +136,9 @@ void ASlashCharacter::BeginPlay()
 	
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> parent of ab17368 (jj)
+=======
 >>>>>>> parent of ab17368 (jj)
 =======
 >>>>>>> parent of ab17368 (jj)
@@ -202,12 +214,15 @@ void ASlashCharacter::Tick(float DeltaTime)
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 	else 
 	{
 		playerAnim = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
 		playerAnim->bRunMotionOn = false;
 	}
 =======
+=======
+>>>>>>> parent of ab17368 (jj)
 =======
 >>>>>>> parent of ab17368 (jj)
 	
