@@ -14,11 +14,8 @@
 #include "followCameraActor.h"
 #include "EngineUtils.h"
 #include "Maactor.h"
-#include <../../../../../../../Source/Runtime/Engine/Classes/GameFramework/SpringArmComponent.h>
-#include <../../../../../../../Source/Runtime/Engine/Classes/Camera/CameraComponent.h>
 #include <../../../../../../../Plugins/FX/Niagara/Source/Niagara/Public/NiagaraFunctionLibrary.h>
 #include "MybulletActor.h"
-#include "PlayerAnimInstance.h"
 
 
 ASlashCharacter::ASlashCharacter()
@@ -39,6 +36,7 @@ ASlashCharacter::ASlashCharacter()
 	GetCharacterMovement()->bConstrainToPlane = true; // 캐릭터의 이동을 평면으로 고정
 	GetCharacterMovement()->bSnapToPlaneAtStart = true; // 캐릭터의 시작을 평면으로 시작되도록 고정
 
+<<<<<<< HEAD
 	springArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	springArmComp->SetupAttachment(RootComponent);
 	springArmComp->SetUsingAbsoluteRotation(true); // Don't want arm to rotate when character does
@@ -54,6 +52,15 @@ ASlashCharacter::ASlashCharacter()
 
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
+=======
+	
+		
+		
+	SpawnLocation = CreateDefaultSubobject<USceneComponent>(TEXT("bullet spawn point"));
+	SpawnLocation->SetupAttachment(GetMesh());
+
+		
+>>>>>>> parent of ab17368 (jj)
 	
 	staffMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Staff Mesh"));
 	staffMeshComp->SetupAttachment(GetMesh(), FName("StaffSocket"));
@@ -101,8 +108,16 @@ void ASlashCharacter::BeginPlay()
 	
 	targetPos = GetActorLocation();  // 일단 캐릭터의 위치에서부터 이동
 
+<<<<<<< HEAD
 	Tags.Add(FName("SlashCharacter")); // 캐릭터 태그이름	
 	/*
+=======
+
+
+	Tags.Add(FName("SlashCharacter")); // 캐릭터 태그이름
+	
+
+>>>>>>> parent of ab17368 (jj)
 	// 월드상의 뷰 타겟을 자동으로 찾아서 실행시켜줌
 	for (TActorIterator<AfollowCameraActor> it(GetWorld()); it; ++it)
 	{
@@ -110,7 +125,6 @@ void ASlashCharacter::BeginPlay()
 		GetController<APlayerController>()->SetViewTarget(mainCam); // 뷰타겟을 찾음
 		break;
 	}
-	*/
 
 	// 지팡이 붙이기
 	Attack=GetWorld()->SpawnActor<AMaactor>(Attackclass);
@@ -129,6 +143,18 @@ AActor* ASlashCharacter::ShootBullet()
 	AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn, SpawnLocation->GetComponentLocation(), GetActorRotation(), SpawnParams);
 	return SpawandActor;
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 // 데미지 시스템
 float ASlashCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -162,11 +188,17 @@ void ASlashCharacter::Tick(float DeltaTime)
 	}
 	// 회전 값 주기
 
+<<<<<<< HEAD
 	else 
 	{
 		playerAnim = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
 		playerAnim->bRunMotionOn = false;
 	}
+=======
+	
+	
+
+>>>>>>> parent of ab17368 (jj)
 }
 
 
