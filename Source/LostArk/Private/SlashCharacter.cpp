@@ -23,10 +23,10 @@
 
 ASlashCharacter::ASlashCharacter()
 {
- 	
+
 	PrimaryActorTick.bCanEverTick = true;
-	
-		
+
+
 
 	GetCapsuleComponent()->InitCapsuleSize(42.0f, 96.0f); //플레이어 캡슐컴포넌트 크기설정
 
@@ -34,16 +34,14 @@ ASlashCharacter::ASlashCharacter()
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationRoll = false;
 	bUseControllerRotationYaw = false;
-	
+
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 640.0f, 0.0f); //마우스랑 다를경우 초당 640만큼회전
 	GetCharacterMovement()->bConstrainToPlane = true; // 캐릭터의 이동을 평면으로 고정
 	GetCharacterMovement()->bSnapToPlaneAtStart = true; // 캐릭터의 시작을 평면으로 시작되도록 고정
 
-
 	staffMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Staff Mesh"));
 	staffMeshComp->SetupAttachment(GetMesh(), FName("StaffSocket"));
-
 
 	springArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	springArmComp->SetupAttachment(RootComponent);
@@ -55,19 +53,19 @@ ASlashCharacter::ASlashCharacter()
 	cameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("TopDownCamera"));
 	cameraComp->SetupAttachment(springArmComp, USpringArmComponent::SocketName);
 	cameraComp->bUsePawnControlRotation = false; // Camera does not rotate relative to arm	
-	cameraComp->SetRelativeLocation(FVector(-427, 0, -295));
-	cameraComp->SetRelativeRotation(FRotator(9.5, 0, 0));
+	cameraComp->SetRelativeLocation(FVector(30, 0, -550));
+	cameraComp->SetRelativeRotation(FRotator(37, 0, 0));
 
 
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
-		
-		
+
+
 	SpawnLocation = CreateDefaultSubobject<USceneComponent>(TEXT("bullet spawn point"));
 	SpawnLocation->SetupAttachment(GetMesh());
-	
 
-		
+
+
 }
 
 
@@ -105,35 +103,37 @@ void ASlashCharacter::BeginPlay()
 	}
 	// ::은 스태틱함수를 의미함. 포인터를 따로 만들지않고 이름을 불러오는 것. 클래스파일로부터 직접함수를 불러올때 사용
 	// ->은 포인터 변수로부터 불러올때
-	
-	
+
+
 	targetPos = GetActorLocation();  // 일단 캐릭터의 위치에서부터 이동
 
 
 
 	Tags.Add(FName("SlashCharacter")); // 캐릭터 태그이름
-	
+
 	/*
 	// 월드상의 뷰 타겟을 자동으로 찾아서 실행시켜줌
 	for (TActorIterator<AfollowCameraActor> it(GetWorld()); it; ++it)
 	{
-		AfollowCameraActor* mainCam = *it; 
+		AfollowCameraActor* mainCam = *it;
 		GetController<APlayerController>()->SetViewTarget(mainCam); // 뷰타겟을 찾음
 		break;
 	}
 	*/
-
+	/*
 	// 지팡이 붙이기
-	/*Attack=GetWorld()->SpawnActor<AMaactor>(Attackclass);
+	Attack=GetWorld()->SpawnActor<AMaactor>(Attackclass);
 	GetMesh()->HideBoneByName(TEXT("Attack"),EPhysBodyOp::PBO_None);
 	Attack->AttachToComponent(GetMesh(),FAttachmentTransformRules::KeepRelativeTransform, TEXT("Attack"));
-	Attack->SetOwner(this);*/
+	Attack->SetOwner(this);
+	*/
 }
 
 AActor* ASlashCharacter::ShootBullet()
 {
-	
+
 	FVector toward = targetPos - GetActorLocation();
+	FVector loc = GetActorLocation();
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Instigator = this;
@@ -156,14 +156,36 @@ float ASlashCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 //입력바인딩 통해 발사
 void ASlashCharacter::FireBullet(const FInputActionValue& value)
 {
+	//FVector dirction = FVector(value.Get<FVector2D>(),0);
+	//ShootRot = dirction.Rotation();
 	ShootBullet();
+	//PlayerCharacter->SetActorRotation(dirction.Rotation());
+	/*
+
+	if(PlayerCharacter && CanFire)
+	{
+		PlayerCharacter->ShootBullet();
+		CanFire = false;
+
+		FTimerDelegate Delegate = FTimerDelegate::CreateUObject(this, &ASlashCharacter::SetCanFire,true);
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle,TimeBetweenFire,false);
+	}
+	*/
+
+}
+
+void ASlashCharacter::SetCanFire(bool value)
+{
+	CanFire = true;
 }
 
 void ASlashCharacter::Tick(float DeltaTime)
 {
+
 	Super::Tick(DeltaTime);
 
-	
+
 
 	//사용자가 입력한 방향대로 이동을 하고 싶다.
 	//FVector moveDir = FVector(); //.도 ->와 비슷한것 ->는 변수가 포인터일때, .는 그냥 클래스가 인스턴스 일때 사용.
@@ -181,6 +203,7 @@ void ASlashCharacter::Tick(float DeltaTime)
 		playerAnim->bRunMotionOn = false;
 	}
 
+	//PlayerCharacter->SetActorRotation(ShootRot);
 }
 
 
@@ -190,7 +213,7 @@ void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	UEnhancedInputComponent* enhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent);
-	
+
 
 
 	if (enhancedInputComponent != nullptr)
@@ -201,12 +224,12 @@ void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		//this 는 현재 값을 말함.
 		// 다른클래스에서 똑같은 이름의 변수를 가져올 수 있으므로 파일명을 앞에 써주는게 좋음 AShootingPlayer::SetInputDirection처럼.
 		enhancedInputComponent->BindAction(ia_Jump, ETriggerEvent::Triggered, this, &ASlashCharacter::SetInputJemp); // 일단 캐릭터 점프를 가져옴
-		enhancedInputComponent->BindAction(ia_attack, ETriggerEvent::Started, this,&ASlashCharacter::Shoot);
-		enhancedInputComponent->BindAction(ia_Fire, ETriggerEvent::Triggered, this, &ASlashCharacter::FireBullet);
+		enhancedInputComponent->BindAction(ia_attack, ETriggerEvent::Started, this, &ASlashCharacter::Shoot);
+		enhancedInputComponent->BindAction(ia_Fire, ETriggerEvent::Started, this, &ASlashCharacter::FireBullet);
 	}
 
-	
-		
+
+
 }
 void ASlashCharacter::Move(FVector direction, float deltaTime)
 {
@@ -221,7 +244,7 @@ void ASlashCharacter::Move(FVector direction, float deltaTime)
 }
 void ASlashCharacter::SetInputDirection(const FInputActionValue& value)
 {
-	
+
 	bool isPressed = value.Get<bool>();   // .이 캐스트의 의미 , 개발자가 어떻게 만들지 예측할 수 없어서 이런식으로 작성
 	if (isPressed)
 	{
@@ -240,33 +263,33 @@ void ASlashCharacter::SetInputDirection(const FInputActionValue& value)
 		{
 			targetPos = hitInfo.ImpactPoint;    //히트된 좌표
 			targetPos.Z = GetActorLocation().Z;   //z 좌표를 플레이어의 좌표로 설정
-			
+
 
 			// 좌표 설정 확인
 			DrawDebugSphere(GetWorld(), hitInfo.ImpactPoint, 10.0f, 15, FColor::Red, false, 3, 1, 1);
 			//UE_LOG(LogTemp, Warning, TEXT("%.1f, %.1f, %.1f"), hitInfo.ImpactPoint.X, hitInfo.ImpactPoint.Y, hitInfo.ImpactPoint.Z);
-			
+
 		}
 
 		//DrawDebugSphere(GetWorld(), mousePos, 1.0f, 5, FColor::Red, false, -1, 1, 1);
 
 		// 월드 포지션z를 캐릭터캡슐컬리전으로 두고
-
-		
 		playerAnim = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
 		playerAnim->bRunMotionOn = true;
 
-		
-		
-		
-		
+
+
+
+
+
+
 
 
 
 
 	}
 
-	}
+}
 
 
 
@@ -287,9 +310,9 @@ void ASlashCharacter::SetInputJemp(const FInputActionValue& value)
 void ASlashCharacter::Shoot(const FInputActionValue& value)
 {
 
-	
+
 	Attack->PullTrigger();
-	
+
 	//UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NI_BASIC, SetInputDirection(true), GetActorRotation());
 
 }
@@ -299,26 +322,26 @@ void ASlashCharacter::Shoot(const FInputActionValue& value)
 
 
 
-	 // 장비 시스템
-	//OverlappingWeapon->SetOwner(this);  // 무기가 장착되면 소유자로 인식
-	//OverlappingWeapon->SetInstigator(this);
+// 장비 시스템
+//OverlappingWeapon->SetOwner(this);  // 무기가 장착되면 소유자로 인식
+//OverlappingWeapon->SetInstigator(this);
 
 
-	/*   void overlapEvent   데미지 시스템
-	* 
-	* 
-	* 
-	* 
-	*  UGamePlayStatics::ApplyDamage(
-	*		Box.Hit.GetActor(),
-	*		Damage,
-	*		GetInstigetor()->GetController(),
-	*		this,
-	*		UDamageType::StaticClass()
-	*		);
-	* 
-	*/
+/*   void overlapEvent   데미지 시스템
+*
+*
+*
+*
+*  UGamePlayStatics::ApplyDamage(
+*		Box.Hit.GetActor(),
+*		Damage,
+*		GetInstigetor()->GetController(),
+*		this,
+*		UDamageType::StaticClass()
+*		);
+*
+*/
 
 
-	// CharacterState = ECharacterState::ECS_EquippedOneHandedWeapon;
-	// 캐릭터 전투상태 만들기 E키를 눌렀을때로 설정해줘야함
+// CharacterState = ECharacterState::ECS_EquippedOneHandedWeapon;
+// 캐릭터 전투상태 만들기 E키를 눌렀을때로 설정해줘야함

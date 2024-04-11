@@ -19,7 +19,7 @@
 
 AEnemy::AEnemy()
 {
- 	
+
 	PrimaryActorTick.bCanEverTick = true;
 
 
@@ -27,21 +27,21 @@ AEnemy::AEnemy()
 	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
 	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 	GetMesh()->SetGenerateOverlapEvents(true);
-	
 
 
-	
+
+
 	HealthBarWidget = CreateDefaultSubobject<UHealthBarComponent>(TEXT("HealthBar")); // 헬스바위젯
 	HealthBarWidget->SetupAttachment(GetRootComponent()); //헬스바위젯을 루트로
 
 
 
 	// 캐릭터 움직임
-	GetCharacterMovement()->bOrientRotationToMovement = true; 
+	GetCharacterMovement()->bOrientRotationToMovement = true;
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
-	
+
 	PawnSensing = CreateDefaultSubobject<UPawnSensingComponent>(TEXT("PawnSensing")); //폰 컴퍼넌트 생성해서 만들기
 	PawnSensing->SightRadius = 4000.f; // 폰의 사이트 반경
 	PawnSensing->SetPeripheralVisionAngle(45.f); // 폰의 시야각 반경
@@ -67,7 +67,13 @@ void AEnemy::Tick(float DeltaTime)
 // 데미지 , 남은체력 계산
 float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigetor, AActor* DamageCauser)
 {
-	HandleDamage(DamageAmount);
+	HP -= DamageAmount;
+	if (HP <= 0)
+	{
+		Destroy();
+	}
+	//return DamageAmount;
+	//HandleDamage(DamageAmount);
 	CombatTarget = EventInstigetor->GetPawn(); // 적이 피해를 입는 즉시 전투목표 설정
 	ChaseTarget();
 	return DamageAmount;
@@ -99,8 +105,8 @@ void AEnemy::BeginPlay()
 
 	if (PawnSensing) PawnSensing->OnSeePawn.AddDynamic(this, &AEnemy::PawnSeen);
 	InitializeEnemy();
-	
-	
+
+
 
 	/* 기본 무기 , 지워도오류 x
 	UWorld* World = GetWorld();
@@ -131,11 +137,11 @@ void AEnemy::Die()
 
 void AEnemy::Attack()
 {
-	
+
 	EnemyState = EEnemyState::EES_Engaged;
 	Super::Attack();
 	//PlayAttackMontage();
-	PlayRandomMontageSection(AttackMontage,AttackMontageSections);
+	PlayRandomMontageSection(AttackMontage, AttackMontageSections);
 
 }
 
@@ -169,7 +175,7 @@ void AEnemy::HandleDamage(float DamageAmount)
 }
 
 int32 AEnemy::PlayDeathMontage() // int32로 부모클래스와 결과를 동일하게 설정 
-{
+ {
 	const int32 Selection = Super::PlayDeathMontage();
 	TEnumAsByte<EDeathPose> Pose(Selection);  // TEnum 열거체
 	if (Pose < EDeathPose::EDP_MAX) // 배열의 요소의 수 확인 (Enum 값보다 높은지)
@@ -238,7 +244,7 @@ void AEnemy::HideHealthBar()
 		HealthBarWidget->SetVisibility(false); // 건강표시기 위젯을 숨기고 다시순찰
 	}
 }
-	// 가까이있을때 헬스바 보임
+// 가까이있을때 헬스바 보임
 void AEnemy::ShowHealthBar()
 {
 	if (HealthBarWidget)
@@ -247,13 +253,13 @@ void AEnemy::ShowHealthBar()
 		HealthBarWidget->SetVisibility(true); // 건강표시기 위젯을 숨기고 다시순찰
 	}
 }
-	// 죽었을때 헬스바 숨김
+// 죽었을때 헬스바 숨김
 void AEnemy::LoseInterest()
 {
 	CombatTarget = nullptr;
 	HideHealthBar();
 }
-	// 순찰시작
+// 순찰시작
 void AEnemy::StartPatrolling()
 {
 	EnemyState = EEnemyState::EES_Patrolling; // 다시 순찰모션으로 변경
@@ -261,7 +267,7 @@ void AEnemy::StartPatrolling()
 	MoveToTarget(PatrolTarget); // 순찰
 
 }
-	// 추격
+// 추격
 void AEnemy::ChaseTarget()
 {
 	EnemyState = EEnemyState::EES_Chasing;  //  추격모션사용
@@ -285,7 +291,7 @@ bool AEnemy::IsInsideAttackRadius()
 
 	return InTargetRange(CombatTarget, AttackRadius);
 }
-	// 에너미 상태가 추격인지 확인
+// 에너미 상태가 추격인지 확인
 bool AEnemy::IsChasing()
 {
 	return EnemyState == EEnemyState::EES_Chasing;
@@ -340,21 +346,21 @@ void AEnemy::MoveToTarget(AActor* Target)
 {
 	if (EnemyController == nullptr || Target == nullptr) return;
 	{
-		
+
 		FAIMoveRequest MoveRequest;
 		MoveRequest.SetGoalActor(Target);
 		MoveRequest.SetAcceptanceRadius(50.f);
 		EnemyController->MoveTo(MoveRequest);
-		
-		
+
+
 	}
-	
+
 }
 
 AActor* AEnemy::ChoosePatrolTarget()
 {
 	// 순찰대상 확인
-	 
+
 	//똑같은거 뽑지않게하는 배열
 	TArray<AActor*> ValidTargets;
 	for (AActor* Target : PatrolTargets)
@@ -370,8 +376,8 @@ AActor* AEnemy::ChoosePatrolTarget()
 	if (NumPatrolTargets > 0)
 	{
 		const int32 TargetSelection = FMath::RandRange(0, NumPatrolTargets - 1);
-		 return ValidTargets[TargetSelection];
-		 UE_LOG(LogTemp, Warning, TEXT("patroller"));
+		return ValidTargets[TargetSelection];
+		UE_LOG(LogTemp, Warning, TEXT("patroller"));
 	}
 
 	return nullptr;
@@ -391,7 +397,7 @@ void AEnemy::PawnSeen(APawn* SeenPawn) // 플레이어 추격
 		ClearPatrolTimer();
 		ChaseTarget(); //  적이 플레이어를보면 달려옴
 	}
-	
+
 }
 
 

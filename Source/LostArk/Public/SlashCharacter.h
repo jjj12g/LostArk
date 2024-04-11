@@ -68,6 +68,19 @@ protected:
 	USceneComponent* SpawnLocation;
 	
 	void FireBullet(const FInputActionValue& value);
+
+	class ASlashCharacter* PlayerCharacter;
+
+	bool CanFire = true;
+
+	UPROPERTY(EditAnywhere, Category = "mysettings")
+	float TimeBetweenFire = 0.2f;
+
+	UFUNCTION()
+	void SetCanFire(bool value);
+
+	FRotator ShootRot;
+	FRotator Movement;
 	
 
 

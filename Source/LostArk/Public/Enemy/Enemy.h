@@ -30,7 +30,7 @@ public:
 
 	/** <AActor> */
 	virtual void Tick(float DeltaTime) override;
-	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigetor, AActor* DamageCauser) override; // 데미지시스템
+	//virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigetor, AActor* DamageCauser) override; // 데미지시스템
 	//virtual void Destroyed() override;
 	/** </AActor> */
 
@@ -53,6 +53,15 @@ protected:
 	virtual int32 PlayDeathMontage() override;
 	/** </ABaseCharacter> */
 
+	// 요한 TAKE 데미지
+	virtual float TakeDamage
+	(
+		float DamageAmount,
+		struct FDamageEvent const& DamageEvent,
+		class AController* EventInstigator,
+		AActor* DamageCauser
+	)override;
+
 	UPROPERTY(BlueprintReadOnly)
 	TEnumAsByte <EDeathPose> DeathPose; // 죽음 모션
 
@@ -60,6 +69,9 @@ protected:
 	EEnemyState EnemyState = EEnemyState::EES_Patrolling; //애니메이션 순찰에들어감
 
 	//void PlayHitReactMontage(const FName& SectionName);
+
+	UPROPERTY(EditAnywhere)
+	float HP = 100;
 
 private:
 	/** AI behavior(행동) */
