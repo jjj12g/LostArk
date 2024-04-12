@@ -36,3 +36,8 @@ void UPlayerAnimInstance::AnimNotify_nnHit()
 {
 	player->ShootBullet2();
 }
+
+void UPlayerAnimInstance::AnimNotify_nnHit2()
+{
+	player->ShootBullet5();
+}

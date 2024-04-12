@@ -131,6 +131,8 @@ void ASlashCharacter::BeginPlay()
 	*/
 }
 
+// 스킬 설정 및 위치 설정 -----------------------------------------------------------------------------------------------------
+
 AActor* ASlashCharacter::ShootBullet()
 {
 
@@ -156,6 +158,92 @@ AActor* ASlashCharacter::ShootBullet2()
 	//AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn2, SpawnLocation->GetComponentLocation(), GetActorRotation(), SpawnParams);
 	return SpawandActor;
 }
+
+AActor* ASlashCharacter::ShootBullet3()
+{
+	FVector toward = targetPos - GetActorLocation();
+	FVector loc = GetActorLocation();
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Instigator = this;
+	AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn3, SpawnLocation->GetComponentLocation(), toward.Rotation(), SpawnParams);
+	//AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn2, SpawnLocation->GetComponentLocation(), GetActorRotation(), SpawnParams);
+	return SpawandActor;
+}
+
+AActor* ASlashCharacter::ShootBullet4()
+{
+	FVector toward = targetPos - GetActorLocation();
+	FVector loc = GetActorLocation();
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Instigator = this;
+	AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn4, SpawnLocation->GetComponentLocation(), toward.Rotation(), SpawnParams);
+	//AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn2, SpawnLocation->GetComponentLocation(), GetActorRotation(), SpawnParams);
+	return SpawandActor;
+}
+
+AActor* ASlashCharacter::ShootBullet5()
+{
+	FVector toward = targetPos - GetActorLocation();
+	FVector loc = GetActorLocation();
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Instigator = this;
+	AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn5, SpawnLocation->GetComponentLocation(), toward.Rotation(), SpawnParams);
+	//AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn2, SpawnLocation->GetComponentLocation(), GetActorRotation(), SpawnParams);
+	return SpawandActor;
+}
+
+AActor* ASlashCharacter::ShootBullet6()
+{
+	FVector toward = targetPos - GetActorLocation();
+	FVector loc = GetActorLocation();
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Instigator = this;
+	AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn6, SpawnLocation->GetComponentLocation(), toward.Rotation(), SpawnParams);
+	//AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn2, SpawnLocation->GetComponentLocation(), GetActorRotation(), SpawnParams);
+	return SpawandActor;
+}
+
+AActor* ASlashCharacter::ShootBullet7()
+{
+	FVector toward = targetPos - GetActorLocation();
+	FVector loc = GetActorLocation();
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Instigator = this;
+	AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn7, SpawnLocation->GetComponentLocation(), toward.Rotation(), SpawnParams);
+	//AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn2, SpawnLocation->GetComponentLocation(), GetActorRotation(), SpawnParams);
+	return SpawandActor;
+}
+
+AActor* ASlashCharacter::ShootBullet8()
+{
+	FVector toward = targetPos - GetActorLocation();
+	FVector loc = GetActorLocation();
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Instigator = this;
+	AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn8, SpawnLocation->GetComponentLocation(), toward.Rotation(), SpawnParams);
+	//AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn2, SpawnLocation->GetComponentLocation(), GetActorRotation(), SpawnParams);
+	return SpawandActor;
+}
+
+AActor* ASlashCharacter::ShootBullet9()
+{
+	FVector toward = targetPos - GetActorLocation();
+	FVector loc = GetActorLocation();
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Instigator = this;
+	AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn9, SpawnLocation->GetComponentLocation(), toward.Rotation(), SpawnParams);
+	//AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn2, SpawnLocation->GetComponentLocation(), GetActorRotation(), SpawnParams);
+	return SpawandActor;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------- 스킬 설정 위치-----
 
 // 데미지 시스템
 float ASlashCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -309,14 +397,18 @@ niagaracomp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NI_spac
 	}
 }
 
+// 스킬  QWERASDF 애니메이션 넣는 곳-----------------------------------------------------------
+
 
 void ASlashCharacter::Q(const FInputActionValue& value)
 {
+	ShootBullet3();
 	UE_LOG(LogTemp,Warning,TEXT("Q"));
 }
 
 void ASlashCharacter::W(const FInputActionValue& value)
 {
+	ShootBullet4();
 	UE_LOG(LogTemp, Warning, TEXT("W"));
 }
 
@@ -332,26 +424,36 @@ void ASlashCharacter::FireBullet2(const FInputActionValue& value)
 
 void ASlashCharacter::R(const FInputActionValue& value)
 {
-	UE_LOG(LogTemp, Warning, TEXT("R"));
+	//ShootBullet5();
+	//UE_LOG(LogTemp, Warning, TEXT("R"));
+	bPlayerIsAttacking = true;
+
+	int32 num = FMath::RandRange(1, 4);
+	FString sectionName = FString("HitGround") + FString::FromInt(num); // FromInt : 숫자 변수의 값을 문자로 변환해주는 함수
+	PlayAnimMontage(hitground_montage, 1, FName(sectionName));
 }
 
 void ASlashCharacter::A(const FInputActionValue& value)
 {
+	ShootBullet6();
 	UE_LOG(LogTemp, Warning, TEXT("A"));
 }
 
 void ASlashCharacter::S(const FInputActionValue& value)
 {
+	ShootBullet7();
 	UE_LOG(LogTemp, Warning, TEXT("S"));
 }
 
 void ASlashCharacter::D(const FInputActionValue& value)
 {
+	ShootBullet8();
 	UE_LOG(LogTemp, Warning, TEXT("D"));
 }
 
 void ASlashCharacter::F(const FInputActionValue& value)
 {
+	//ShootBullet8();
 	bPlayerIsAttacking = true;
 
 	int32 num = FMath::RandRange(1, 3);	
@@ -363,6 +465,13 @@ void ASlashCharacter::F(const FInputActionValue& value)
 	//playerAnim = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
 	//playerAnim->bRunMotionOn = false;
 }
+
+// 여기 까지~~~ 스킬 ~~-------
+
+
+
+
+
 
 void ASlashCharacter::SetInputDirection(const FInputActionValue& value)
 {

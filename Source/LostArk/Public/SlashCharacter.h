@@ -42,6 +42,13 @@ public:
 	
 	AActor* ShootBullet();
 	AActor* ShootBullet2();
+	AActor* ShootBullet3();
+	AActor* ShootBullet4();
+	AActor* ShootBullet5();
+	AActor* ShootBullet6();
+	AActor* ShootBullet7();
+	AActor* ShootBullet8();
+	AActor* ShootBullet9();
 
 
 protected:
@@ -56,6 +63,27 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AMybulletActor> bullettospawn2;
+	
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AMybulletActor> bullettospawn3;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AMybulletActor> bullettospawn4;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AMybulletActor> bullettospawn5;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AMybulletActor> bullettospawn6;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AMybulletActor> bullettospawn7;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AMybulletActor> bullettospawn8;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AMybulletActor> bullettospawn9;
 
 	UPROPERTY(EditAnywhere)
 	float HP = 50;

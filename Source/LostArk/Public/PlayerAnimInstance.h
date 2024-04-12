@@ -37,6 +37,9 @@ private:
 	UFUNCTION()
 	void AnimNotify_nnHit();
 
+	UFUNCTION()
+	void AnimNotify_nnHit2();
+
 	
 	
 };
