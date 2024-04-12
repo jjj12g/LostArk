@@ -82,8 +82,8 @@ protected:
 
 	//void PlayHitReactMontage(const FName& SectionName);
 
-	UPROPERTY(EditAnywhere)
-	float HP = 100;
+	UPROPERTY(EditAnywhere, Category = "Mysettings")
+	float HP = 500;
 
 private:
 	/** AI behavior(Çàµ¿) */

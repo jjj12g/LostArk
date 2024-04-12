@@ -150,6 +150,12 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "MySettings")
 	float speed = 500.0f; // 스피드
+
+	UPROPERTY(EditAnywhere, Category = "MySettings")
+	class UNiagaraSystem* NI_space;
+
+	USceneComponent* niagarasccomp;
+	class UNiagaraComponent* niagaracomp;
 	
 	FVector targetPos; // 마우스로 찍은 타겟위치 전방선언
 

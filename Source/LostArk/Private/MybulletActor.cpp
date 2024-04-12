@@ -18,9 +18,10 @@ AMybulletActor::AMybulletActor()
 
 	bulletFX = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Niagara"));
 	SetRootComponent(bulletFX);
-
+	
 	Collisionsphere = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere Collision"));
 	Collisionsphere->SetupAttachment(bulletFX);
+	Collisionsphere->SetCollisionProfileName(FName("Bullet preset"));
 
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
 	ProjectileMovement->ProjectileGravityScale = 0;
@@ -40,9 +41,16 @@ void AMybulletActor::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 	BulletHit();
 
 	AController* Playerc = GetInstigator()->GetController();
-	UGameplayStatics::ApplyDamage(OtherActor, 30, Playerc, this, DamageType);
+	UGameplayStatics::ApplyDamage(OtherActor, BaseDamage, Playerc, this, DamageType);
 	//AMybulletActor* 
-	Destroy();
+	bullet = Cast<AMybulletActor>(OtherActor);
+
+	if (bullet != nullptr && !GetWorld()->GetTimerManager().IsTimerActive(skillDelay))
+	{
+		GetWorld()->GetTimerManager().SetTimer(skillDelay, FTimerDelegate::CreateLambda([&]() {
+			bullet-> Destroy();
+			}), 3.0f, false);
+	}
 
 }
 

@@ -19,6 +19,7 @@
 #include <../../../../../../../Plugins/FX/Niagara/Source/Niagara/Public/NiagaraFunctionLibrary.h>
 #include "MybulletActor.h"
 #include "PlayerAnimInstance.h"
+#include "../../../../../../../Program Files/Epic Games/UE_5.3/Engine/Plugins/Runtime/ModelViewViewModel/Source/ModelViewViewModelDebuggerEditor/Private/Widgets/SMainDebugTab.h"
 
 
 ASlashCharacter::ASlashCharacter()
@@ -137,8 +138,8 @@ AActor* ASlashCharacter::ShootBullet()
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Instigator = this;
-	//AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn, SpawnLocation->GetComponentLocation(), toward.Rotation(), SpawnParams);
-	AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn, SpawnLocation->GetComponentLocation(), GetActorRotation(), SpawnParams);
+	AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn, SpawnLocation->GetComponentLocation(), toward.Rotation(), SpawnParams);
+	//AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn, SpawnLocation->GetComponentLocation(), GetActorRotation(), SpawnParams);
 	return SpawandActor;
 
 }
@@ -151,8 +152,8 @@ AActor* ASlashCharacter::ShootBullet2()
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Instigator = this;
-	//AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn, SpawnLocation->GetComponentLocation(), toward.Rotation(), SpawnParams);
-	AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn2, SpawnLocation->GetComponentLocation(), GetActorRotation(), SpawnParams);
+	AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn2, SpawnLocation->GetComponentLocation(), toward.Rotation(), SpawnParams);
+	//AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn2, SpawnLocation->GetComponentLocation(), GetActorRotation(), SpawnParams);
 	return SpawandActor;
 
 }
@@ -292,6 +293,7 @@ void ASlashCharacter::ShiftStarted(const FInputActionValue& value)
 {
 	// 스페이스바 입력이 들어오면
 	UE_LOG(LogTemp, Warning, (TEXT("spacebar")));
+niagaracomp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NI_space, GetActorLocation(), FRotator::ZeroRotator);
 
 	// 플레이어 위치와 목표 좌표의 거리가 100이상일 때
 	FVector distance = targetPos - GetActorLocation();
