@@ -18,8 +18,9 @@
 #include <../../../../../../../Source/Runtime/Engine/Classes/Camera/CameraComponent.h>
 #include <../../../../../../../Plugins/FX/Niagara/Source/Niagara/Public/NiagaraFunctionLibrary.h>
 #include "MybulletActor.h"
-#include "PlayerAnimInstance.h"
+
 #include "../../../../../../../Program Files/Epic Games/UE_5.3/Engine/Plugins/Runtime/ModelViewViewModel/Source/ModelViewViewModelDebuggerEditor/Private/Widgets/SMainDebugTab.h"
+#include "PlayerAnimInstance.h"
 
 
 ASlashCharacter::ASlashCharacter()
@@ -146,7 +147,6 @@ AActor* ASlashCharacter::ShootBullet()
 
 AActor* ASlashCharacter::ShootBullet2()
 {
-
 	FVector toward = targetPos - GetActorLocation();
 	FVector loc = GetActorLocation();
 
@@ -155,7 +155,6 @@ AActor* ASlashCharacter::ShootBullet2()
 	AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn2, SpawnLocation->GetComponentLocation(), toward.Rotation(), SpawnParams);
 	//AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn2, SpawnLocation->GetComponentLocation(), GetActorRotation(), SpawnParams);
 	return SpawandActor;
-
 }
 
 // 데미지 시스템
@@ -215,6 +214,7 @@ void ASlashCharacter::Tick(float DeltaTime)
 
 	else
 	{
+		// 이동 완료 후에는 RunMotion을 false로 설정
 		playerAnim = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
 		playerAnim->bRunMotionOn = false;
 	}
@@ -322,7 +322,12 @@ void ASlashCharacter::W(const FInputActionValue& value)
 
 void ASlashCharacter::FireBullet2(const FInputActionValue& value)
 {
-	ShootBullet2();
+	//ShootBullet2();
+	bPlayerIsAttacking = true;
+
+	int32 num = FMath::RandRange(1, 4);
+	FString sectionName = FString("HitGround") + FString::FromInt(num); // FromInt : 숫자 변수의 값을 문자로 변환해주는 함수
+	PlayAnimMontage(hitground_montage, 1, FName(sectionName));
 }
 
 void ASlashCharacter::R(const FInputActionValue& value)
@@ -347,7 +352,16 @@ void ASlashCharacter::D(const FInputActionValue& value)
 
 void ASlashCharacter::F(const FInputActionValue& value)
 {
-	UE_LOG(LogTemp, Warning, TEXT("F"));
+	bPlayerIsAttacking = true;
+
+	int32 num = FMath::RandRange(1, 3);	
+	FString sectionName = FString("Fencing") + FString::FromInt(num); // FromInt : 숫자 변수의 값을 문자로 변환해주는 함수
+	PlayAnimMontage(fencing_montage, 1, FName(sectionName));
+
+	UE_LOG(LogTemp, Warning, TEXT("F___%d"), num);
+
+	//playerAnim = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
+	//playerAnim->bRunMotionOn = false;
 }
 
 void ASlashCharacter::SetInputDirection(const FInputActionValue& value)
@@ -356,6 +370,10 @@ void ASlashCharacter::SetInputDirection(const FInputActionValue& value)
 	bool isPressed = value.Get<bool>();   // .이 캐스트의 의미 , 개발자가 어떻게 만들지 예측할 수 없어서 이런식으로 작성
 	if (isPressed)
 	{
+		if (bPlayerIsAttacking)
+		{
+			return;
+		}
 		//FVector mousePos;
 		//FVector mouseDir;
 		//APlayerController->DeprojectMousePositionToWorld(mousePos, mouseDir);
@@ -381,7 +399,7 @@ void ASlashCharacter::SetInputDirection(const FInputActionValue& value)
 
 		//DrawDebugSphere(GetWorld(), mousePos, 1.0f, 5, FColor::Red, false, -1, 1, 1);
 
-		// 월드 포지션z를 캐릭터캡슐컬리전으로 두고
+		// 이동 입력이 들어오면 RunMotion을 true로 설정
 		playerAnim = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
 		playerAnim->bRunMotionOn = true;
 	}

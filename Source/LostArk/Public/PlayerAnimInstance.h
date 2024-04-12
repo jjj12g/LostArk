@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
+#include "SlashCharacter.h"
 #include "PlayerAnimInstance.generated.h"
 
 /**
@@ -24,9 +25,17 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MySettings")
 	bool bRunMotionOn = false;
 
-private:
-	UPROPERTY()
+	
 	class ASlashCharacter* player;
+
+private:
+	
+
+	UFUNCTION()
+	void AnimNotify_nnIdle();
+
+	UFUNCTION()
+	void AnimNotify_nnHit();
 
 	
 	

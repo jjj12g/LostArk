@@ -40,14 +40,14 @@ class LOSTARK_API ASlashCharacter : public ABaseCharacter //공통부모로 변경
 public:
 	ASlashCharacter();
 	
-
+	AActor* ShootBullet();
+	AActor* ShootBullet2();
 
 
 protected:
 	virtual void BeginPlay() override;
 	// 총알 발사 관련
-	AActor* ShootBullet();
-	AActor* ShootBullet2();
+	
 
 	
 
@@ -87,7 +87,7 @@ protected:
 	FRotator ShootRot;
 	FRotator Movement;
 	
-
+	
 
 	
 public:
@@ -96,7 +96,7 @@ public:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	UPROPERTY(VisibleAnywhere, Category = "MySettings|Components")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "MySettings|Components")
 	class UStaticMeshComponent* staffMeshComp;
 
 	// 카메라 관련 변수 선언
@@ -183,8 +183,13 @@ public:
 	void Shoot(const FInputActionValue& value);
 
 	UPROPERTY(EditAnywhere, Category="MySettings|Animations")
-	class UAnimMontage* move_montage;
+	class UAnimMontage* fencing_montage;
 
+	UPROPERTY(EditAnywhere, Category="MySettings|Animations")
+	class UAnimMontage* hitground_montage;
+
+	UPROPERTY()
+	bool bPlayerIsAttacking=false;
 
 	
 private:   //나만 사용가능하다는 뜻 , 외부에서 호출할게 아니면 여기서 작성하는게 좋음
@@ -235,6 +240,8 @@ private:   //나만 사용가능하다는 뜻 , 외부에서 호출할게 아니면 여기서 작성하는게
 
 	UPROPERTY()
 	bool bPlayerIsInvisible=false;
+
+	
 };
 
 

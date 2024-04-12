@@ -22,6 +22,17 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	 
 	 if (playerMovementComp != nullptr)
 	 {
-
+		
 	 }
+}
+
+void UPlayerAnimInstance::AnimNotify_nnIdle()
+{
+	// SlashCharacter의 bool 변수인 bPlayerIsAttacking을 false로 설정한다 (=이동 입력을 받을 수 있도록 초기화)
+	player->bPlayerIsAttacking=false;
+}
+
+void UPlayerAnimInstance::AnimNotify_nnHit()
+{
+	player->ShootBullet2();
 }
