@@ -216,6 +216,12 @@ public:
 	UPROPERTY(EditAnywhere, Category="MySettings|Animations")
 	class UAnimMontage* hitground_montage;
 
+	UPROPERTY(EditAnywhere, Category="MySettings|Animations")
+	class UAnimMontage* sky_montage;
+
+	UPROPERTY(EditAnywhere, Category="MySettings|Animations")
+	class UAnimMontage* straight_montage;
+
 	UPROPERTY()
 	bool bPlayerIsAttacking=false;
 

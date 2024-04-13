@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Pull at 스킬 1_8
 
 
 #include "SlashCharacter.h"
@@ -274,7 +274,6 @@ void ASlashCharacter::FireBullet(const FInputActionValue& value)
 		GetWorld()->GetTimerManager().SetTimer(TimerHandle,TimeBetweenFire,false);
 	}
 	*/
-
 }
 
 void ASlashCharacter::SetCanFire(bool value)
@@ -362,10 +361,8 @@ void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		enhancedInputComponent->BindAction(ia_d, ETriggerEvent::Started, this, &ASlashCharacter::D);
 		enhancedInputComponent->BindAction(ia_f, ETriggerEvent::Started, this, &ASlashCharacter::F);
 	}
-
-
-
 }
+
 void ASlashCharacter::Move(FVector direction, float deltaTime)
 {
 	// direction의 방향으로 이동한다.
@@ -429,8 +426,8 @@ void ASlashCharacter::R(const FInputActionValue& value)
 	bPlayerIsAttacking = true;
 
 	int32 num = FMath::RandRange(1, 4);
-	FString sectionName = FString("HitGround") + FString::FromInt(num); // FromInt : 숫자 변수의 값을 문자로 변환해주는 함수
-	PlayAnimMontage(hitground_montage, 1, FName(sectionName));
+	FString sectionName = FString("Sky") + FString::FromInt(num); // FromInt : 숫자 변수의 값을 문자로 변환해주는 함수
+	PlayAnimMontage(sky_montage, 1, FName(sectionName));
 }
 
 void ASlashCharacter::A(const FInputActionValue& value)
@@ -468,11 +465,7 @@ void ASlashCharacter::F(const FInputActionValue& value)
 
 // 여기 까지~~~ 스킬 ~~-------
 
-
-
-
-
-
+// 클릭 좌표로 이동 함수
 void ASlashCharacter::SetInputDirection(const FInputActionValue& value)
 {
 
@@ -512,7 +505,6 @@ void ASlashCharacter::SetInputDirection(const FInputActionValue& value)
 		playerAnim = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
 		playerAnim->bRunMotionOn = true;
 	}
-
 }
 
 

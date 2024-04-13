@@ -32,12 +32,22 @@ void UPlayerAnimInstance::AnimNotify_nnIdle()
 	player->bPlayerIsAttacking=false;
 }
 
-void UPlayerAnimInstance::AnimNotify_nnHit()
+void UPlayerAnimInstance::AnimNotify_nnHit1() //땅 내리찍기 HitGroundMontage
 {
 	player->ShootBullet2();
 }
 
-void UPlayerAnimInstance::AnimNotify_nnHit2()
+void UPlayerAnimInstance::AnimNotify_nnSky1() //하늘에서 기모으기 SkyMontage
 {
 	player->ShootBullet5();
+}
+ 
+void UPlayerAnimInstance::AnimNotify_nnShoot1() //평타 StraightForwardMontage
+{
+
+}
+
+void UPlayerAnimInstance::AnimNotify_nnPierce1() //찌르기 FencingMontage
+{
+
 }
