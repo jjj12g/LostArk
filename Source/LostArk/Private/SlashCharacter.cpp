@@ -1,4 +1,4 @@
-// Pull at 스킬 1_8
+// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "SlashCharacter.h"
@@ -274,6 +274,7 @@ void ASlashCharacter::FireBullet(const FInputActionValue& value)
 		GetWorld()->GetTimerManager().SetTimer(TimerHandle,TimeBetweenFire,false);
 	}
 	*/
+
 }
 
 void ASlashCharacter::SetCanFire(bool value)
@@ -351,7 +352,7 @@ void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		enhancedInputComponent->BindAction(ia_attack, ETriggerEvent::Started, this, &ASlashCharacter::Shoot);
 		enhancedInputComponent->BindAction(ia_Fire, ETriggerEvent::Started, this, &ASlashCharacter::FireBullet);
 
-		enhancedInputComponent->BindAction(ia_shift, ETriggerEvent::Started, this, &ASlashCharacter::ShiftStarted);
+		enhancedInputComponent->BindAction(ia_shift, ETriggerEvent::Triggered, this, &ASlashCharacter::ShiftStarted);
 		enhancedInputComponent->BindAction(ia_q, ETriggerEvent::Started, this, &ASlashCharacter::Q);
 		enhancedInputComponent->BindAction(ia_w, ETriggerEvent::Started, this, &ASlashCharacter::W);
 		enhancedInputComponent->BindAction(ia_e, ETriggerEvent::Started, this, &ASlashCharacter::FireBullet2);
@@ -361,8 +362,10 @@ void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		enhancedInputComponent->BindAction(ia_d, ETriggerEvent::Started, this, &ASlashCharacter::D);
 		enhancedInputComponent->BindAction(ia_f, ETriggerEvent::Started, this, &ASlashCharacter::F);
 	}
-}
 
+
+
+}
 void ASlashCharacter::Move(FVector direction, float deltaTime)
 {
 	// direction의 방향으로 이동한다.
@@ -378,7 +381,7 @@ void ASlashCharacter::ShiftStarted(const FInputActionValue& value)
 {
 	// 스페이스바 입력이 들어오면
 	UE_LOG(LogTemp, Warning, (TEXT("spacebar")));
-niagaracomp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NI_space, GetActorLocation(), FRotator::ZeroRotator);
+	niagaracomp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NI_space, GetActorLocation(), FRotator::ZeroRotator);
 
 	// 플레이어 위치와 목표 좌표의 거리가 100이상일 때
 	FVector distance = targetPos - GetActorLocation();
@@ -389,6 +392,7 @@ niagaracomp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NI_spac
 		// 모습이 감춰져 있는 동안 이동 속도를 평상시보다 더 빠르게 설정한다.
 		GetCharacterMovement()->MaxWalkSpeed = 1500;
 		GetCharacterMovement()->MaxAcceleration = 4000;
+		
 		// 플레이어는 투명상태 : true로 설정
 		bPlayerIsInvisible = true;
 	}
@@ -426,8 +430,8 @@ void ASlashCharacter::R(const FInputActionValue& value)
 	bPlayerIsAttacking = true;
 
 	int32 num = FMath::RandRange(1, 4);
-	FString sectionName = FString("Sky") + FString::FromInt(num); // FromInt : 숫자 변수의 값을 문자로 변환해주는 함수
-	PlayAnimMontage(sky_montage, 1, FName(sectionName));
+	FString sectionName = FString("HitGround") + FString::FromInt(num); // FromInt : 숫자 변수의 값을 문자로 변환해주는 함수
+	PlayAnimMontage(hitground_montage, 1, FName(sectionName));
 }
 
 void ASlashCharacter::A(const FInputActionValue& value)
@@ -465,7 +469,11 @@ void ASlashCharacter::F(const FInputActionValue& value)
 
 // 여기 까지~~~ 스킬 ~~-------
 
-// 클릭 좌표로 이동 함수
+
+
+
+
+
 void ASlashCharacter::SetInputDirection(const FInputActionValue& value)
 {
 
@@ -505,6 +513,7 @@ void ASlashCharacter::SetInputDirection(const FInputActionValue& value)
 		playerAnim = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
 		playerAnim->bRunMotionOn = true;
 	}
+
 }
 
 
