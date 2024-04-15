@@ -86,7 +86,7 @@ void AEnemy::Tick(float DeltaTime)
 	if (breath1 == true)
 	{
 		if (NI_breath != nullptr)
-			NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NI_breath, GetActorLocation()-FVector(0,-100,-100), FRotator(0, 90, 0));
+			NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NI_breath, GetActorLocation()+ FVector(100,370,200), FRotator(0, 90, 0));
 		breath1 = false;
 	}
 	if (EnemyoverlapOn == true)
