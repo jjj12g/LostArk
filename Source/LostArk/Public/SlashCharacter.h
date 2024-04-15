@@ -19,7 +19,7 @@ class UAnimMontage;
 class UInputMappingContext;
 class UInputAction;
 class AMaactor;
-
+class UHealthBarComponent; // hp 바
 // 데미지 관련 슬래쉬캐릭터 h 와 cpp에 일단 주석으로 넣어둠
 
 
@@ -232,6 +232,9 @@ private:   //나만 사용가능하다는 뜻 , 외부에서 호출할게 아니면 여기서 작성하는게
 		
 		//UPROPERTY(EditAnyWhere, Category = "Damage)
 		//float Damage = 20.f;				
+
+	UPROPERTY(VisibleAnywhere)
+	UHealthBarComponent* HealthBarWidget; //hp 바
 
 		//이동
 	UFUNCTION(BlueprintCallable)

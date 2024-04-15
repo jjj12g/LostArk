@@ -21,6 +21,7 @@
 
 #include "../../../../../../../Program Files/Epic Games/UE_5.3/Engine/Plugins/Runtime/ModelViewViewModel/Source/ModelViewViewModelDebuggerEditor/Private/Widgets/SMainDebugTab.h"
 #include "PlayerAnimInstance.h"
+#include "HUD/HealthBarComponent.h"
 
 
 ASlashCharacter::ASlashCharacter()
@@ -36,6 +37,10 @@ ASlashCharacter::ASlashCharacter()
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationRoll = false;
 	bUseControllerRotationYaw = false;
+
+
+	HealthBarWidget = CreateDefaultSubobject<UHealthBarComponent>(TEXT("HealthBar")); // 헬스바위젯
+	HealthBarWidget->SetupAttachment(GetRootComponent()); //헬스바위젯을 루트로
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 640.0f, 0.0f); //마우스랑 다를경우 초당 640만큼회전

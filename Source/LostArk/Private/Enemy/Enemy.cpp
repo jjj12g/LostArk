@@ -12,6 +12,12 @@
 #include "Navigation/PathFollowingComponent.h"
 #include "items/Weapons/Weapon.h"
 #include "DrawDebugHelpers.h"
+#include "EnemyAnimInstance.h"
+#include "TimerManager.h"
+#include "Components/Boxcomponent.h"
+#include <../../../../../../../Source/Runtime/Engine/Classes/Kismet/GameplayStatics.h>
+
+
 
 
 #define	DRAW_SPHERE_COLOR(Location, Color) DrawDebugSphere(GetWorld(), Location, 8.f, 12, Color, false, 5.f);  // 디버그 구체
@@ -26,10 +32,15 @@ AEnemy::AEnemy()
 	GetMesh()->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
 	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
 	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
+	// 매쉬콜리전 일단잠시 노콜리전으로 두기 박스컬리전확인해보고 바꿀생각
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetMesh()->SetCollisionProfileName(FName("EnemyPreset"));
+	//GetMesh()->SetGenerateOverlapEvents(true);
+	// 에너미 프리셋으로 변경
+	//GetMesh()->SetCollisionProfileName(FName("Enemypreset"));
+	//boxComp = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Component"));
+	//boxComp->SetGenerateOverlapEvents(true);
 	GetMesh()->SetGenerateOverlapEvents(true);
-
-
-
 
 	HealthBarWidget = CreateDefaultSubobject<UHealthBarComponent>(TEXT("HealthBar")); // 헬스바위젯
 	HealthBarWidget->SetupAttachment(GetRootComponent()); //헬스바위젯을 루트로
@@ -62,20 +73,56 @@ void AEnemy::Tick(float DeltaTime)
 		CheckPatrolTarget();  //순찰 목표범위에 들어갔는지 확인 (순찰대상 확인)
 	}
 
+	//UE_LOG(LogTemp, Warning, TEXT("State Transition: %s"), *UEnum::GetValueAsString<EEnemyState>(EnemyState)); // 현재스테이터스 확인
+
+
+	// 러쉬어택
+	if (rush1 == true)
+	{ 
+		rushAttack(DeltaTime);
+	}
+	
+	// 브레스
+	if (breath1 == true)
+	{
+		if (NI_breath != nullptr)
+			NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NI_breath, GetActorLocation(), FRotator::ZeroRotator);	
+		breath1 = false;
+	}
+	if (EnemyoverlapOn == true)
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("enemy collsion on!"));
+		enemyCollisionOn();
+		if (EnemyoveralpOff == true)
+		{ 
+			//UE_LOG(LogTemp, Warning, TEXT("enemy collsion off!"));
+			enemyCollisionOff();
+			EnemyoverlapOn = false;
+			EnemyoveralpOff = false;
+		}
+	}
+
+
+
 }
 
 // 데미지 , 남은체력 계산
 float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigetor, AActor* DamageCauser)
 {
+	
 	HP -= DamageAmount;
-	if (HP <= 0)
+	if (HP <= 0.0f)
 	{
 		Destroy();
 	}
+	UE_LOG(LogTemp, Warning, TEXT("enemy hit!"));
 	//return DamageAmount;
-	//HandleDamage(DamageAmount);
+	HandleDamage(DamageAmount);
+	if (player == nullptr)
+	{
 	CombatTarget = EventInstigetor->GetPawn(); // 적이 피해를 입는 즉시 전투목표 설정
 	ChaseTarget();
+	}
 	return DamageAmount;
 }
 
@@ -102,6 +149,11 @@ void AEnemy::GetHit_Implementation(const FVector& ImpactPoint)
 void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
+
+	
+	//GetMesh()->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::BeginOverlap);
+	GetMesh()->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::BeginOverlap);
+
 
 	if (PawnSensing) PawnSensing->OnSeePawn.AddDynamic(this, &AEnemy::PawnSeen);
 	InitializeEnemy();
@@ -143,28 +195,35 @@ void AEnemy::Attack()
 	if (AnimInstance && AttackMontage)
 	{
 		AnimInstance->Montage_Play(AttackMontage);
-		const int32 Selection = FMath::RandRange(0, 9); // 0~2까지가 3개
+		const int32 Selection = FMath::RandRange(2, 2); // 0~2까지가 3개
 		FName SectionName = FName();
 		switch (Selection)
 		{
-		case 0:
+			// 돌진 공격
+		case 0:	
 			AttackMontage1();
 			break;
+			// 브레스
 		case 1:
 			AttackMontage2();
 			break;
+			// 위로 한바퀴
 		case 2:
 			AttackMontage3();
 			break;
+			// 뒤로꼬리치고 몸들었다가 다시꼬리치기
 		case 3:
 			AttackMontage4();
 			break;
+			// 바닥찍고 꼬리치기
 		case 4:
 			AttackMontage5();
 			break;
+			// 바닥 3번찍기
 		case 5:
 			AttackMontage6();
 			break;
+			// 양옆 감전날개
 		case 6:
 			AttackMontage7();
 			break;
@@ -194,6 +253,43 @@ void AEnemy::AttackMontage1()
 	UE_LOG(LogTemp, Warning, TEXT("attack1"));
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	AnimInstance->Montage_JumpToSection(FName("Attack1"), AttackMontage);
+	
+	NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), Lighting, GetActorLocation(), FRotator::ZeroRotator);
+			
+	// 타겟 범위
+	startLoc = GetActorLocation();
+	targetLoc = GetActorLocation()+ GetActorForwardVector() * 500;
+
+	//UE_LOG(LogTemp, Warning, TEXT("State Transition: %s"), *UEnum::GetValueAsString<EEnemyState>(EnemyState));
+}
+
+bool AEnemy::rushAttack(float deltaSeconds)
+{
+
+	// 러쉬어택
+	stackTime += deltaSeconds;
+
+	FVector rushLocation = FMath::Lerp(startLoc, targetLoc, stackTime);
+
+	SetActorLocation(rushLocation);
+	NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NI_Bossskill1, GetActorLocation(), FRotator::ZeroRotator);
+	//if(FVector::Distance(GetActorLocation(), targetLoc) < 10.0f){
+	//	resh = false;
+	//}
+	if(stackTime >= 1.0f){
+		stackTime = 0.0f;
+		
+		rush1=false;
+	}
+
+	if (rush2 == true)
+	{
+		// 콜리전 없애기.
+		
+	}
+
+	//EEnemyState::EES_Attacking;
+	return true;
 }
 
 void AEnemy::AttackMontage2()
@@ -201,6 +297,10 @@ void AEnemy::AttackMontage2()
 	UE_LOG(LogTemp, Warning, TEXT("attack2"));
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	AnimInstance->Montage_JumpToSection(FName("Attack2"), AttackMontage);
+
+	
+
+
 }
 
 void AEnemy::AttackMontage3()
@@ -208,6 +308,7 @@ void AEnemy::AttackMontage3()
 	UE_LOG(LogTemp, Warning, TEXT("attack3"));
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	AnimInstance->Montage_JumpToSection(FName("Attack3"), AttackMontage);
+
 }
 
 void AEnemy::AttackMontage4()
@@ -215,6 +316,7 @@ void AEnemy::AttackMontage4()
 	UE_LOG(LogTemp, Warning, TEXT("attack4"));
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	AnimInstance->Montage_JumpToSection(FName("Attack4"), AttackMontage);
+
 }
 
 void AEnemy::AttackMontage5()
@@ -222,6 +324,7 @@ void AEnemy::AttackMontage5()
 	UE_LOG(LogTemp, Warning, TEXT("attack5"));
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	AnimInstance->Montage_JumpToSection(FName("Attack5"), AttackMontage);
+
 }
 
 void AEnemy::AttackMontage6()
@@ -229,6 +332,7 @@ void AEnemy::AttackMontage6()
 	UE_LOG(LogTemp, Warning, TEXT("attack6"));
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	AnimInstance->Montage_JumpToSection(FName("Attack6"), AttackMontage);
+
 }
 
 void AEnemy::AttackMontage7()
@@ -236,6 +340,7 @@ void AEnemy::AttackMontage7()
 	UE_LOG(LogTemp, Warning, TEXT("attack7"));
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	AnimInstance->Montage_JumpToSection(FName("Attack7"), AttackMontage);
+
 }
 
 void AEnemy::AttackMontage8()
@@ -243,6 +348,7 @@ void AEnemy::AttackMontage8()
 	UE_LOG(LogTemp, Warning, TEXT("attack8"));
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	AnimInstance->Montage_JumpToSection(FName("Attack8"), AttackMontage);
+
 }
 
 void AEnemy::AttackMontage9()
@@ -250,13 +356,43 @@ void AEnemy::AttackMontage9()
 	UE_LOG(LogTemp, Warning, TEXT("attack9"));
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	AnimInstance->Montage_JumpToSection(FName("Attack9"), AttackMontage);
+
 }
 void AEnemy::AttackMontage10()
 {
 	UE_LOG(LogTemp, Warning, TEXT("attack10"));
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	AnimInstance->Montage_JumpToSection(FName("Attack10"), AttackMontage);
+
 }
+
+void AEnemy::enemyCollisionOn()
+{
+	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_EngineTraceChannel1, ECollisionResponse::ECR_Ignore);
+
+}
+
+void AEnemy::enemyCollisionOff()
+{
+	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_EngineTraceChannel1, ECollisionResponse::ECR_Ignore);
+
+}
+
+void AEnemy::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	UE_LOG(LogTemp, Warning, TEXT("TakeDamegeEnemy"));
+	//AController* aiCT = GetInstigator()->GetController();
+	//AController* Playerc = GetInstigator()->GetController();
+	//AAIController* enemyCon = EnemyController;
+
+	UGameplayStatics::ApplyDamage(OtherActor, 30, EnemyController,  this, DamageType);
+	enemy = Cast<AEnemy>(OtherActor);
+
+}
+
+
+
+
 
 bool AEnemy::CanAttack()
 {
@@ -282,7 +418,6 @@ void AEnemy::HandleDamage(float DamageAmount)
 	if (Attributes && HealthBarWidget)
 	{
 		HealthBarWidget->SetHealthPercent(Attributes->GetHealthPercent());
-
 	}
 
 }
@@ -383,9 +518,11 @@ void AEnemy::StartPatrolling()
 // 추격
 void AEnemy::ChaseTarget()
 {
+	
 	EnemyState = EEnemyState::EES_Chasing;  //  추격모션사용
 	GetCharacterMovement()->MaxWalkSpeed = ChasingSpeed; // 무브스피드 300으로하고
 	MoveToTarget(CombatTarget); // 목표물로 이동
+	
 }
 
 bool AEnemy::IsOutsideCombatRadius()
@@ -512,6 +649,8 @@ void AEnemy::PawnSeen(APawn* SeenPawn) // 플레이어 추격
 	}
 
 }
+
+
 
 
 

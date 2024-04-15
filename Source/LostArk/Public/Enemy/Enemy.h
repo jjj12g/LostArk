@@ -34,10 +34,39 @@ public:
 	//virtual void Destroyed() override;
 	/** </AActor> */
 
+	UPROPERTY(EditAnywhere, Category = "MySettings")
+	class UBoxComponent* boxComp;
 
 	/** <IHitInterface>  */
 	virtual void GetHit_Implementation(const FVector& ImpactPoint) override;
 	/** </IHitInterface>  */
+
+	// 나이아가라
+	UPROPERTY(EditAnywhere)
+	class UNiagaraSystem* NI_Bossskill1;
+
+	UPROPERTY(EditAnywhere)
+	class UNiagaraSystem* Lighting;
+
+	UPROPERTY(EditAnywhere)
+	class UNiagaraSystem* NI_breath;
+
+	USceneComponent* NiagaraSceneComp;
+	class UNiagaraComponent* NiagaraComp;
+	
+	class ASlashCharacter* player;
+
+	UPROPERTY(BlueprintReadOnly)
+	EEnemyState EnemyState = EEnemyState::EES_Patrolling; //애니메이션 순찰에들어감
+
+	// 공격 노티파이 시스템
+	bool rushAttack(float deltaSeconds);
+	bool rush = false;
+	bool rush1 = false;
+	bool rush2 = false;
+	bool breath1 = false;
+	bool EnemyoverlapOn = false;
+	bool EnemyoveralpOff = false;
 
 protected:
 	/** <AActor> */
@@ -53,6 +82,13 @@ protected:
 	virtual int32 PlayDeathMontage() override;
 	/** </ABaseCharacter> */
 
+	// 오버랩 이벤트
+	UFUNCTION()
+	void BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mysettings")
+	class AEnemy* enemy;
+
 	// 공격 모션 함수
 	void AttackMontage1();
 	void AttackMontage2();
@@ -64,6 +100,12 @@ protected:
 	void AttackMontage8();
 	void AttackMontage9();
 	void AttackMontage10();
+
+	void enemyCollisionOn();
+	void enemyCollisionOff();
+
+	UPROPERTY(EditAnywhere, Category = "mysettings")
+	TSubclassOf<UDamageType> DamageType;
 
 	// 요한 TAKE 데미지
 	virtual float TakeDamage
@@ -77,13 +119,12 @@ protected:
 	UPROPERTY(BlueprintReadOnly)
 	TEnumAsByte <EDeathPose> DeathPose; // 죽음 모션
 
-	UPROPERTY(BlueprintReadOnly)
-	EEnemyState EnemyState = EEnemyState::EES_Patrolling; //애니메이션 순찰에들어감
+	
 
 	//void PlayHitReactMontage(const FName& SectionName);
 
-	UPROPERTY(EditAnywhere, Category = "Mysettings")
-	float HP = 500;
+	UPROPERTY(EditAnywhere)
+	float HP = 100;
 
 private:
 	/** AI behavior(행동) */
@@ -109,7 +150,7 @@ private:
 	bool InTargetRange(AActor* Target, double Radius); // 타깃이 범위내에 있다면 true값 반환     수용반경
 	void MoveToTarget(AActor* Target);   //순찰시간끝나면 이동
 	AActor* ChoosePatrolTarget(); //새 표적 선택하기
-	
+
 
 	UFUNCTION()
 	void PawnSeen(APawn* SeenPawn); // Callback for OnPawnSeen in UPawnSensingComponent
@@ -126,12 +167,14 @@ private:
 	UPROPERTY()
 	AActor* CombatTarget;
 
+	float stackTime = 0.0f;
+
 	//이동속도
 	UPROPERTY(EditAnywhere)
 	double CombatRadius = 1000.f;
 
 	UPROPERTY(EditAnywhere)
-	double AttackRadius = 300.f;   // 공격 반경
+	double AttackRadius = 350.f;   // 공격 반경
 
 	UPROPERTY()
 	class AAIController* EnemyController;  //액터가 지시사항 전달 컨트롤러에 변수설정
@@ -162,6 +205,10 @@ private:
 	
 	FTimerHandle AttackTimer;
 	
+	FVector targetLoc;
+	FVector startLoc;
+	
+
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	float AttackMin = 0.5f;
 
@@ -174,4 +221,10 @@ private:
 	
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	float DeathLifeSpan = 8.0f;
+
+	/*UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	class EnemyAnimInstance* Anim;*/
+
+	//UFUNCTION()
+	//void AnimNotify_rushAttack1();
 };
