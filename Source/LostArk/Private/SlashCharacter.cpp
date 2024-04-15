@@ -420,18 +420,16 @@ void ASlashCharacter::FireBullet2(const FInputActionValue& value)
 
 	int32 num = FMath::RandRange(1, 4);
 	FString sectionName = FString("HitGround") + FString::FromInt(num); // FromInt : 숫자 변수의 값을 문자로 변환해주는 함수
-	PlayAnimMontage(hitground_montage, 1, FName(sectionName));
+	PlayAnimMontage(hitground_montage, 1.3, FName(sectionName));
 }
 
 void ASlashCharacter::R(const FInputActionValue& value)
 {
-	//ShootBullet5();
-	//UE_LOG(LogTemp, Warning, TEXT("R"));
 	bPlayerIsAttacking = true;
 
 	int32 num = FMath::RandRange(1, 4);
-	FString sectionName = FString("HitGround") + FString::FromInt(num); // FromInt : 숫자 변수의 값을 문자로 변환해주는 함수
-	PlayAnimMontage(hitground_montage, 1, FName(sectionName));
+	FString sectionName = FString("Sky") + FString::FromInt(num); // FromInt : 숫자 변수의 값을 문자로 변환해주는 함수
+	PlayAnimMontage(sky_montage, 1.3, FName(sectionName));
 }
 
 void ASlashCharacter::A(const FInputActionValue& value)

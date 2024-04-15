@@ -29,15 +29,15 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 void UPlayerAnimInstance::AnimNotify_nnIdle()
 {
 	// SlashCharacter의 bool 변수인 bPlayerIsAttacking을 false로 설정한다 (=이동 입력을 받을 수 있도록 초기화)
-	player->bPlayerIsAttacking=false;
+	player->bPlayerIsAttacking = false;
 }
 
-void UPlayerAnimInstance::AnimNotify_nnHit()
+void UPlayerAnimInstance::AnimNotify_nnHit1()
 {
 	player->ShootBullet2();
 }
 
-void UPlayerAnimInstance::AnimNotify_nnHit2()
+void UPlayerAnimInstance::AnimNotify_nnSky1()
 {
 	player->ShootBullet5();
 }

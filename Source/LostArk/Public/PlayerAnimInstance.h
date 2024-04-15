@@ -31,15 +31,20 @@ public:
 private:
 	
 
-	UFUNCTION()
+		UFUNCTION()
 	void AnimNotify_nnIdle();
 
 	UFUNCTION()
-	void AnimNotify_nnHit();
+	void AnimNotify_nnHit1(); //¶¥ ³»¸®Âï±â HitGroundMontage
 
 	UFUNCTION()
-	void AnimNotify_nnHit2();
+	void AnimNotify_nnSky1(); //ÇÏ´Ã¿¡¼­ ±â¸ðÀ¸±â SkyMontage
 
+	//UFUNCTION()
+	//void AnimNotify_nnShoot1(); //ÆòÅ¸ StraightForwardMontage
+
+	//UFUNCTION()
+	//void AnimNotify_nnPierce1(); //Âî¸£±â FencingMontage
 	
 	
 };
