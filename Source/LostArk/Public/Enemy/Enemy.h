@@ -174,7 +174,7 @@ private:
 	double CombatRadius = 1000.f;
 
 	UPROPERTY(EditAnywhere)
-	double AttackRadius = 350.f;   // 공격 반경
+	double AttackRadius = 600.f;   // 공격 반경
 
 	UPROPERTY()
 	class AAIController* EnemyController;  //액터가 지시사항 전달 컨트롤러에 변수설정

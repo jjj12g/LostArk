@@ -86,7 +86,7 @@ void AEnemy::Tick(float DeltaTime)
 	if (breath1 == true)
 	{
 		if (NI_breath != nullptr)
-			NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NI_breath, GetActorLocation(), FRotator::ZeroRotator);	
+			NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NI_breath, GetActorLocation()-FVector(0,-100,-100), FRotator(0, 90, 0));
 		breath1 = false;
 	}
 	if (EnemyoverlapOn == true)
@@ -195,7 +195,7 @@ void AEnemy::Attack()
 	if (AnimInstance && AttackMontage)
 	{
 		AnimInstance->Montage_Play(AttackMontage);
-		const int32 Selection = FMath::RandRange(2, 2); // 0~2까지가 3개
+		const int32 Selection = FMath::RandRange(0, 0); // 0~2까지가 3개
 		FName SectionName = FName();
 		switch (Selection)
 		{
@@ -254,12 +254,12 @@ void AEnemy::AttackMontage1()
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	AnimInstance->Montage_JumpToSection(FName("Attack1"), AttackMontage);
 	
-	NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), Lighting, GetActorLocation(), FRotator::ZeroRotator);
+	NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), Lighting, GetActorLocation()-FVector(0,0,400), FRotator(0, 90, 0));
 			
 	// 타겟 범위
 	startLoc = GetActorLocation();
 	targetLoc = GetActorLocation()+ GetActorForwardVector() * 500;
-
+	
 	//UE_LOG(LogTemp, Warning, TEXT("State Transition: %s"), *UEnum::GetValueAsString<EEnemyState>(EnemyState));
 }
 
@@ -272,7 +272,7 @@ bool AEnemy::rushAttack(float deltaSeconds)
 	FVector rushLocation = FMath::Lerp(startLoc, targetLoc, stackTime);
 
 	SetActorLocation(rushLocation);
-	NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NI_Bossskill1, GetActorLocation(), FRotator::ZeroRotator);
+	NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NI_Bossskill1, GetActorLocation() - FVector(0, 0, 400), FRotator(0,90,0));
 	//if(FVector::Distance(GetActorLocation(), targetLoc) < 10.0f){
 	//	resh = false;
 	//}
