@@ -56,6 +56,11 @@ public:
 	
 	class ASlashCharacter* player;
 
+	class UMaterialInstanceDynamic* dynamicMAT;
+
+	class UMaterialInstanceDynamic* dynamicMAT1;
+	
+
 	UPROPERTY(BlueprintReadOnly)
 	EEnemyState EnemyState = EEnemyState::EES_Patrolling; //애니메이션 순찰에들어감
 
@@ -67,6 +72,9 @@ public:
 	bool breath1 = false;
 	bool EnemyoverlapOn = false;
 	bool EnemyoveralpOff = false;
+
+	
+
 
 protected:
 	/** <AActor> */

@@ -16,6 +16,7 @@
 #include "TimerManager.h"
 #include "Components/Boxcomponent.h"
 #include <../../../../../../../Source/Runtime/Engine/Classes/Kismet/GameplayStatics.h>
+#include <../../../../../../../Source/Runtime/Engine/Classes/Materials/MaterialInstance.h>
 
 
 
@@ -159,6 +160,18 @@ void AEnemy::BeginPlay()
 	InitializeEnemy();
 
 
+	// 기본적인 머터리얼 색상 변경이 x 파라미터 형태로만 접근 가능
+	// 메시의 머터리얼을 DynamicMaterial로 변경 해준다
+	UMaterialInterface* currentMat = GetMesh()->GetMaterial(0);
+	dynamicMAT = UMaterialInstanceDynamic::Create(currentMat, nullptr);
+	GetMesh()->SetMaterial(0, dynamicMAT);
+
+
+	// 두번째 머터리얼 색 변경
+	UMaterialInterface* currentMat2 = GetMesh()->GetMaterial(1);
+	dynamicMAT1 = UMaterialInstanceDynamic::Create(currentMat2, nullptr);
+	GetMesh()->SetMaterial(1, dynamicMAT1);
+
 
 	/* 기본 무기 , 지워도오류 x
 	UWorld* World = GetWorld();
@@ -202,6 +215,7 @@ void AEnemy::Attack()
 			// 돌진 공격
 		case 0:	
 			AttackMontage1();
+
 			break;
 			// 브레스
 		case 1:
@@ -256,6 +270,12 @@ void AEnemy::AttackMontage1()
 	
 	NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), Lighting, GetActorLocation()-FVector(0,0,400), FRotator(0, 90, 0));
 			
+	// 공격 시 머터리얼 색 변경
+	dynamicMAT->SetVectorParameterValue(FName("Hit color"), FVector4(100, 95, 0,100));
+	// 두번째 색 변경
+	dynamicMAT1->SetVectorParameterValue(FName("hit Color"), FVector4(100, 95, 0, 100));
+
+
 	// 타겟 범위
 	startLoc = GetActorLocation();
 	targetLoc = GetActorLocation()+ GetActorForwardVector() * 500;
@@ -513,7 +533,10 @@ void AEnemy::StartPatrolling()
 	EnemyState = EEnemyState::EES_Patrolling; // 다시 순찰모션으로 변경
 	GetCharacterMovement()->MaxWalkSpeed = patrollingSpeed; // 그 후 다시 속도를 125로함.
 	MoveToTarget(PatrolTarget); // 순찰
-
+	// 공격 시 머터리얼 색 변경
+	dynamicMAT->SetVectorParameterValue(FName("Hit color"), FVector4(1, 1, 1, 1));
+	// 두번째 색 변경
+	dynamicMAT1->SetVectorParameterValue(FName("hit Color"), FVector4(1, 1, 1, 1));
 }
 // 추격
 void AEnemy::ChaseTarget()
