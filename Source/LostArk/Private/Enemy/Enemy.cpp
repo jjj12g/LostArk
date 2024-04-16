@@ -17,6 +17,9 @@
 #include "Components/Boxcomponent.h"
 #include <../../../../../../../Source/Runtime/Engine/Classes/Kismet/GameplayStatics.h>
 #include <../../../../../../../Source/Runtime/Engine/Classes/Materials/MaterialInstance.h>
+#include <../../../../../../../Plugins/FX/Niagara/Source/Niagara/Public/NiagaraComponent.h>
+#include <../../../../../../../Source/Runtime/Engine/Classes/GameFramework/Character.h>
+#include "Components/CapsuleComponent.h"
 
 
 
@@ -57,6 +60,19 @@ AEnemy::AEnemy()
 	PawnSensing = CreateDefaultSubobject<UPawnSensingComponent>(TEXT("PawnSensing")); //폰 컴퍼넌트 생성해서 만들기
 	PawnSensing->SightRadius = 4000.f; // 폰의 사이트 반경
 	PawnSensing->SetPeripheralVisionAngle(45.f); // 폰의 시야각 반경
+
+
+	// 나이아가라 스폰 위치
+	SpawnLocation = CreateDefaultSubobject<USceneComponent>(TEXT("bullet spawn point"));
+	SpawnLocation->SetupAttachment(GetMesh());
+
+	Dash = CreateDefaultSubobject<UNiagaraComponent>(TEXT("niagara comp"));
+	Dash->SetupAttachment(GetCapsuleComponent());
+
+
+
+
+
 }
 
 void AEnemy::Tick(float DeltaTime)
@@ -79,15 +95,15 @@ void AEnemy::Tick(float DeltaTime)
 
 	// 러쉬어택
 	if (rush1 == true)
-	{ 
+	{
 		rushAttack(DeltaTime);
 	}
-	
+
 	// 브레스
 	if (breath1 == true)
 	{
 		if (NI_breath != nullptr)
-			NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NI_breath, GetActorLocation()+ FVector(100,370,200), FRotator(0, 90, 0));
+			NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NI_breath, SpawnLocation->GetComponentLocation(), SpawnLocation->GetComponentRotation());
 		breath1 = false;
 	}
 	if (EnemyoverlapOn == true)
@@ -95,7 +111,7 @@ void AEnemy::Tick(float DeltaTime)
 		//UE_LOG(LogTemp, Warning, TEXT("enemy collsion on!"));
 		enemyCollisionOn();
 		if (EnemyoveralpOff == true)
-		{ 
+		{
 			//UE_LOG(LogTemp, Warning, TEXT("enemy collsion off!"));
 			enemyCollisionOff();
 			EnemyoverlapOn = false;
@@ -110,7 +126,7 @@ void AEnemy::Tick(float DeltaTime)
 // 데미지 , 남은체력 계산
 float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigetor, AActor* DamageCauser)
 {
-	
+
 	HP -= DamageAmount;
 	if (HP <= 0.0f)
 	{
@@ -121,8 +137,8 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 	HandleDamage(DamageAmount);
 	if (player == nullptr)
 	{
-	CombatTarget = EventInstigetor->GetPawn(); // 적이 피해를 입는 즉시 전투목표 설정
-	ChaseTarget();
+		CombatTarget = EventInstigetor->GetPawn(); // 적이 피해를 입는 즉시 전투목표 설정
+		ChaseTarget();
 	}
 	return DamageAmount;
 }
@@ -151,7 +167,8 @@ void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 
-	
+
+
 	//GetMesh()->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::BeginOverlap);
 	GetMesh()->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::BeginOverlap);
 
@@ -208,13 +225,14 @@ void AEnemy::Attack()
 	if (AnimInstance && AttackMontage)
 	{
 		AnimInstance->Montage_Play(AttackMontage);
-		const int32 Selection = FMath::RandRange(0, 0); // 0~2까지가 3개
+		const int32 Selection = FMath::RandRange(0, 1); // 0~2까지가 3개
 		FName SectionName = FName();
 		switch (Selection)
 		{
 			// 돌진 공격
-		case 0:	
+		case 0:
 			AttackMontage1();
+
 
 			break;
 			// 브레스
@@ -267,19 +285,25 @@ void AEnemy::AttackMontage1()
 	UE_LOG(LogTemp, Warning, TEXT("attack1"));
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	AnimInstance->Montage_JumpToSection(FName("Attack1"), AttackMontage);
-	
-	NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), Lighting, GetActorLocation()-FVector(0,0,400), FRotator(0, 90, 0));
-			
+	if (Dash != nullptr)
+	{
+		Dash->Activate();
+	}
+
+	NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), Lighting, SpawnLocation->GetComponentLocation(), SpawnLocation->GetComponentRotation());
+
+
+
+
+
 	// 공격 시 머터리얼 색 변경
-	dynamicMAT->SetVectorParameterValue(FName("Hit color"), FVector4(100, 95, 0,100));
+	//dynamicMAT->SetVectorParameterValue(FName("Hit color"), FVector4(100, 95, 0,100));
 	// 두번째 색 변경
-	dynamicMAT1->SetVectorParameterValue(FName("hit Color"), FVector4(100, 95, 0, 100));
-
-
+	//dynamicMAT1->SetVectorParameterValue(FName("hit Color"), FVector4(100, 95, 0, 100));
 	// 타겟 범위
 	startLoc = GetActorLocation();
-	targetLoc = GetActorLocation()+ GetActorForwardVector() * 500;
-	
+	targetLoc = GetActorLocation() + GetActorForwardVector() * 500;
+
 	//UE_LOG(LogTemp, Warning, TEXT("State Transition: %s"), *UEnum::GetValueAsString<EEnemyState>(EnemyState));
 }
 
@@ -289,23 +313,27 @@ bool AEnemy::rushAttack(float deltaSeconds)
 	// 러쉬어택
 	stackTime += deltaSeconds;
 
+
+
 	FVector rushLocation = FMath::Lerp(startLoc, targetLoc, stackTime);
 
 	SetActorLocation(rushLocation);
-	NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NI_Bossskill1, GetActorLocation() - FVector(0, 0, 400), FRotator(0,90,0));
+	NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NI_Bossskill1, SpawnLocation->GetComponentLocation(), SpawnLocation->GetComponentRotation());
+
 	//if(FVector::Distance(GetActorLocation(), targetLoc) < 10.0f){
 	//	resh = false;
 	//}
-	if(stackTime >= 1.0f){
+
+	if (stackTime >= 1.0f) {
 		stackTime = 0.0f;
-		
-		rush1=false;
+
+		rush1 = false;
 	}
 
 	if (rush2 == true)
 	{
 		// 콜리전 없애기.
-		
+
 	}
 
 	//EEnemyState::EES_Attacking;
@@ -318,7 +346,7 @@ void AEnemy::AttackMontage2()
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	AnimInstance->Montage_JumpToSection(FName("Attack2"), AttackMontage);
 
-	
+
 
 
 }
@@ -405,7 +433,7 @@ void AEnemy::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Othe
 	//AController* Playerc = GetInstigator()->GetController();
 	//AAIController* enemyCon = EnemyController;
 
-	UGameplayStatics::ApplyDamage(OtherActor, 30, EnemyController,  this, DamageType);
+	UGameplayStatics::ApplyDamage(OtherActor, 30, EnemyController, this, DamageType);
 	enemy = Cast<AEnemy>(OtherActor);
 
 }
@@ -443,7 +471,7 @@ void AEnemy::HandleDamage(float DamageAmount)
 }
 
 int32 AEnemy::PlayDeathMontage() // int32로 부모클래스와 결과를 동일하게 설정 
- {
+{
 	const int32 Selection = Super::PlayDeathMontage();
 	TEnumAsByte<EDeathPose> Pose(Selection);  // TEnum 열거체
 	if (Pose < EDeathPose::EDP_MAX) // 배열의 요소의 수 확인 (Enum 값보다 높은지)
@@ -533,19 +561,16 @@ void AEnemy::StartPatrolling()
 	EnemyState = EEnemyState::EES_Patrolling; // 다시 순찰모션으로 변경
 	GetCharacterMovement()->MaxWalkSpeed = patrollingSpeed; // 그 후 다시 속도를 125로함.
 	MoveToTarget(PatrolTarget); // 순찰
-	// 공격 시 머터리얼 색 변경
-	dynamicMAT->SetVectorParameterValue(FName("Hit color"), FVector4(1, 1, 1, 1));
-	// 두번째 색 변경
-	dynamicMAT1->SetVectorParameterValue(FName("hit Color"), FVector4(1, 1, 1, 1));
+
 }
 // 추격
 void AEnemy::ChaseTarget()
 {
-	
+
 	EnemyState = EEnemyState::EES_Chasing;  //  추격모션사용
 	GetCharacterMovement()->MaxWalkSpeed = ChasingSpeed; // 무브스피드 300으로하고
 	MoveToTarget(CombatTarget); // 목표물로 이동
-	
+
 }
 
 bool AEnemy::IsOutsideCombatRadius()
@@ -694,17 +719,4 @@ void AEnemy::PawnSeen(APawn* SeenPawn) // 플레이어 추격
 // 어택 나이아가라
 //SectionName = FName("Attack2");
 //NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NI_Bossskill1, GetActorLocation(), FRotator::ZeroRotator);
-
-
-
-
-
-
-
-
-
-
-
-
-
 

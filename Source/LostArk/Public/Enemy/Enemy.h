@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+//Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -41,6 +41,7 @@ public:
 	virtual void GetHit_Implementation(const FVector& ImpactPoint) override;
 	/** </IHitInterface>  */
 
+	
 	// 나이아가라
 	UPROPERTY(EditAnywhere)
 	class UNiagaraSystem* NI_Bossskill1;
@@ -51,7 +52,16 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UNiagaraSystem* NI_breath;
 
+	UPROPERTY(EditDefaultsOnly)
+	USceneComponent* SpawnLocation;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	class UNiagaraComponent* Dash;
+
+
+
 	USceneComponent* NiagaraSceneComp;
+
 	class UNiagaraComponent* NiagaraComp;
 	
 	class ASlashCharacter* player;
@@ -59,6 +69,7 @@ public:
 	class UMaterialInstanceDynamic* dynamicMAT;
 
 	class UMaterialInstanceDynamic* dynamicMAT1;
+
 	
 
 	UPROPERTY(BlueprintReadOnly)
