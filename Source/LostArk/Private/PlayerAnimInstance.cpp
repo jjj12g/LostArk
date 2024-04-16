@@ -41,3 +41,8 @@ void UPlayerAnimInstance::AnimNotify_nnSky1()
 {
 	player->ShootBullet5();
 }
+
+void UPlayerAnimInstance::AnimNotify_nnPierce1()
+{
+	player->ShootBullet();
+}

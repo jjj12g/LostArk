@@ -43,8 +43,7 @@ private:
 	//UFUNCTION()
 	//void AnimNotify_nnShoot1(); //ÆòÅ¸ StraightForwardMontage
 
-	//UFUNCTION()
-	//void AnimNotify_nnPierce1(); //Âî¸£±â FencingMontage
-	
+	UFUNCTION()
+	void AnimNotify_nnPierce1(); //Âî¸£±â FencingMontage
 	
 };

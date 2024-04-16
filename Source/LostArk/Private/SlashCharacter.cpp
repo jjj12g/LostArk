@@ -22,6 +22,7 @@
 #include "../../../../../../../Program Files/Epic Games/UE_5.3/Engine/Plugins/Runtime/ModelViewViewModel/Source/ModelViewViewModelDebuggerEditor/Private/Widgets/SMainDebugTab.h"
 #include "PlayerAnimInstance.h"
 #include "HUD/HealthBarComponent.h"
+#include <../../../../../../../Source/Runtime/Engine/Classes/Kismet/KismetMathLibrary.h>
 
 
 ASlashCharacter::ASlashCharacter()
@@ -141,7 +142,7 @@ void ASlashCharacter::BeginPlay()
 AActor* ASlashCharacter::ShootBullet()
 {
 
-	FVector toward = targetPos - GetActorLocation();
+	FVector toward = CachedDestination - GetActorLocation();
 	FVector loc = GetActorLocation();
 
 	FActorSpawnParameters SpawnParams;
@@ -263,22 +264,28 @@ float ASlashCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 //입력바인딩 통해 발사
 void ASlashCharacter::FireBullet(const FInputActionValue& value)
 {
-	//FVector dirction = FVector(value.Get<FVector2D>(),0);
-	//ShootRot = dirction.Rotation();
-	ShootBullet();
-	//PlayerCharacter->SetActorRotation(dirction.Rotation());
-	/*
 
-	if(PlayerCharacter && CanFire)
+	FVector WorldPosition, WorldDirection;
+	APlayerController* MyController = Cast<APlayerController>(GetController());
+	MyController->DeprojectMousePositionToWorld(WorldPosition, WorldDirection);
+
+	FHitResult hitInfo;   // 마우스가 히트되었을때
+
+	if (GetWorld()->LineTraceSingleByChannel(hitInfo, WorldPosition, WorldPosition + WorldDirection * 10000, ECC_Visibility))
 	{
-		PlayerCharacter->ShootBullet();
-		CanFire = false;
+		CachedDestination = hitInfo.ImpactPoint;    //히트된 좌표
 
-		FTimerDelegate Delegate = FTimerDelegate::CreateUObject(this, &ASlashCharacter::SetCanFire,true);
-		FTimerHandle TimerHandle;
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle,TimeBetweenFire,false);
+		FVector dir = CachedDestination - GetActorLocation();
+		
+		FRotator newRot = UKismetMathLibrary::MakeRotFromZX(GetActorUpVector(), dir);
+		SetActorRotation(newRot);
+
+		int32 num = FMath::RandRange(1, 3);
+		FString sectionName = FString("Fencing") + FString::FromInt(num); // FromInt : 숫자 변수의 값을 문자로 변환해주는 함수
+		PlayAnimMontage(fencing_montage, 1.3, FName(sectionName));
+
+		/*ShootBullet();*/
 	}
-	*/
 
 }
 
