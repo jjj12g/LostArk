@@ -35,7 +35,7 @@ void UEnemyAnimInstance::AnimNotify_rushAttack2()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Notify2"));
 	enemy->rush1 = true;
-
+	enemy->EnemyoverlapOn = true;
 }
 
 void UEnemyAnimInstance::AnimNotify_rushAttack3()
@@ -59,10 +59,11 @@ void UEnemyAnimInstance::AnimNotify_OverlapOn()
 	enemy->EnemyoverlapOn = true;
 }
 
-void UEnemyAnimInstance::AnimNotify_OverlapOff()
+void UEnemyAnimInstance::AnimNotify_AttackEnd()
 {
-	UE_LOG(LogTemp, Warning, TEXT("OverlapOff"));
-	enemy->EnemyoveralpOff = true;
+	UE_LOG(LogTemp, Warning, TEXT("AttackEnd"));
+	enemy->AttackEnd();
+	enemy->EnemyoverlapOn = false;
 }
 
 

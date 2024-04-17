@@ -39,12 +39,12 @@ AEnemy::AEnemy()
 	// 매쉬콜리전 일단잠시 노콜리전으로 두기 박스컬리전확인해보고 바꿀생각
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetMesh()->SetCollisionProfileName(FName("EnemyPreset"));
-	//GetMesh()->SetGenerateOverlapEvents(true);
+	GetMesh()->SetGenerateOverlapEvents(true);
 	// 에너미 프리셋으로 변경
 	//GetMesh()->SetCollisionProfileName(FName("Enemypreset"));
 	//boxComp = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Component"));
 	//boxComp->SetGenerateOverlapEvents(true);
-	GetMesh()->SetGenerateOverlapEvents(true);
+	//GetMesh()->SetGenerateOverlapEvents(true);
 
 	HealthBarWidget = CreateDefaultSubobject<UHealthBarComponent>(TEXT("HealthBar")); // 헬스바위젯
 	HealthBarWidget->SetupAttachment(GetRootComponent()); //헬스바위젯을 루트로
@@ -109,14 +109,7 @@ void AEnemy::Tick(float DeltaTime)
 	if (EnemyoverlapOn == true)
 	{
 		//UE_LOG(LogTemp, Warning, TEXT("enemy collsion on!"));
-		enemyCollisionOn();
-		if (EnemyoveralpOff == true)
-		{
-			//UE_LOG(LogTemp, Warning, TEXT("enemy collsion off!"));
-			enemyCollisionOff();
-			EnemyoverlapOn = false;
-			EnemyoveralpOff = false;
-		}
+		
 	}
 
 
@@ -167,15 +160,10 @@ void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 
-
-
-	//GetMesh()->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::BeginOverlap);
 	GetMesh()->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::BeginOverlap);
-
 
 	if (PawnSensing) PawnSensing->OnSeePawn.AddDynamic(this, &AEnemy::PawnSeen);
 	InitializeEnemy();
-
 
 	// 기본적인 머터리얼 색상 변경이 x 파라미터 형태로만 접근 가능
 	// 메시의 머터리얼을 DynamicMaterial로 변경 해준다
@@ -183,12 +171,10 @@ void AEnemy::BeginPlay()
 	dynamicMAT = UMaterialInstanceDynamic::Create(currentMat, nullptr);
 	GetMesh()->SetMaterial(0, dynamicMAT);
 
-
 	// 두번째 머터리얼 색 변경
 	UMaterialInterface* currentMat2 = GetMesh()->GetMaterial(1);
 	dynamicMAT1 = UMaterialInstanceDynamic::Create(currentMat2, nullptr);
 	GetMesh()->SetMaterial(1, dynamicMAT1);
-
 
 	/* 기본 무기 , 지워도오류 x
 	UWorld* World = GetWorld();
@@ -219,6 +205,8 @@ void AEnemy::Die()
 
 void AEnemy::Attack()
 {
+	EnemyController->StopMovement();
+	
 	EnemyState = EEnemyState::EES_Engaged;
 
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
@@ -229,11 +217,8 @@ void AEnemy::Attack()
 		FName SectionName = FName();
 		switch (Selection)
 		{
-			// 돌진 공격
 		case 0:
 			AttackMontage1();
-
-
 			break;
 			// 브레스
 		case 1:
@@ -243,19 +228,19 @@ void AEnemy::Attack()
 		case 2:
 			AttackMontage3();
 			break;
-			// 뒤로꼬리치고 몸들었다가 다시꼬리치기
+			// 바닥찍고 꼬리치기
 		case 3:
 			AttackMontage4();
 			break;
-			// 바닥찍고 꼬리치기
+			// 바닥 3번찍기
 		case 4:
 			AttackMontage5();
 			break;
-			// 바닥 3번찍기
+			// 양옆 감전날개
 		case 5:
 			AttackMontage6();
 			break;
-			// 양옆 감전날개
+
 		case 6:
 			AttackMontage7();
 			break;
@@ -269,8 +254,6 @@ void AEnemy::Attack()
 			AttackMontage10();
 			break;
 		}
-
-
 	}
 	//PlayAttackMontage();
 	//PlayRandomMontageSection(AttackMontage,AttackMontageSections);
@@ -291,11 +274,6 @@ void AEnemy::AttackMontage1()
 	}
 
 	NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), Lighting, SpawnLocation->GetComponentLocation(), SpawnLocation->GetComponentRotation());
-
-
-
-
-
 	// 공격 시 머터리얼 색 변경
 	//dynamicMAT->SetVectorParameterValue(FName("Hit color"), FVector4(100, 95, 0,100));
 	// 두번째 색 변경
@@ -303,17 +281,13 @@ void AEnemy::AttackMontage1()
 	// 타겟 범위
 	startLoc = GetActorLocation();
 	targetLoc = GetActorLocation() + GetActorForwardVector() * 500;
-
 	//UE_LOG(LogTemp, Warning, TEXT("State Transition: %s"), *UEnum::GetValueAsString<EEnemyState>(EnemyState));
 }
 
 bool AEnemy::rushAttack(float deltaSeconds)
 {
-
 	// 러쉬어택
 	stackTime += deltaSeconds;
-
-
 
 	FVector rushLocation = FMath::Lerp(startLoc, targetLoc, stackTime);
 
@@ -414,27 +388,17 @@ void AEnemy::AttackMontage10()
 
 }
 
-void AEnemy::enemyCollisionOn()
-{
-	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_EngineTraceChannel1, ECollisionResponse::ECR_Ignore);
 
-}
-
-void AEnemy::enemyCollisionOff()
-{
-	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_EngineTraceChannel1, ECollisionResponse::ECR_Ignore);
-
-}
 
 void AEnemy::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	UE_LOG(LogTemp, Warning, TEXT("TakeDamegeEnemy"));
-	//AController* aiCT = GetInstigator()->GetController();
-	//AController* Playerc = GetInstigator()->GetController();
-	//AAIController* enemyCon = EnemyController;
-
-	UGameplayStatics::ApplyDamage(OtherActor, 30, EnemyController, this, DamageType);
-	enemy = Cast<AEnemy>(OtherActor);
+	if (EnemyoverlapOn == true)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("TakeDamegeEnemy"));
+		UGameplayStatics::ApplyDamage(OtherActor, 30, EnemyController, this, DamageType);
+		enemy = Cast<AEnemy>(OtherActor);
+		EnemyoverlapOn = false;
+	}
 
 }
 

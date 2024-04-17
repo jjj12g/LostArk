@@ -82,8 +82,7 @@ public:
 	bool rush2 = false;
 	bool breath1 = false;
 	bool EnemyoverlapOn = false;
-	bool EnemyoveralpOff = false;
-
+	void AttackEnd();
 	
 
 
@@ -96,7 +95,6 @@ protected:
 	virtual void Die() override;
 	virtual void Attack() override;  // 공격
 	virtual bool CanAttack() override;
-	virtual void AttackEnd() override;
 	virtual void HandleDamage(float DamageAmount) override;
 	virtual int32 PlayDeathMontage() override;
 	/** </ABaseCharacter> */
@@ -119,9 +117,6 @@ protected:
 	void AttackMontage8();
 	void AttackMontage9();
 	void AttackMontage10();
-
-	void enemyCollisionOn();
-	void enemyCollisionOff();
 
 	UPROPERTY(EditAnywhere, Category = "mysettings")
 	TSubclassOf<UDamageType> DamageType;
@@ -220,7 +215,7 @@ private:
 
 	// 순찰 속도
 	UPROPERTY(EditAnywhere, Category = "Combat")
-	float patrollingSpeed = 125.f;
+	float patrollingSpeed = 300.f;
 	
 	FTimerHandle AttackTimer;
 	
@@ -236,7 +231,7 @@ private:
 
 	// 순찰 타겟발견했을때의 속도
 	UPROPERTY(EditAnywhere, Category = "Combat")
-	float ChasingSpeed = 300.f;
+	float ChasingSpeed = 600.f;
 	
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	float DeathLifeSpan = 8.0f;

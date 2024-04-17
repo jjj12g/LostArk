@@ -53,8 +53,7 @@ public:
 	void AnimNotify_OverlapOn();
 
 	UFUNCTION()
-	void AnimNotify_OverlapOff();
-
+	void AnimNotify_AttackEnd();
 
 
 
