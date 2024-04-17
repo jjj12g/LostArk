@@ -102,7 +102,6 @@ void ASlashCharacter::BeginPlay()
 			// 3. EnhancedInputLocalPlayerSubsystem에다가 imc 파일을 추가한다.
 			subsys->AddMappingContext(imc_myMapping, 0);  //0 뒤의 옵션은 따로 안적어도 됨. 기본값이 따로 들어가있음.
 		}
-
 		pc->SetShowMouseCursor(true);  // 플레이중 마우스 커서 보이게
 	}
 	else
@@ -115,26 +114,7 @@ void ASlashCharacter::BeginPlay()
 
 	targetPos = GetActorLocation();  // 일단 캐릭터의 위치에서부터 이동
 
-
-
-	Tags.Add(FName("SlashCharacter")); // 캐릭터 태그이름
-
-	/*
-	// 월드상의 뷰 타겟을 자동으로 찾아서 실행시켜줌
-	for (TActorIterator<AfollowCameraActor> it(GetWorld()); it; ++it)
-	{
-		AfollowCameraActor* mainCam = *it;
-		GetController<APlayerController>()->SetViewTarget(mainCam); // 뷰타겟을 찾음
-		break;
-	}
-	*/
-	/*
-	// 지팡이 붙이기
-	Attack=GetWorld()->SpawnActor<AMaactor>(Attackclass);
-	GetMesh()->HideBoneByName(TEXT("Attack"),EPhysBodyOp::PBO_None);
-	Attack->AttachToComponent(GetMesh(),FAttachmentTransformRules::KeepRelativeTransform, TEXT("Attack"));
-	Attack->SetOwner(this);
-	*/
+	Tags.Add(FName("SlashCharacter")); // 캐릭터 태그이름	
 }
 
 // 스킬 설정 및 위치 설정 -----------------------------------------------------------------------------------------------------
@@ -155,7 +135,7 @@ AActor* ASlashCharacter::ShootBullet()
 
 AActor* ASlashCharacter::ShootBullet2()
 {
-	FVector toward = targetPos - GetActorLocation();
+	FVector toward = CachedDestination - GetActorLocation();
 	FVector loc = GetActorLocation();
 
 	FActorSpawnParameters SpawnParams;
@@ -261,33 +241,9 @@ float ASlashCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 	}
 	return DamageAmount;
 }
-//입력바인딩 통해 발사
-void ASlashCharacter::FireBullet(const FInputActionValue& value)
-{
 
-	FVector WorldPosition, WorldDirection;
-	APlayerController* MyController = Cast<APlayerController>(GetController());
-	MyController->DeprojectMousePositionToWorld(WorldPosition, WorldDirection);
 
-	FHitResult hitInfo;   // 마우스가 히트되었을때
 
-	if (GetWorld()->LineTraceSingleByChannel(hitInfo, WorldPosition, WorldPosition + WorldDirection * 10000, ECC_Visibility))
-	{
-		CachedDestination = hitInfo.ImpactPoint;    //히트된 좌표
-
-		FVector dir = CachedDestination - GetActorLocation();
-		
-		FRotator newRot = UKismetMathLibrary::MakeRotFromZX(GetActorUpVector(), dir);
-		SetActorRotation(newRot);
-
-		int32 num = FMath::RandRange(1, 3);
-		FString sectionName = FString("Fencing") + FString::FromInt(num); // FromInt : 숫자 변수의 값을 문자로 변환해주는 함수
-		PlayAnimMontage(fencing_montage, 1.3, FName(sectionName));
-
-		/*ShootBullet();*/
-	}
-
-}
 
 void ASlashCharacter::SetCanFire(bool value)
 {
@@ -305,12 +261,21 @@ void ASlashCharacter::Tick(float DeltaTime)
 	//FVector moveDir = FVector(); //.도 ->와 비슷한것 ->는 변수가 포인터일때, .는 그냥 클래스가 인스턴스 일때 사용.
 
 	FVector dir = targetPos - GetActorLocation(); // 타겟의 위치에서 나의 위치를 빼서
-
+	
 	if (dir.Length() > 100)   // 플레이어의 컬리전이 1미터쯤되니 1미터이상일때만 움직이도록
 	{
 		AddMovementInput(dir.GetSafeNormal());  // 마우스가 찍은 위치로
+		if (bAttackEnabled)
+		{
+			//GetCharacterMovement()->DisableMovement();
+			GetCharacterMovement()->DisableMovement();
+
+			playerAnim = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
+			playerAnim->bRunMotionOn = false;
+		}
+		//GetCharacterMovement()->SetMovementMode();
+		//GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 	}
-	// 회전 값 주기
 
 	else
 	{
@@ -319,14 +284,13 @@ void ASlashCharacter::Tick(float DeltaTime)
 		playerAnim->bRunMotionOn = false;
 	}
 
+
 	//PlayerCharacter->SetActorRotation(ShootRot);
 
 
 
 	if (bPlayerIsInvisible) // 플레이어가 쉬프트 투명 상태라면,
-	{
-		float dist = dir.Length();
-		UE_LOG(LogTemp, Warning, TEXT("distance: %.2f"), dist);
+	{		
 		// targetPos 목표 위치에 도달했을 때
 		if (dir.Length() < 50)
 		{
@@ -362,12 +326,20 @@ void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		// 다른클래스에서 똑같은 이름의 변수를 가져올 수 있으므로 파일명을 앞에 써주는게 좋음 AShootingPlayer::SetInputDirection처럼.
 		enhancedInputComponent->BindAction(ia_Jump, ETriggerEvent::Triggered, this, &ASlashCharacter::SetInputJemp); // 일단 캐릭터 점프를 가져옴
 		enhancedInputComponent->BindAction(ia_attack, ETriggerEvent::Started, this, &ASlashCharacter::Shoot);
+
 		enhancedInputComponent->BindAction(ia_Fire, ETriggerEvent::Started, this, &ASlashCharacter::FireBullet);
+		
 
 		enhancedInputComponent->BindAction(ia_shift, ETriggerEvent::Triggered, this, &ASlashCharacter::ShiftStarted);
+
 		enhancedInputComponent->BindAction(ia_q, ETriggerEvent::Started, this, &ASlashCharacter::Q);
+		enhancedInputComponent->BindAction(ia_q, ETriggerEvent::Completed, this, &ASlashCharacter::Q);
+
 		enhancedInputComponent->BindAction(ia_w, ETriggerEvent::Started, this, &ASlashCharacter::W);
-		enhancedInputComponent->BindAction(ia_e, ETriggerEvent::Started, this, &ASlashCharacter::FireBullet2);
+
+		enhancedInputComponent->BindAction(ia_e, ETriggerEvent::Triggered, this, &ASlashCharacter::FireBullet2);
+		enhancedInputComponent->BindAction(ia_e, ETriggerEvent::Completed, this, &ASlashCharacter::FireBullet2);
+
 		enhancedInputComponent->BindAction(ia_r, ETriggerEvent::Started, this, &ASlashCharacter::R);
 		enhancedInputComponent->BindAction(ia_a, ETriggerEvent::Started, this, &ASlashCharacter::A);
 		enhancedInputComponent->BindAction(ia_s, ETriggerEvent::Started, this, &ASlashCharacter::S);
@@ -382,8 +354,8 @@ void ASlashCharacter::Move(FVector direction, float deltaTime)
 {
 	// direction의 방향으로 이동한다.
 	// 이동 구성 요소: 방향, 속력, 시간 
-	FVector prevLocation = GetActorLocation(); // 현재위치값을 브리뷰 로케이션에 담는다. 원본에는 지장을주지않음.
-	FVector nextLocation = prevLocation + direction * speed * deltaTime;
+	//FVector prevLocation = GetActorLocation(); // 현재위치값을 브리뷰 로케이션에 담는다. 원본에는 지장을주지않음.
+	FVector nextLocation = GetActorLocation() + direction *1.0f * deltaTime;
 	SetActorLocation(nextLocation, true);  // bSweep은 바닥을 쓸다라는 뜻으로 기본값 flase가 되어있음. true로 바꿔주면 앞에 뭐가있는지 체크를 하면서 이동함.
 
 	//SetActorLocation(GetActorLocation() + direction * speed * deltaTime); 위에를 줄여쓰면 이렇게 사용가능.
@@ -410,13 +382,65 @@ void ASlashCharacter::ShiftStarted(const FInputActionValue& value)
 	}
 }
 
+// 좌클릭 바인딩 된 함수
+void ASlashCharacter::FireBullet(const FInputActionValue& value)
+{
+	bAttackEnabled = value.Get<bool>();
+
+	if (bAttackEnabled)
+	{
+		UE_LOG(LogTemp, Warning, (TEXT("Click")));
+	}
+
+	FVector WorldPosition, WorldDirection;
+	APlayerController* MyController = Cast<APlayerController>(GetController());
+	MyController->DeprojectMousePositionToWorld(WorldPosition, WorldDirection);
+
+	FHitResult hitInfo;   // 마우스가 히트되었을때
+
+	if (GetWorld()->LineTraceSingleByChannel(hitInfo, WorldPosition, WorldPosition + WorldDirection * 10000, ECC_Visibility))
+	{
+		CachedDestination = hitInfo.ImpactPoint;    //히트된 좌표
+
+		FVector dir = CachedDestination - GetActorLocation();
+
+		FRotator newRot = UKismetMathLibrary::MakeRotFromZX(GetActorUpVector(), dir);
+		SetActorRotation(newRot);
+
+		if (!bKeyPressed && !bPlayerIsAttacking)
+		{
+			bPlayerIsAttacking = true;
+			
+			// 몽타주 실행
+			int32 num = FMath::RandRange(1, 3);
+			FString sectionName = FString("Fencing") + FString::FromInt(num);
+			PlayAnimMontage(fencing_montage, 1.3, FName(sectionName));					
+		}
+
+		if (e && !bPlayerIsAttacking)
+		{
+			
+			UE_LOG(LogTemp, Warning, (TEXT("SKILL")));
+			
+			bPlayerIsAttacking = true;
+
+			// 랜덤으로 몽타주 실행
+			int32 num = FMath::RandRange(1, 4);
+			FString sectionName = FString("HitGround") + FString::FromInt(num); 
+			PlayAnimMontage(hitground_montage, 1.3, FName(sectionName));			
+		}
+
+	}
+}
 // 스킬  QWERASDF 애니메이션 넣는 곳-----------------------------------------------------------
 
 
 void ASlashCharacter::Q(const FInputActionValue& value)
 {
-	ShootBullet3();
+	/*ShootBullet3();*/
+	q = value.Get<bool>();
 	UE_LOG(LogTemp,Warning,TEXT("Q"));
+	
 }
 
 void ASlashCharacter::W(const FInputActionValue& value)
@@ -426,13 +450,28 @@ void ASlashCharacter::W(const FInputActionValue& value)
 }
 
 void ASlashCharacter::FireBullet2(const FInputActionValue& value)
-{
-	//ShootBullet2();
-	bPlayerIsAttacking = true;
+{	
+	
+	e = value.Get<bool>();
 
-	int32 num = FMath::RandRange(1, 4);
-	FString sectionName = FString("HitGround") + FString::FromInt(num); // FromInt : 숫자 변수의 값을 문자로 변환해주는 함수
-	PlayAnimMontage(hitground_montage, 1.3, FName(sectionName));
+	if (e)
+	{
+	UE_LOG(LogTemp, Warning, (TEXT("on")));
+	bKeyPressed = true;
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, (TEXT("off")));
+		bKeyPressed = false;
+	}
+
+	//if(!bPlayerIsAttacking && bAttackEnabled)
+	//{
+	//	bPlayerIsAttacking = true;
+	//	int32 num = FMath::RandRange(1, 4);
+	//	FString sectionName = FString("HitGround") + FString::FromInt(num); // FromInt : 숫자 변수의 값을 문자로 변환해주는 함수
+	//	PlayAnimMontage(hitground_montage, 1.3, FName(sectionName));			
+	//}
 }
 
 void ASlashCharacter::R(const FInputActionValue& value)
@@ -522,6 +561,8 @@ void ASlashCharacter::SetInputDirection(const FInputActionValue& value)
 		// 이동 입력이 들어오면 RunMotion을 true로 설정
 		playerAnim = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
 		playerAnim->bRunMotionOn = true;
+
+		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 	}
 
 }

@@ -222,8 +222,11 @@ public:
 	UPROPERTY(EditAnywhere, Category="MySettings|Animations")
 	class UAnimMontage* straight_montage;
 
-	UPROPERTY()
-	bool bPlayerIsAttacking=false;
+	bool bKeyPressed;
+	bool bAttackEnabled;
+	bool bPlayerIsAttacking = false;
+
+
 
 	
 private:   //나만 사용가능하다는 뜻 , 외부에서 호출할게 아니면 여기서 작성하는게 좋음
@@ -278,7 +281,12 @@ private:   //나만 사용가능하다는 뜻 , 외부에서 호출할게 아니면 여기서 작성하는게
 	UPROPERTY()
 	bool bPlayerIsInvisible=false;
 
+	
 	FVector CachedDestination;
+
+	bool q;
+	bool w;
+	bool e;
 };
 
 

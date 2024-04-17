@@ -29,7 +29,14 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 void UPlayerAnimInstance::AnimNotify_nnIdle()
 {
 	// SlashCharacter의 bool 변수인 bPlayerIsAttacking을 false로 설정한다 (=이동 입력을 받을 수 있도록 초기화)
+	UE_LOG(LogTemp, Warning, (TEXT("nnIdle")));
 	player->bPlayerIsAttacking = false;
+	player->bKeyPressed = false;
+	player->bAttackEnabled = false;
+	if(!player->bKeyPressed)
+	{
+		UE_LOG(LogTemp, Warning, (TEXT("bKeyPressed FALSE")));
+	}
 }
 
 void UPlayerAnimInstance::AnimNotify_nnHit1()
