@@ -51,6 +51,8 @@ public:
 	AActor* ShootBullet9();
 
 
+
+
 protected:
 	virtual void BeginPlay() override;
 	// 총알 발사 관련
@@ -86,8 +88,16 @@ protected:
 	TSubclassOf<AMybulletActor> bullettospawn9;
 
 	UPROPERTY(EditAnywhere)
-	float HP = 50;
+	int32 MaxHP = 100;
+	FORCEINLINE int32 GetcurrentHP() { return currentHP; };
 
+	UPROPERTY()
+	class UHealthBarWidget* PlayerWidget;
+	// 캐릭터 컨트롤러 전역으로
+	UPROPERTY()
+	class APlayerController* pc;
+
+	
 	virtual float TakeDamage
 	(
 		float DamageAmount,
@@ -95,6 +105,7 @@ protected:
 		class AController* EventInstigator,
 		AActor* DamageCauser
 	)override;
+
 
 	UPROPERTY(EditDefaultsOnly)
 	USceneComponent* SpawnLocation;
@@ -283,6 +294,8 @@ private:   //나만 사용가능하다는 뜻 , 외부에서 호출할게 아니면 여기서 작성하는게
 
 	
 	FVector CachedDestination;
+	
+	int32 currentHP = 0;
 
 	bool q;
 	bool w;

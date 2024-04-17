@@ -102,6 +102,12 @@ protected:
 	// 오버랩 이벤트
 	UFUNCTION()
 	void BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	// 캐릭터 삭제
+	UFUNCTION()
+	FORCEINLINE AActor* GetcurrentTarget() {return target;};
+	
+	UFUNCTION()
+	FORCEINLINE void removetarget() { target = nullptr; };
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mysettings")
 	class AEnemy* enemy;
@@ -164,7 +170,9 @@ private:
 	bool InTargetRange(AActor* Target, double Radius); // 타깃이 범위내에 있다면 true값 반환     수용반경
 	void MoveToTarget(AActor* Target);   //순찰시간끝나면 이동
 	AActor* ChoosePatrolTarget(); //새 표적 선택하기
-
+	
+	UPROPERTY()
+	class AActor* target;
 
 	UFUNCTION()
 	void PawnSeen(APawn* SeenPawn); // Callback for OnPawnSeen in UPawnSensingComponent

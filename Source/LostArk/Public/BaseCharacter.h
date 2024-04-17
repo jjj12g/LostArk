@@ -32,6 +32,8 @@ public:
 	//USceneComponent* NiagaraSceneComp;
 	//class UNiagaraComponent* NiagaraComp;
 
+	
+
 
 	
 

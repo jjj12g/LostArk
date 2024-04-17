@@ -20,6 +20,7 @@
 #include <../../../../../../../Plugins/FX/Niagara/Source/Niagara/Public/NiagaraComponent.h>
 #include <../../../../../../../Source/Runtime/Engine/Classes/GameFramework/Character.h>
 #include "Components/CapsuleComponent.h"
+#include "SlashCharacter.h"
 
 
 
@@ -159,6 +160,11 @@ void AEnemy::GetHit_Implementation(const FVector& ImpactPoint)
 void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
+	/*
+	for (TActorIterator<ASlashCharacter> player(GetWorld()); players; ++players)
+	{
+		target = *player;
+	}*/
 
 	GetMesh()->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::BeginOverlap);
 
@@ -392,6 +398,8 @@ void AEnemy::AttackMontage10()
 
 void AEnemy::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	
+	
 	if (EnemyoverlapOn == true)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("TakeDamegeEnemy"));
@@ -399,6 +407,18 @@ void AEnemy::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Othe
 		enemy = Cast<AEnemy>(OtherActor);
 		EnemyoverlapOn = false;
 	}
+
+	
+	
+	
+	/*
+	if (EnemyoverlapOn == true)
+	{
+		player->OnDamaged(1000, enemy);
+		UE_LOG(LogTemp, Warning, TEXT("Attack Player!"));
+		enemy = Cast<AEnemy>(OtherActor);
+		EnemyoverlapOn = false;
+	}*/
 
 }
 

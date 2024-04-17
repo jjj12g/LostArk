@@ -23,6 +23,9 @@
 #include "PlayerAnimInstance.h"
 #include "HUD/HealthBarComponent.h"
 #include <../../../../../../../Source/Runtime/Engine/Classes/Kismet/KismetMathLibrary.h>
+#include <HealthBarWidget.h>
+#include "RealLostArkModeBase.h"
+#include "Enemy/Enemy.h"
 
 
 ASlashCharacter::ASlashCharacter()
@@ -85,7 +88,7 @@ void ASlashCharacter::BeginPlay()
 
 	// EnhacedInputSystem에서 입력 맵핑 콘텍스트 파일을 언리얼 엔진 시스템에 로드하기
 	// 1. 현재 사용 중인 APlayerController 클래스 변수를 불러온다.
-	APlayerController* pc = GetWorld()->GetFirstPlayerController(); // 여기서 펄스트는 플레이어0번을 말함. pc는 플레이어컨트롤러의 약자
+	 pc = GetWorld()->GetFirstPlayerController(); // 여기서 펄스트는 플레이어0번을 말함. pc는 플레이어컨트롤러의 약자
 	/*
 	int32 num; //이 경우라면 디폴트로 0이들어가 있을거임
 	FString name = ""; // 이경우 ""라는 디폴트값이 들어가있음
@@ -115,6 +118,9 @@ void ASlashCharacter::BeginPlay()
 	targetPos = GetActorLocation();  // 일단 캐릭터의 위치에서부터 이동
 
 	Tags.Add(FName("SlashCharacter")); // 캐릭터 태그이름	
+	// 기본 체력 ui
+	currentHP = MaxHP;
+	PlayerWidget = Cast<UHealthBarWidget>(HealthBarWidget->GetWidget());
 }
 
 // 스킬 설정 및 위치 설정 -----------------------------------------------------------------------------------------------------
@@ -232,15 +238,52 @@ AActor* ASlashCharacter::ShootBullet9()
 //--------------------------------------------------------------------------------------------------------------------------------- 스킬 설정 위치-----
 
 // 데미지 시스템
+
 float ASlashCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	HP -= DamageAmount;
+	/*
+	maxHP -= DamageAmount;
 	if (HP <= 0)
 	{
 		Destroy();
 	}
 	return DamageAmount;
+	*/
+	currentHP = FMath::Clamp(currentHP - DamageAmount, 0, MaxHP);
+	if (PlayerWidget != nullptr)
+	{
+
+		PlayerWidget->SetHealthBar((float)currentHP / (float)MaxHP, FLinearColor(1.0f, 0.13f, 0.05f, 1.0f));
+		
+	}
+	return DamageAmount;
+	
+	//if (currentHP <= 0)
+	//{
+			//AEnemy* enemy;
+			//enemy -> removetarget();
+		//attacker->enemyState = EEnemyState::RETURN;
+
+		// 페이드 인 효과를 준다.
+		//pc->PlayerCameraManager->StartCameraFade(0, 1, 1.5f, FLinearColor::Black);
+
+
+		//ClientSetCameraFade(true, )  다른 방법 함수
+
+		// 시작위치에서 다시 시작한다.
+		//FTimerHandle restarthandle;
+		//GetWorldTimerManager().SetTimer(restarthandle, FTimerDelegate::CreateLambda([&]() {
+			//pc->UnPossess();
+			//Cast<ARealLostArkModeBase>(GetWorld()->GetAuthGameMode())->RespawnPlayer(pc, this);
+			//}), 1.5f, false);
+
+		
+
+	//}
+	//return DamageAmount;
+	
 }
+
 
 
 
