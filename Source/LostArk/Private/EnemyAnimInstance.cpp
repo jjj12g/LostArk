@@ -64,13 +64,13 @@ void UEnemyAnimInstance::AnimNotify_AttackEnd()
 	UE_LOG(LogTemp, Warning, TEXT("AttackEnd"));
 	enemy->AttackEnd();
 	enemy->EnemyoverlapOn = false;
+	enemy->dontMove = false;
+	enemy->look = true;
 }
 
 
 
 
-
-// 땅찍기 노티파이
 
 
 

@@ -66,7 +66,7 @@ public:
 
 	class UNiagaraComponent* NiagaraComp;
 	
-	class ASlashCharacter* player;
+	class ASlashCharacter* players;
 
 	class UMaterialInstanceDynamic* dynamicMAT;
 
@@ -84,9 +84,21 @@ public:
 	bool rush2 = false;
 	bool breath1 = false;
 	bool EnemyoverlapOn = false;
+	void MoveToTarget(AActor* Target);   //순찰시간끝나면 이동
 	void AttackEnd();
 	
+	bool dontMove = false;
+	bool look = false;
 
+	// 공격 전 회전
+	float rotTime = 0;
+	FRotator rotStart;
+	FRotator rotTarget;
+	bool bLookTarget = false;
+
+	// 공격범위
+	UPROPERTY(EditAnywhere, Category = "MySettings")
+	float attackDistance = 600.0f;
 
 protected:
 	/** <AActor> */
@@ -170,9 +182,13 @@ private:
 	void StartAttackTimer(); /** Combat */
 	void ClearAttackTimer(); /** Combat */
 	bool InTargetRange(AActor* Target, double Radius); // 타깃이 범위내에 있다면 true값 반환     수용반경
-	void MoveToTarget(AActor* Target);   //순찰시간끝나면 이동
+	
 	AActor* ChoosePatrolTarget(); //새 표적 선택하기
-	class ASlashCharacter* target;
+
+	UPROPERTY()
+	class AActor* target;
+
+	FVector moveDir;   // 이동방향 잡기위한 변수
 	
 	//체력관련
 	int32 currentHP = 0;
@@ -204,7 +220,7 @@ private:
 	double CombatRadius = 1000.f;
 
 	UPROPERTY(EditAnywhere)
-	double AttackRadius = 600.f;   // 공격 반경
+	double AttackRadius = 1000.f;   // 공격 반경
 
 	UPROPERTY()
 	class AAIController* EnemyController;  //액터가 지시사항 전달 컨트롤러에 변수설정
@@ -218,7 +234,7 @@ private:
 
 	// 전투반경
 	UPROPERTY(EditAnywhere)
-	double PatrolRadius = 200.f;
+	double PatrolRadius = 3000.f;
 
 	FTimerHandle PatrolTimer;  // 순찰 타이머
 	

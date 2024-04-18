@@ -90,10 +90,10 @@ void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	for (TActorIterator<ASlashCharacter> players(GetWorld()); players; ++players)
-	{
-		target = *players;
-	}
+	//for (TActorIterator<ASlashCharacter> players(GetWorld()); players; ++players)
+	//{
+	//	target = *players;
+	//}
 
 	GetMesh()->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::BeginOverlap);
 
@@ -127,7 +127,14 @@ void AEnemy::BeginPlay()
 	//위젯 컴포넌트에 할당되어 있는 위젯 인스턴스를 가져온다.
 	EnemyWidget = Cast<UHealthBarWidget>(floatingWidgetComp->GetWidget());
 
+	// 월드에 있는 플레이어를 찾는다
+	for (TActorIterator<ASlashCharacter>player(GetWorld()); player; ++player)
+	{
+		target = *player; // 클래스의 다형성
+	}
 
+	MoveToTarget(target);
+	EnemyState = EEnemyState::EES_NoState;
 }
 
 void AEnemy::Tick(float DeltaTime)
@@ -163,12 +170,40 @@ void AEnemy::Tick(float DeltaTime)
 			NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NI_breath, SpawnLocation->GetComponentLocation(), SpawnLocation->GetComponentRotation());
 		breath1 = false;
 	}
-	if (EnemyoverlapOn == true)
+
+	// 공격시 움직임 멈춤
+	if (dontMove == true)
 	{
-		//UE_LOG(LogTemp, Warning, TEXT("enemy collsion on!"));
-		
+		EnemyController->StopMovement();
+	}
+	// 공격이 다 끝나면 움직이기 가능
+	if (look == true)
+	{
+		stackTime += DeltaTime;
+		if (stackTime >= 2.3f) {
+			stackTime = 0.0f;
+			UE_LOG(LogTemp, Warning, TEXT("look!"));
+			MoveToTarget(target);
+			look = false;
+		}
 	}
 
+	// 공격전 회전
+	if (bLookTarget)
+	{
+		if (rotTime < 1.0f)
+		{
+			rotTime += DeltaTime;
+			SetActorRotation(FMath::Lerp(rotStart, rotTarget, rotTime));
+			//UE_LOG(LogTemp, Warning, TEXT("111111111111111"));
+		}
+		else
+		{
+			rotTime = 0;
+			targetLoc = GetActorLocation() + GetActorForwardVector() * 1500;
+			bLookTarget = false;
+		}
+	}
 	
 
 
@@ -178,13 +213,20 @@ void AEnemy::Tick(float DeltaTime)
 float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigetor, AActor* DamageCauser)
 {
 	/*
-	maxHP -= DamageAmount;
-	if (maxHP <= 0.0f)
+	HP -= DamageAmount;
+	if (HP <= 0.0f)
 	{
 		Destroy();
 	}
 	UE_LOG(LogTemp, Warning, TEXT("enemy hit!"));
-	//return DamageAmount;*/
+	//return DamageAmount;
+	HandleDamage(DamageAmount);
+	if (target == nullptr)
+	{
+		CombatTarget = EventInstigetor->GetPawn(); // 적이 피해를 입는 즉시 전투목표 설정
+		ChaseTarget();
+	}
+	return DamageAmount;*/
 
 	currentHP = FMath::Clamp(currentHP - DamageAmount, 0, maxHP);
 	if (EnemyWidget != nullptr)
@@ -201,16 +243,10 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 	}
 	return DamageAmount;
 }
-	/*
-	HandleDamage(DamageAmount);
-	if (player == nullptr)
-	{
-		CombatTarget = EventInstigetor->GetPawn(); // 적이 피해를 입는 즉시 전투목표 설정
-		ChaseTarget();
-	}*/
+	
 
 
-// Destroyed 무기나 필요없을듯.
+
 
 	// 히트 모션
 void AEnemy::GetHit_Implementation(const FVector& ImpactPoint)
@@ -248,54 +284,114 @@ void AEnemy::Die()
 
 void AEnemy::Attack()
 {
-	EnemyController->StopMovement();
-	
+	// 공격전 플레이어에게로 방향회전
+	FVector lookDir = target->GetActorLocation() - GetActorLocation();
+	moveDir = lookDir.GetSafeNormal();  //노멀라이즈를 해줘야 백터 길이가 1이됨.
+	FRotator newRot = UKismetMathLibrary::MakeRotFromZX(GetActorUpVector(), moveDir);  // 첫번째 축은 고정축 두번째 축은 맞추려는 축
+	rotStart = GetActorRotation();
+	rotTarget = newRot;
+	bLookTarget = true;
+
 	EnemyState = EEnemyState::EES_Engaged;
+	look = false;
+	dontMove = true;
 
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	if (AnimInstance && AttackMontage)
+	if (FVector::Distance(target->GetActorLocation(), GetActorLocation()) > attackDistance)
 	{
-		AnimInstance->Montage_Play(AttackMontage);
-		const int32 Selection = FMath::RandRange(0, 1); // 0~2까지가 3개
-		FName SectionName = FName();
-		switch (Selection)
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		if (AnimInstance && AttackMontage)
 		{
-		case 0:
-			AttackMontage1();
-			break;
-			// 브레스
-		case 1:
-			AttackMontage2();
-			break;
-			// 위로 한바퀴
-		case 2:
-			AttackMontage3();
-			break;
-			// 바닥찍고 꼬리치기
-		case 3:
-			AttackMontage4();
-			break;
-			// 바닥 3번찍기
-		case 4:
-			AttackMontage5();
-			break;
-			// 양옆 감전날개
-		case 5:
-			AttackMontage6();
-			break;
-
-		case 6:
-			AttackMontage7();
-			break;
-		case 7:
-			AttackMontage8();
-			break;
-		case 8:
-			AttackMontage9();
-			break;
-		default:
-			AttackMontage10();
-			break;
+			AnimInstance->Montage_Play(AttackMontage);
+			const int32 Selection = FMath::RandRange(0, 0); // 0~2까지가 3개
+			FName SectionName = FName();
+			switch (Selection)
+			{
+				// 돌진
+			case 0:
+				AttackMontage1();
+				break;
+				// 브레스
+			case 1:
+				AttackMontage2();
+				break;
+				// 위로 한바퀴
+			case 2:
+				AttackMontage3();
+				break;
+				// 바닥찍고 꼬리치기
+			case 3:
+				AttackMontage4();
+				break;
+				// 바닥 3번찍기
+			case 4:
+				AttackMontage5();
+				break;
+				// 양옆 감전날개
+			case 5:
+				AttackMontage6();
+				break;
+			case 6:
+				AttackMontage7();
+				break;
+			case 7:
+				AttackMontage8();
+				break;
+			case 8:
+				AttackMontage9();
+				break;
+			default:
+				AttackMontage10();
+				break;
+			}
+		}
+	}
+	else
+	{
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		if (AnimInstance && AttackMontage)
+		{
+			AnimInstance->Montage_Play(AttackMontage);
+			const int32 Selection = FMath::RandRange(1, 1); // 0~2까지가 3개
+			FName SectionName = FName();
+			switch (Selection)
+			{
+				// 돌진
+			case 0:
+				AttackMontage1();
+				break;
+				// 브레스
+			case 1:
+				AttackMontage2();
+				break;
+				// 위로 한바퀴
+			case 2:
+				AttackMontage3();
+				break;
+				// 바닥찍고 꼬리치기
+			case 3:
+				AttackMontage4();
+				break;
+				// 바닥 3번찍기
+			case 4:
+				AttackMontage5();
+				break;
+				// 양옆 감전날개
+			case 5:
+				AttackMontage6();
+				break;
+			case 6:
+				AttackMontage7();
+				break;
+			case 7:
+				AttackMontage8();
+				break;
+			case 8:
+				AttackMontage9();
+				break;
+			default:
+				AttackMontage10();
+				break;
+			}
 		}
 	}
 	//PlayAttackMontage();
@@ -323,7 +419,7 @@ void AEnemy::AttackMontage1()
 	//dynamicMAT1->SetVectorParameterValue(FName("hit Color"), FVector4(100, 95, 0, 100));
 	// 타겟 범위
 	startLoc = GetActorLocation();
-	targetLoc = GetActorLocation() + GetActorForwardVector() * 500;
+	//targetLoc = GetActorLocation() + GetActorForwardVector() * 1500;
 	//UE_LOG(LogTemp, Warning, TEXT("State Transition: %s"), *UEnum::GetValueAsString<EEnemyState>(EnemyState));
 }
 
@@ -333,7 +429,7 @@ bool AEnemy::rushAttack(float deltaSeconds)
 	stackTime += deltaSeconds;
 
 	FVector rushLocation = FMath::Lerp(startLoc, targetLoc, stackTime);
-
+	SetActorRotation(rotTarget);
 	SetActorLocation(rushLocation);
 	NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NI_Bossskill1, SpawnLocation->GetComponentLocation(), SpawnLocation->GetComponentRotation());
 
@@ -343,16 +439,8 @@ bool AEnemy::rushAttack(float deltaSeconds)
 
 	if (stackTime >= 1.0f) {
 		stackTime = 0.0f;
-
 		rush1 = false;
 	}
-
-	if (rush2 == true)
-	{
-		// 콜리전 없애기.
-
-	}
-
 	//EEnemyState::EES_Attacking;
 	return true;
 }
@@ -661,7 +749,7 @@ bool AEnemy::InTargetRange(AActor* Target, double Radius)
 	if (Target == nullptr) return false;
 	//표적까지의 위치
 	const double DistanceToTarget = (Target->GetActorLocation() - GetActorLocation()).Size();
-	return DistanceToTarget <= Radius;
+	return DistanceToTarget <= 1500;//Radius;
 }
 
 // 순찰시간 끝나면 다음으로 이동
@@ -669,15 +757,11 @@ void AEnemy::MoveToTarget(AActor* Target)
 {
 	if (EnemyController == nullptr || Target == nullptr) return;
 	{
-
 		FAIMoveRequest MoveRequest;
 		MoveRequest.SetGoalActor(Target);
 		MoveRequest.SetAcceptanceRadius(50.f);
 		EnemyController->MoveTo(MoveRequest);
-
-
 	}
-
 }
 
 AActor* AEnemy::ChoosePatrolTarget()
@@ -709,11 +793,11 @@ AActor* AEnemy::ChoosePatrolTarget()
 FRotator AEnemy::BillboradwidgetComponent(AActor* camActor)
 {
 	//UE_LOG(LogTemp,Warning,TEXT("1111111111111111111"));
-	player = Cast<ASlashCharacter>(target);
-	if (player != nullptr)
+	players = Cast<ASlashCharacter>(target);
+	if (players != nullptr)
 	{
 		//UE_LOG(LogTemp, Warning, TEXT("222222222222221111"));
-		FVector lookDir = (player->cameraComp->GetComponentLocation() - floatingWidgetComp->GetComponentLocation()).GetSafeNormal();
+		FVector lookDir = (players->cameraComp->GetComponentLocation() - floatingWidgetComp->GetComponentLocation()).GetSafeNormal();
 		//FRotator lookRot = UKismetMathLibrary::MakeRotFromX(lookDir);
 		FRotator lookRot = lookDir.ToOrientationRotator();
 
@@ -721,7 +805,7 @@ FRotator AEnemy::BillboradwidgetComponent(AActor* camActor)
 	}
 	else
 	{	
-		UE_LOG(LogTemp, Warning, TEXT("33333333333111"));
+		//UE_LOG(LogTemp, Warning, TEXT("33333333333111"));
 		return FRotator::ZeroRotator;
 	}
 
