@@ -37,7 +37,6 @@ AEnemy::AEnemy()
 
 	PrimaryActorTick.bCanEverTick = true;
 
-
 	GetMesh()->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
 	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
 	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
@@ -51,16 +50,12 @@ AEnemy::AEnemy()
 	//boxComp->SetGenerateOverlapEvents(true);
 	//GetMesh()->SetGenerateOverlapEvents(true);
 
-	
-
-
 	floatingWidgetComp = CreateDefaultSubobject<UWidgetComponent>(TEXT("FloatingWidgetComp"));
 	floatingWidgetComp->SetupAttachment(GetMesh());
 	floatingWidgetComp->SetRelativeLocation(FVector(240, 0, 400));
 	//floatingWidgetComp->SetRelativeRotation(FRotator(0, 0, 90));
 	floatingWidgetComp->SetWidgetSpace(EWidgetSpace::World);
 	floatingWidgetComp->SetDrawSize(FVector2D(150, 100));
-
 
 	// 캐릭터 움직임
 	GetCharacterMovement()->bOrientRotationToMovement = true;
@@ -72,17 +67,12 @@ AEnemy::AEnemy()
 	PawnSensing->SightRadius = 4000.f; // 폰의 사이트 반경
 	PawnSensing->SetPeripheralVisionAngle(45.f); // 폰의 시야각 반경
 
-
 	// 나이아가라 스폰 위치
 	SpawnLocation = CreateDefaultSubobject<USceneComponent>(TEXT("bullet spawn point"));
 	SpawnLocation->SetupAttachment(GetMesh());
 
 	Dash = CreateDefaultSubobject<UNiagaraComponent>(TEXT("niagara comp"));
 	Dash->SetupAttachment(GetCapsuleComponent());
-
-
-
-
 
 }
 
@@ -204,14 +194,15 @@ void AEnemy::Tick(float DeltaTime)
 			bLookTarget = false;
 		}
 	}
-	
-
 
 }
 
 // 데미지 , 남은체력 계산
 float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigetor, AActor* DamageCauser)
 {
+	if (bDie) {return 0.0f;}
+		
+		
 	/*
 	HP -= DamageAmount;
 	if (HP <= 0.0f)
@@ -227,21 +218,19 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 		ChaseTarget();
 	}
 	return DamageAmount;*/
-
+	
 	currentHP = FMath::Clamp(currentHP - DamageAmount, 0, maxHP);
 	if (EnemyWidget != nullptr)
 	{
-
 		EnemyWidget->SetHealthBar((float)currentHP / (float)maxHP, FLinearColor(1.0f, 0.13f, 0.05f, 1.0f));
 		UE_LOG(LogTemp, Warning, TEXT("enemy hit!"));
 	}
 
-	if (currentHP <= 0)
+	if (currentHP <= 0.0f)
 	{
-		
-
+		Die();
 	}
-	return DamageAmount;
+	return 0.0f;
 }
 	
 
@@ -251,33 +240,37 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 	// 히트 모션
 void AEnemy::GetHit_Implementation(const FVector& ImpactPoint)
 {
-	//DRAW_SPHERE_COLOR(ImpactPoint, FColor::Orange);
-	ShowHealthBar(); // 체력바 보이게 설정
-
-	// 살아있다면 히트몽타주
-	if (IsAlive())
-	{
-		DirectionalHitReact(ImpactPoint);
-	}
-	// 그게아니면 데스모션
-	//else Die();
-
-	PlayHitSound(ImpactPoint);
-	SpawnHitParticles(ImpactPoint);
+//	//DRAW_SPHERE_COLOR(ImpactPoint, FColor::Orange);
+//	ShowHealthBar(); // 체력바 보이게 설정
+//
+//	// 살아있다면 히트몽타주
+//	if (currentHP > 0.0f)
+//	{
+//		DirectionalHitReact(ImpactPoint);
+//	}
+//	 //그게아니면 데스모션
+//	else 
+//	{
+//	Die();
+//	PlayHitSound(ImpactPoint);
+//	SpawnHitParticles(ImpactPoint);
+//	}
 }
 
 
 void AEnemy::Die()
 {
+	bDie = true;
 	EnemyState = EEnemyState::EES_Dead;
+	UE_LOG(LogTemp,Warning,TEXT("die"));
 	// 죽음모션
-	PlayDeathMontage();
-	//ClearAttackTimer(); // 공격중이면 공격멈춤
+	PlayDeathMontages();
+	ClearAttackTimer(); // 공격중이면 공격멈춤
 	// 죽으면 체력바 위젯 안보이게 설정
 	//HideHealthBar();
-	//DisableCapsule(); // 에너미가 죽엇을때 콜리전을 사라지게 함.
-	//SetLifeSpan(DeathLifeSpan); // 에너미가 죽으면 n초 뒤에 사라짐
-	//GetCharacterMovement()->bOrientRotationToMovement = false; // 죽은 뒤 다른방향으로 움직이지 않게 고정
+	DisableCapsule(); // 에너미가 죽엇을때 콜리전을 사라지게 함.
+	SetLifeSpan(DeathLifeSpan); // 에너미가 죽으면 n초 뒤에 사라짐
+	GetCharacterMovement()->bOrientRotationToMovement = false; // 죽은 뒤 다른방향으로 움직이지 않게 고정
 
 
 }
@@ -452,8 +445,6 @@ void AEnemy::AttackMontage2()
 	AnimInstance->Montage_JumpToSection(FName("Attack2"), AttackMontage);
 
 
-
-
 }
 
 void AEnemy::AttackMontage3()
@@ -519,14 +510,18 @@ void AEnemy::AttackMontage10()
 
 }
 
+void AEnemy::DeathMontage1()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Death1"));
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	AnimInstance->Montage_JumpToSection(FName("Death1"), DeathMontage);
+}
+
 
 
 void AEnemy::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	
 
-	
-	
 	if (EnemyoverlapOn == true)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("TakeDamegeEnemy"));
@@ -535,23 +530,7 @@ void AEnemy::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Othe
 		EnemyoverlapOn = false;
 	}
 
-
-	
-	
-	
-	/*
-	if (EnemyoverlapOn == true)
-	{
-		player->OnDamaged(1000, enemy);
-		UE_LOG(LogTemp, Warning, TEXT("Attack Player!"));
-		enemy = Cast<AEnemy>(OtherActor);
-		EnemyoverlapOn = false;
-	}*/
-
 }
-
-
-
 
 
 bool AEnemy::CanAttack()
@@ -562,6 +541,26 @@ bool AEnemy::CanAttack()
 		!IsEngaged() &&
 		!IsDead();
 	return bCanAttack;
+}
+
+void AEnemy::PlayDeathMontages()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && DeathMontage)
+	{
+		AnimInstance->Montage_Play(DeathMontage);
+		const int32 Selection = FMath::RandRange(0, 0); // 0~2까지가 3개
+		FName SectionName = FName();
+		switch (Selection)
+		{
+
+		case 0:
+			DeathMontage1();
+			break;
+		default:
+			break;
+		}
+	}
 }
 
 void AEnemy::AttackEnd()
@@ -581,19 +580,6 @@ void AEnemy::HandleDamage(float DamageAmount)
 	}
 
 }*/
-
-int32 AEnemy::PlayDeathMontage() // int32로 부모클래스와 결과를 동일하게 설정 
-{
-	const int32 Selection = Super::PlayDeathMontage();
-	/*
-	TEnumAsByte<EDeathPose> Pose(Selection);  // TEnum 열거체
-	if (Pose < EDeathPose::EDP_MAX) // 배열의 요소의 수 확인 (Enum 값보다 높은지)
-	{
-		DeathPose = Pose;
-	}
-	*/
-	return Selection;
-}
 
 void AEnemy::InitializeEnemy()
 {
@@ -827,13 +813,6 @@ void AEnemy::PawnSeen(APawn* SeenPawn) // 플레이어 추격
 	}
 
 }
-
-
-
-
-
-
-
 
 /*void AEnemy::PlayHitReactMontage(const FName& SectionName)
 {

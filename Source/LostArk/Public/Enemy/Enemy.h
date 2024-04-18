@@ -89,7 +89,7 @@ public:
 	
 	bool dontMove = false;
 	bool look = false;
-
+	bool bDie = false;
 	// 공격 전 회전
 	float rotTime = 0;
 	FRotator rotStart;
@@ -110,7 +110,7 @@ protected:
 	virtual void Attack() override;  // 공격
 	virtual bool CanAttack() override;
 	//virtual void HandleDamage(float DamageAmount) override;
-	virtual int32 PlayDeathMontage() override;
+	 void PlayDeathMontages();
 	/** </ABaseCharacter> */
 
 	// 오버랩 이벤트
@@ -137,6 +137,8 @@ protected:
 	void AttackMontage8();
 	void AttackMontage9();
 	void AttackMontage10();
+
+	void DeathMontage1();
 
 	UPROPERTY(EditAnywhere, Category = "mysettings")
 	TSubclassOf<UDamageType> DamageType;
