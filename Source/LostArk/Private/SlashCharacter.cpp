@@ -44,7 +44,8 @@ ASlashCharacter::ASlashCharacter()
 
 
 	HealthBarWidget = CreateDefaultSubobject<UHealthBarComponent>(TEXT("HealthBar")); // 헬스바위젯
-	HealthBarWidget->SetupAttachment(GetRootComponent()); //헬스바위젯을 루트로
+	HealthBarWidget->SetupAttachment(GetMesh()); //헬스바위젯을 루트로
+	HealthBarWidget->SetRelativeLocation(FVector(0,0,240));
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 640.0f, 0.0f); //마우스랑 다를경우 초당 640만큼회전
@@ -241,33 +242,39 @@ AActor* ASlashCharacter::ShootBullet9()
 
 float ASlashCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	/*
-	maxHP -= DamageAmount;
-	if (HP <= 0)
-	{
-		Destroy();
-	}
-	return DamageAmount;
-	*/
+
 	currentHP = FMath::Clamp(currentHP - DamageAmount, 0, MaxHP);
+	
+	
+	
+	
+
 	if (PlayerWidget != nullptr)
 	{
 
 		PlayerWidget->SetHealthBar((float)currentHP / (float)MaxHP, FLinearColor(1.0f, 0.13f, 0.05f, 1.0f));
 		
 	}
-	return DamageAmount;
+
+	//currentHP -= DamageAmount;
+	if (currentHP <= 0)
+	{
+		pc->PlayerCameraManager->StartCameraFade(0, 1, 1.5f, FLinearColor::Black);
+
+	}
+	//return DamageAmount;
 	
-	//if (currentHP <= 0)
-	//{
+	/*
+	if (currentHP <= 0)
+	{
 			//AEnemy* enemy;
 			//enemy -> removetarget();
 		//attacker->enemyState = EEnemyState::RETURN;
 
-		// 페이드 인 효과를 준다.
-		//pc->PlayerCameraManager->StartCameraFade(0, 1, 1.5f, FLinearColor::Black);
+		//페이드 인 효과를 준다.
+		pc->PlayerCameraManager->StartCameraFade(0, 1, 1.5f, FLinearColor::Black);
 
-
+		return;
 		//ClientSetCameraFade(true, )  다른 방법 함수
 
 		// 시작위치에서 다시 시작한다.
@@ -276,11 +283,12 @@ float ASlashCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 			//pc->UnPossess();
 			//Cast<ARealLostArkModeBase>(GetWorld()->GetAuthGameMode())->RespawnPlayer(pc, this);
 			//}), 1.5f, false);
+	}*/
 
 		
 
 	//}
-	//return DamageAmount;
+	return DamageAmount;
 	
 }
 
@@ -424,6 +432,8 @@ void ASlashCharacter::ShiftStarted(const FInputActionValue& value)
 		bPlayerIsInvisible = true;
 	}
 }
+
+
 
 // 좌클릭 바인딩 된 함수
 void ASlashCharacter::FireBullet(const FInputActionValue& value)

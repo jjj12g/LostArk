@@ -11,7 +11,7 @@
 
 
 
-class UHealthBarComponent; // hp 바
+//class UHealthBarComponent; // hp 바
 class UPawnSensingComponent; //폰 감지센서 전방선언
 
 
@@ -58,6 +58,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	class UNiagaraComponent* Dash;
 
+	UPROPERTY(EditAnywhere, Category = "MySettings|Components")
+	class UWidgetComponent* floatingWidgetComp;
 
 
 	USceneComponent* NiagaraSceneComp;
@@ -95,7 +97,7 @@ protected:
 	virtual void Die() override;
 	virtual void Attack() override;  // 공격
 	virtual bool CanAttack() override;
-	virtual void HandleDamage(float DamageAmount) override;
+	//virtual void HandleDamage(float DamageAmount) override;
 	virtual int32 PlayDeathMontage() override;
 	/** </ABaseCharacter> */
 
@@ -103,11 +105,11 @@ protected:
 	UFUNCTION()
 	void BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	// 캐릭터 삭제
-	UFUNCTION()
-	FORCEINLINE AActor* GetcurrentTarget() {return target;};
+	//UFUNCTION()
+	//FORCEINLINE AActor* GetcurrentTarget() {return target;};
 	
-	UFUNCTION()
-	FORCEINLINE void removetarget() { target = nullptr; };
+	//UFUNCTION()
+	//FORCEINLINE void removetarget() { target = nullptr; };
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mysettings")
 	class AEnemy* enemy;
@@ -143,8 +145,8 @@ protected:
 
 	//void PlayHitReactMontage(const FName& SectionName);
 
-	UPROPERTY(EditAnywhere)
-	float HP = 100;
+	UPROPERTY(EditAnywhere, Category = "MySettings")
+	int32 maxHP = 30;
 
 private:
 	/** AI behavior(행동) */
@@ -152,7 +154,7 @@ private:
 	void CheckPatrolTarget();
 	void CheckCombatTarget();
 	void PatrolTimerFinished(); // 순찰 타이머가 끝나면 실행
-	void HideHealthBar();
+	//void HideHealthBar();
 	void ShowHealthBar();
 	void LoseInterest();
 	void StartPatrolling();  // 순찰시작
@@ -170,15 +172,21 @@ private:
 	bool InTargetRange(AActor* Target, double Radius); // 타깃이 범위내에 있다면 true값 반환     수용반경
 	void MoveToTarget(AActor* Target);   //순찰시간끝나면 이동
 	AActor* ChoosePatrolTarget(); //새 표적 선택하기
+	class ASlashCharacter* target;
 	
-	UPROPERTY()
-	class AActor* target;
+	//체력관련
+	int32 currentHP = 0;
+
+	class UHealthBarWidget* EnemyWidget;
+
+	FRotator BillboradwidgetComponent(class AActor* camActor);
+	
 
 	UFUNCTION()
 	void PawnSeen(APawn* SeenPawn); // Callback for OnPawnSeen in UPawnSensingComponent
 
-	UPROPERTY(VisibleAnywhere)
-	UHealthBarComponent* HealthBarWidget; //hp 바
+	/*UPROPERTY(VisibleAnywhere)
+	class UHealthBarComponent* HealthBarWidget;*/ //hp 바
 
 	UPROPERTY(VisibleAnywhere)
 	UPawnSensingComponent* PawnSensing; // 폰의 위치감지(시각, 청각) 컴포넌트 생성

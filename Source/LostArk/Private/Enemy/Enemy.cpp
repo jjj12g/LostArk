@@ -21,6 +21,10 @@
 #include <../../../../../../../Source/Runtime/Engine/Classes/GameFramework/Character.h>
 #include "Components/CapsuleComponent.h"
 #include "SlashCharacter.h"
+#include "HealthBarWidget.h"
+#include <../../../../../../../Source/Runtime/Engine/Classes/Kismet/KismetMathLibrary.h>
+#include <../../../../../../../Source/Runtime/Engine/Classes/Camera/CameraComponent.h>
+#include "EngineUtils.h"
 
 
 
@@ -47,9 +51,15 @@ AEnemy::AEnemy()
 	//boxComp->SetGenerateOverlapEvents(true);
 	//GetMesh()->SetGenerateOverlapEvents(true);
 
-	HealthBarWidget = CreateDefaultSubobject<UHealthBarComponent>(TEXT("HealthBar")); // 헬스바위젯
-	HealthBarWidget->SetupAttachment(GetRootComponent()); //헬스바위젯을 루트로
+	
 
+
+	floatingWidgetComp = CreateDefaultSubobject<UWidgetComponent>(TEXT("FloatingWidgetComp"));
+	floatingWidgetComp->SetupAttachment(GetMesh());
+	floatingWidgetComp->SetRelativeLocation(FVector(240, 0, 400));
+	//floatingWidgetComp->SetRelativeRotation(FRotator(0, 0, 90));
+	floatingWidgetComp->SetWidgetSpace(EWidgetSpace::World);
+	floatingWidgetComp->SetDrawSize(FVector2D(150, 100));
 
 
 	// 캐릭터 움직임
@@ -76,9 +86,55 @@ AEnemy::AEnemy()
 
 }
 
+void AEnemy::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	for (TActorIterator<ASlashCharacter> players(GetWorld()); players; ++players)
+	{
+		target = *players;
+	}
+
+	GetMesh()->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::BeginOverlap);
+
+	if (PawnSensing) PawnSensing->OnSeePawn.AddDynamic(this, &AEnemy::PawnSeen);
+	InitializeEnemy();
+
+	// 기본적인 머터리얼 색상 변경이 x 파라미터 형태로만 접근 가능
+	// 메시의 머터리얼을 DynamicMaterial로 변경 해준다
+	UMaterialInterface* currentMat = GetMesh()->GetMaterial(0);
+	dynamicMAT = UMaterialInstanceDynamic::Create(currentMat, nullptr);
+	GetMesh()->SetMaterial(0, dynamicMAT);
+
+	// 두번째 머터리얼 색 변경
+	UMaterialInterface* currentMat2 = GetMesh()->GetMaterial(1);
+	dynamicMAT1 = UMaterialInstanceDynamic::Create(currentMat2, nullptr);
+	GetMesh()->SetMaterial(1, dynamicMAT1);
+
+	/* 기본 무기 , 지워도오류 x
+	UWorld* World = GetWorld();
+	if (World && WeaponClass)
+	{
+		//AWeapon* DefaultWeapon = World->SpawnActor<AWeapon>(WeaponClass);
+		//DefaultWeapon->Equip(GetMesh(), FName("RightHandSocket"), this, this);
+		//EquippedWeapon = DefaultWeapon;
+	}
+	*/
+
+	// 체력변수 초기화
+	// 체력 변수를 초기화한다.
+	currentHP = maxHP;
+	//위젯 컴포넌트에 할당되어 있는 위젯 인스턴스를 가져온다.
+	EnemyWidget = Cast<UHealthBarWidget>(floatingWidgetComp->GetWidget());
+
+
+}
+
 void AEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	floatingWidgetComp->SetWorldRotation(BillboradwidgetComponent(target));
 
 	//  전투타겟이 널포인터인지 확인
 	if (IsDead()) return;
@@ -113,6 +169,7 @@ void AEnemy::Tick(float DeltaTime)
 		
 	}
 
+	
 
 
 }
@@ -120,22 +177,38 @@ void AEnemy::Tick(float DeltaTime)
 // 데미지 , 남은체력 계산
 float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigetor, AActor* DamageCauser)
 {
-
-	HP -= DamageAmount;
-	if (HP <= 0.0f)
+	/*
+	maxHP -= DamageAmount;
+	if (maxHP <= 0.0f)
 	{
 		Destroy();
 	}
 	UE_LOG(LogTemp, Warning, TEXT("enemy hit!"));
-	//return DamageAmount;
+	//return DamageAmount;*/
+
+	currentHP = FMath::Clamp(currentHP - DamageAmount, 0, maxHP);
+	if (EnemyWidget != nullptr)
+	{
+
+		EnemyWidget->SetHealthBar((float)currentHP / (float)maxHP, FLinearColor(1.0f, 0.13f, 0.05f, 1.0f));
+		UE_LOG(LogTemp, Warning, TEXT("enemy hit!"));
+	}
+
+	if (currentHP <= 0)
+	{
+		
+
+	}
+	return DamageAmount;
+}
+	/*
 	HandleDamage(DamageAmount);
 	if (player == nullptr)
 	{
 		CombatTarget = EventInstigetor->GetPawn(); // 적이 피해를 입는 즉시 전투목표 설정
 		ChaseTarget();
-	}
-	return DamageAmount;
-}
+	}*/
+
 
 // Destroyed 무기나 필요없을듯.
 
@@ -151,60 +224,24 @@ void AEnemy::GetHit_Implementation(const FVector& ImpactPoint)
 		DirectionalHitReact(ImpactPoint);
 	}
 	// 그게아니면 데스모션
-	else Die();
+	//else Die();
 
 	PlayHitSound(ImpactPoint);
 	SpawnHitParticles(ImpactPoint);
 }
 
-void AEnemy::BeginPlay()
-{
-	Super::BeginPlay();
-	/*
-	for (TActorIterator<ASlashCharacter> player(GetWorld()); players; ++players)
-	{
-		target = *player;
-	}*/
-
-	GetMesh()->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::BeginOverlap);
-
-	if (PawnSensing) PawnSensing->OnSeePawn.AddDynamic(this, &AEnemy::PawnSeen);
-	InitializeEnemy();
-
-	// 기본적인 머터리얼 색상 변경이 x 파라미터 형태로만 접근 가능
-	// 메시의 머터리얼을 DynamicMaterial로 변경 해준다
-	UMaterialInterface* currentMat = GetMesh()->GetMaterial(0);
-	dynamicMAT = UMaterialInstanceDynamic::Create(currentMat, nullptr);
-	GetMesh()->SetMaterial(0, dynamicMAT);
-
-	// 두번째 머터리얼 색 변경
-	UMaterialInterface* currentMat2 = GetMesh()->GetMaterial(1);
-	dynamicMAT1 = UMaterialInstanceDynamic::Create(currentMat2, nullptr);
-	GetMesh()->SetMaterial(1, dynamicMAT1);
-
-	/* 기본 무기 , 지워도오류 x
-	UWorld* World = GetWorld();
-	if (World && WeaponClass)
-	{
-		//AWeapon* DefaultWeapon = World->SpawnActor<AWeapon>(WeaponClass);
-		//DefaultWeapon->Equip(GetMesh(), FName("RightHandSocket"), this, this);
-		//EquippedWeapon = DefaultWeapon;
-	}
-	*/
-
-}
 
 void AEnemy::Die()
 {
 	EnemyState = EEnemyState::EES_Dead;
 	// 죽음모션
 	PlayDeathMontage();
-	ClearAttackTimer(); // 공격중이면 공격멈춤
+	//ClearAttackTimer(); // 공격중이면 공격멈춤
 	// 죽으면 체력바 위젯 안보이게 설정
-	HideHealthBar();
-	DisableCapsule(); // 에너미가 죽엇을때 콜리전을 사라지게 함.
-	SetLifeSpan(DeathLifeSpan); // 에너미가 죽으면 n초 뒤에 사라짐
-	GetCharacterMovement()->bOrientRotationToMovement = false; // 죽은 뒤 다른방향으로 움직이지 않게 고정
+	//HideHealthBar();
+	//DisableCapsule(); // 에너미가 죽엇을때 콜리전을 사라지게 함.
+	//SetLifeSpan(DeathLifeSpan); // 에너미가 죽으면 n초 뒤에 사라짐
+	//GetCharacterMovement()->bOrientRotationToMovement = false; // 죽은 뒤 다른방향으로 움직이지 않게 고정
 
 
 }
@@ -399,6 +436,8 @@ void AEnemy::AttackMontage10()
 void AEnemy::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	
+
+	
 	
 	if (EnemyoverlapOn == true)
 	{
@@ -407,6 +446,7 @@ void AEnemy::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Othe
 		enemy = Cast<AEnemy>(OtherActor);
 		EnemyoverlapOn = false;
 	}
+
 
 	
 	
@@ -442,27 +482,28 @@ void AEnemy::AttackEnd()
 	CheckCombatTarget();
 
 }
-
+/*
 void AEnemy::HandleDamage(float DamageAmount)
 {
 	Super::HandleDamage(DamageAmount);
 
-	if (Attributes && HealthBarWidget)
+	if (Attributes && floatingWidgetComp)
 	{
-		HealthBarWidget->SetHealthPercent(Attributes->GetHealthPercent());
+		floatingWidgetComp->SetHealthPercent(Attributes->GetHealthPercent());
 	}
 
-}
+}*/
 
 int32 AEnemy::PlayDeathMontage() // int32로 부모클래스와 결과를 동일하게 설정 
 {
 	const int32 Selection = Super::PlayDeathMontage();
+	/*
 	TEnumAsByte<EDeathPose> Pose(Selection);  // TEnum 열거체
 	if (Pose < EDeathPose::EDP_MAX) // 배열의 요소의 수 확인 (Enum 값보다 높은지)
 	{
 		DeathPose = Pose;
 	}
-
+	*/
 	return Selection;
 }
 
@@ -470,7 +511,7 @@ void AEnemy::InitializeEnemy()
 {
 	EnemyController = Cast<AAIController>(GetController());  //AI 컨트롤러로 캐스트해줌  
 	MoveToTarget(PatrolTarget); //에너미 순찰경로지정
-	HideHealthBar();
+	//HideHealthBar();
 }
 
 void AEnemy::CheckPatrolTarget()
@@ -516,28 +557,28 @@ void AEnemy::PatrolTimerFinished()
 	MoveToTarget(PatrolTarget);
 
 }
-
+/*
 void AEnemy::HideHealthBar()
 {
-	if (HealthBarWidget)
+	if (floatingWidgetComp)
 	{
-		HealthBarWidget->SetVisibility(false); // 건강표시기 위젯을 숨기고 다시순찰
+		floatingWidgetComp->SetVisibility(false); // 건강표시기 위젯을 숨기고 다시순찰
 	}
-}
+}*/
 // 가까이있을때 헬스바 보임
 void AEnemy::ShowHealthBar()
 {
-	if (HealthBarWidget)
+	if (floatingWidgetComp)
 	{
 
-		HealthBarWidget->SetVisibility(true); // 건강표시기 위젯을 숨기고 다시순찰
+		floatingWidgetComp->SetVisibility(true); // 건강표시기 위젯을 숨기고 다시순찰
 	}
 }
 // 죽었을때 헬스바 숨김
 void AEnemy::LoseInterest()
 {
 	CombatTarget = nullptr;
-	HideHealthBar();
+	//HideHealthBar();
 }
 // 순찰시작
 void AEnemy::StartPatrolling()
@@ -663,6 +704,27 @@ AActor* AEnemy::ChoosePatrolTarget()
 	}
 
 	return nullptr;
+}
+
+FRotator AEnemy::BillboradwidgetComponent(AActor* camActor)
+{
+	//UE_LOG(LogTemp,Warning,TEXT("1111111111111111111"));
+	player = Cast<ASlashCharacter>(target);
+	if (player != nullptr)
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("222222222222221111"));
+		FVector lookDir = (player->cameraComp->GetComponentLocation() - floatingWidgetComp->GetComponentLocation()).GetSafeNormal();
+		//FRotator lookRot = UKismetMathLibrary::MakeRotFromX(lookDir);
+		FRotator lookRot = lookDir.ToOrientationRotator();
+
+		return lookRot;
+	}
+	else
+	{	
+		UE_LOG(LogTemp, Warning, TEXT("33333333333111"));
+		return FRotator::ZeroRotator;
+	}
+
 }
 
 void AEnemy::PawnSeen(APawn* SeenPawn) // 플레이어 추격

@@ -43,6 +43,7 @@ void AMybulletActor::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 	AController* Playerc = GetInstigator()->GetController();
 	UGameplayStatics::ApplyDamage(OtherActor, BaseDamage, Playerc, this, DamageType);
 	//AMybulletActor* 
+	/*
 	bullet = Cast<AMybulletActor>(OtherActor);
 
 	if (bullet != nullptr && !GetWorld()->GetTimerManager().IsTimerActive(skillDelay))
@@ -51,6 +52,7 @@ void AMybulletActor::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 			bullet-> Destroy();
 			}), 3.0f, false);
 	}
+	*/
 
 }
 

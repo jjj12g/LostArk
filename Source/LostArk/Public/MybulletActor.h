@@ -32,7 +32,7 @@ protected:
 	class UProjectileMovementComponent* ProjectileMovement;
 
 	UPROPERTY(EditAnywhere, Category = "mysettings")
-	float BaseDamage;
+	float BaseDamage = 1000;
 
 	UPROPERTY(EditAnywhere, Category = "mysettings")
 	TSubclassOf<UDamageType> DamageType;

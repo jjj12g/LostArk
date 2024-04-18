@@ -50,6 +50,8 @@ public:
 	AActor* ShootBullet8();
 	AActor* ShootBullet9();
 
+	
+
 
 
 
@@ -138,12 +140,14 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "MySettings|Components")
 	class UStaticMeshComponent* staffMeshComp;
 
-	// 카메라 관련 변수 선언
-	UPROPERTY(VisibleAnywhere, Category="MySettings|Components")
-	class UCameraComponent* cameraComp;
 
 	UPROPERTY(VisibleAnywhere, Category="MySettings|Components")
 	class USpringArmComponent* springArmComp;
+	
+	// 카메라 관련 변수 선언
+	UPROPERTY(VisibleAnywhere, Category="MySettings|Components")
+	class UCameraComponent* cameraComp;
+	
 	// 캐릭터 움직임 구현
 	UPROPERTY(EditAnywhere, Category = "MySettings")
 	class UInputMappingContext* imc_myMapping;
