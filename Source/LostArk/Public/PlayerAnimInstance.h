@@ -43,7 +43,9 @@ private:
 	//UFUNCTION()
 	//void AnimNotify_nnShoot1(); //평타 StraightForwardMontage
 
-	UFUNCTION()
-	void AnimNotify_nnPierce1(); //찌르기 FencingMontage
+	//UFUNCTION()
+	//void AnimNotify_nnPierce1(); //찌르기 FencingMontage
 	
+	UFUNCTION()
+	void AnimNotify_nnBasic(); //평타 기본공격
 };

@@ -20,10 +20,7 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	 Super::NativeUpdateAnimation(DeltaSeconds);
 	 
-	 if (playerMovementComp != nullptr)
-	 {
-		
-	 }
+	 
 }
 
 void UPlayerAnimInstance::AnimNotify_nnIdle()
@@ -49,7 +46,12 @@ void UPlayerAnimInstance::AnimNotify_nnSky1()
 	player->ShootBullet5();
 }
 
-void UPlayerAnimInstance::AnimNotify_nnPierce1()
+//void UPlayerAnimInstance::AnimNotify_nnPierce1()
+//{
+//	player->ShootBullet();
+//}
+
+void UPlayerAnimInstance::AnimNotify_nnBasic()
 {
 	player->ShootBullet();
 }

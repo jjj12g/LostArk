@@ -237,6 +237,9 @@ public:
 	UPROPERTY(EditAnywhere, Category="MySettings|Animations")
 	class UAnimMontage* straight_montage;
 
+	UPROPERTY(EditAnywhere, Category="MySettings|Animations")
+	class UAnimMontage* basic_montage;
+
 	bool bKeyPressed;
 	bool bAttackEnabled;
 	bool bPlayerIsAttacking = false;
@@ -304,6 +307,7 @@ private:   //나만 사용가능하다는 뜻 , 외부에서 호출할게 아니면 여기서 작성하는게
 	bool q;
 	bool w;
 	bool e;
+	bool r;
 };
 
 

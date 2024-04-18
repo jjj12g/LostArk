@@ -147,7 +147,7 @@ AActor* ASlashCharacter::ShootBullet2()
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Instigator = this;
-	AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn2, SpawnLocation->GetComponentLocation(), toward.Rotation(), SpawnParams);
+	AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn2, CachedDestination, toward.Rotation(), SpawnParams);
 	//AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn2, SpawnLocation->GetComponentLocation(), GetActorRotation(), SpawnParams);
 	return SpawandActor;
 }
@@ -464,16 +464,39 @@ void ASlashCharacter::FireBullet(const FInputActionValue& value)
 		{
 			bPlayerIsAttacking = true;
 			
-			// 몽타주 실행
-			int32 num = FMath::RandRange(1, 3);
-			FString sectionName = FString("Fencing") + FString::FromInt(num);
-			PlayAnimMontage(fencing_montage, 1.3, FName(sectionName));					
+			PlayAnimMontage(basic_montage);					
 		}
+
+		//if (q && !bPlayerIsAttacking)
+		//{
+
+		//	UE_LOG(LogTemp, Warning, (TEXT("Q_SKILL")));
+
+		//	bPlayerIsAttacking = true;
+
+		//	// 랜덤으로 몽타주 실행
+		//	int32 num = FMath::RandRange(1, 4);
+		//	FString sectionName = FString("HitGround") + FString::FromInt(num);
+		//	PlayAnimMontage(hitground_montage, 1.3, FName(sectionName));
+		//}
+
+		//if (w && !bPlayerIsAttacking)
+		//{
+
+		//	UE_LOG(LogTemp, Warning, (TEXT("W_SKILL")));
+
+		//	bPlayerIsAttacking = true;
+
+		//	// 랜덤으로 몽타주 실행
+		//	int32 num = FMath::RandRange(1, 4);
+		//	FString sectionName = FString("HitGround") + FString::FromInt(num);
+		//	PlayAnimMontage(hitground_montage, 1.3, FName(sectionName));
+		//}
 
 		if (e && !bPlayerIsAttacking)
 		{
 			
-			UE_LOG(LogTemp, Warning, (TEXT("SKILL")));
+			UE_LOG(LogTemp, Warning, (TEXT("E_SKILL")));
 			
 			bPlayerIsAttacking = true;
 
@@ -483,23 +506,48 @@ void ASlashCharacter::FireBullet(const FInputActionValue& value)
 			PlayAnimMontage(hitground_montage, 1.3, FName(sectionName));			
 		}
 
+		if (r && !bPlayerIsAttacking)
+		{
+
+			UE_LOG(LogTemp, Warning, (TEXT("R_SKILL")));
+
+			bPlayerIsAttacking = true;
+
+			// 랜덤으로 몽타주 실행
+			int32 num = FMath::RandRange(1, 4);
+			FString sectionName = FString("Sky") + FString::FromInt(num);
+			PlayAnimMontage(sky_montage, 1.3, FName(sectionName));
+		}
 	}
 }
+
 // 스킬  QWERASDF 애니메이션 넣는 곳-----------------------------------------------------------
-
-
 void ASlashCharacter::Q(const FInputActionValue& value)
 {
-	/*ShootBullet3();*/
 	q = value.Get<bool>();
-	UE_LOG(LogTemp,Warning,TEXT("Q"));
-	
+
+	if (q)
+	{
+		bKeyPressed = true;
+	}
+	else
+	{
+		bKeyPressed = false;
+	}
 }
 
 void ASlashCharacter::W(const FInputActionValue& value)
 {
-	ShootBullet4();
-	UE_LOG(LogTemp, Warning, TEXT("W"));
+	w = value.Get<bool>();
+
+	if (w)
+	{
+		bKeyPressed = true;
+	}
+	else
+	{
+		bKeyPressed = false;
+	}
 }
 
 void ASlashCharacter::FireBullet2(const FInputActionValue& value)
@@ -509,31 +557,26 @@ void ASlashCharacter::FireBullet2(const FInputActionValue& value)
 
 	if (e)
 	{
-	UE_LOG(LogTemp, Warning, (TEXT("on")));
 	bKeyPressed = true;
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, (TEXT("off")));
 		bKeyPressed = false;
-	}
-
-	//if(!bPlayerIsAttacking && bAttackEnabled)
-	//{
-	//	bPlayerIsAttacking = true;
-	//	int32 num = FMath::RandRange(1, 4);
-	//	FString sectionName = FString("HitGround") + FString::FromInt(num); // FromInt : 숫자 변수의 값을 문자로 변환해주는 함수
-	//	PlayAnimMontage(hitground_montage, 1.3, FName(sectionName));			
-	//}
+	}		
 }
 
 void ASlashCharacter::R(const FInputActionValue& value)
 {
-	bPlayerIsAttacking = true;
+	r = value.Get<bool>();
 
-	int32 num = FMath::RandRange(1, 4);
-	FString sectionName = FString("Sky") + FString::FromInt(num); // FromInt : 숫자 변수의 값을 문자로 변환해주는 함수
-	PlayAnimMontage(sky_montage, 1.3, FName(sectionName));
+	if (r)
+	{
+		bKeyPressed = true;
+	}
+	else
+	{
+		bKeyPressed = false;
+	}
 }
 
 void ASlashCharacter::A(const FInputActionValue& value)
