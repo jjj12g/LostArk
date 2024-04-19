@@ -7,6 +7,8 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GamePlayStatics.h"
 #include "NiagaraFunctionLibrary.h"
+#include "SlashCharacter.h"
+#include "EngineUtils.h"
 
 
 // Sets default values
@@ -31,7 +33,14 @@ void AMybulletActor::BeginPlay()
 {
 	Super::BeginPlay();
 
+	for (TActorIterator<ASlashCharacter> it(GetWorld()); it; ++it)
+	{
+		player = *it;
+	}
+
 	Collisionsphere->OnComponentBeginOverlap.AddDynamic(this, &AMybulletActor::BeginOverlap);
+
+	SetLifeSpan(2.0f);
 
 }
 
@@ -43,16 +52,25 @@ void AMybulletActor::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 	AController* Playerc = GetInstigator()->GetController();
 	UGameplayStatics::ApplyDamage(OtherActor, BaseDamage, Playerc, this, DamageType);
 	//AMybulletActor* 
-	/*
-	bullet = Cast<AMybulletActor>(OtherActor);
+	
+
+	if (player != nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("nnnnnn"));
+		player->bcamerashake();
+	}
+
+
+
+	/*bullet = Cast<AMybulletActor>(OtherActor);
 
 	if (bullet != nullptr && !GetWorld()->GetTimerManager().IsTimerActive(skillDelay))
 	{
 		GetWorld()->GetTimerManager().SetTimer(skillDelay, FTimerDelegate::CreateLambda([&]() {
 			bullet-> Destroy();
 			}), 3.0f, false);
-	}
-	*/
+	}*/
+	
 
 }
 

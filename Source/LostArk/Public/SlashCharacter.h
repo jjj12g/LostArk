@@ -51,7 +51,7 @@ public:
 	AActor* ShootBullet9();
 
 	
-
+	bool camrashake = false;
 
 
 
@@ -205,11 +205,16 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MySettings")
 	bool inputDir;
 
+	// 카메라 쉐이크 변수
+	UPROPERTY(EditAnywhere, Category="MySettings|Variables")
+	TSubclassOf<class UCameraShakeBase> PlayerHitShake_bp;
+
 	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState;} // 캐릭터애니메이션쪽에서 캐릭터상태를 가져가기위한세팅
 
 	UFUNCTION() 
 	void SetInputDirection(const FInputActionValue& value);
 	
+	void bcamerashake(); // 카메라 쉐이크 함수
 
 	// 공격 모션 만들기
 	UPROPERTY(EditAnywhere, Category = "Mysettings")

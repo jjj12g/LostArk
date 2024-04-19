@@ -356,6 +356,11 @@ void ASlashCharacter::Tick(float DeltaTime)
 			bPlayerIsInvisible = false;
 		}
 	}
+	if (camrashake)
+	{
+		bcamerashake();
+		camrashake = false;
+	}
 }
 
 
@@ -664,6 +669,16 @@ void ASlashCharacter::SetInputDirection(const FInputActionValue& value)
 }
 
 
+void ASlashCharacter::bcamerashake()
+{
+
+	if (pc != nullptr)
+	{
+		//pc->ClientStopCameraShake(PlayerHitShake_bp);
+		pc->ClientStartCameraShake(PlayerHitShake_bp);
+	}
+
+}
 
 void ASlashCharacter::SetInputJemp(const FInputActionValue& value)
 {	// 점프미완성

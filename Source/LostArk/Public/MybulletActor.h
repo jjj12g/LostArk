@@ -47,6 +47,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	class UNiagaraSystem* impactparticle;
 
+	class ASlashCharacter* player;
+
 	virtual void BulletHit();
 
 private:
