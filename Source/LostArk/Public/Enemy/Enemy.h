@@ -6,6 +6,7 @@
 #include "BaseCharacter.h" //에너미와 플레이어의 공통부모
 #include "interfaces/HitInterface.h"
 #include "CharacterTypes.h" // 캐릭터 죽음같은 애니메이션 동작넣을때 사용할것.
+#include "MybulletActor.h"
 #include "Enemy.generated.h"
 
 
@@ -52,8 +53,15 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UNiagaraSystem* NI_breath;
 
+	UPROPERTY(EditAnywhere)
+	class UNiagaraSystem* NI_SHOWKWAVE;
+
 	UPROPERTY(EditDefaultsOnly)
 	USceneComponent* SpawnLocation;
+
+	// 불릿액터 넣는 곳
+	UPROPERTY(EditAnywhere, Category = "MySettings")
+	class AMybulletActor* abreath;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	class UNiagaraComponent* Dash;
@@ -72,6 +80,13 @@ public:
 
 	class UMaterialInstanceDynamic* dynamicMAT1;
 	
+
+	// 불릿 액터 관련
+	UPROPERTY(EditAnywhere, Category = "mysettings")
+	TSubclassOf<AMybulletActor> bullettospawn;
+
+	AActor* ShootBullet();
+
 
 
 	UPROPERTY(BlueprintReadOnly)

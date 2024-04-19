@@ -27,6 +27,8 @@
 #include "EngineUtils.h"
 #include "BaseFloatingText.h"
 #include "Components/TextRenderComponent.h"
+#include "MybulletActor.h"
+#include <../../../../../../../Source/Runtime/Engine/Classes/Engine/World.h>
 
 
 
@@ -162,6 +164,7 @@ void AEnemy::Tick(float DeltaTime)
 	{
 		if (NI_breath != nullptr)
 			NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NI_breath, SpawnLocation->GetComponentLocation(), SpawnLocation->GetComponentRotation());
+			ShootBullet();
 		breath1 = false;
 	}
 
@@ -350,7 +353,7 @@ void AEnemy::Attack()
 		if (AnimInstance && AttackMontage)
 		{
 			AnimInstance->Montage_Play(AttackMontage);
-			const int32 Selection = FMath::RandRange(1, 1); // 0~2까지가 3개
+			const int32 Selection = FMath::RandRange(4, 4); // 0~2까지가 3개
 			FName SectionName = FName();
 			switch (Selection)
 			{
@@ -422,6 +425,15 @@ void AEnemy::AttackMontage1()
 	//UE_LOG(LogTemp, Warning, TEXT("State Transition: %s"), *UEnum::GetValueAsString<EEnemyState>(EnemyState));
 }
 
+AActor* AEnemy::ShootBullet()
+{
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Instigator = this;
+	AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn, SpawnLocation->GetComponentLocation(), SpawnLocation->GetComponentRotation(), SpawnParams);
+	//AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn, SpawnLocation->GetComponentLocation(), GetActorRotation(), SpawnParams);
+	return SpawandActor;
+}
+
 bool AEnemy::rushAttack(float deltaSeconds)
 {
 	// 러쉬어택
@@ -466,6 +478,7 @@ void AEnemy::AttackMontage4()
 	UE_LOG(LogTemp, Warning, TEXT("attack4"));
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	AnimInstance->Montage_JumpToSection(FName("Attack4"), AttackMontage);
+	
 
 }
 
@@ -474,6 +487,7 @@ void AEnemy::AttackMontage5()
 	UE_LOG(LogTemp, Warning, TEXT("attack5"));
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	AnimInstance->Montage_JumpToSection(FName("Attack5"), AttackMontage);
+	NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NI_SHOWKWAVE, SpawnLocation->GetComponentLocation(), SpawnLocation->GetComponentRotation());
 
 }
 
