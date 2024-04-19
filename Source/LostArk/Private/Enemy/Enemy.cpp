@@ -294,6 +294,11 @@ void AEnemy::Attack()
 	rotTarget = newRot;
 	bLookTarget = true;
 
+	// 공격 시 머터리얼 색 변경
+	dynamicMAT->SetVectorParameterValue(FName("Hit color"), FVector4(1, 1, 1, 100));
+	// 두번째 색 변경
+	dynamicMAT1->SetVectorParameterValue(FName("hit Color"), FVector4(1, 1, 1, 100));
+
 	EnemyState = EEnemyState::EES_Engaged;
 	look = false;
 	dontMove = true;
@@ -488,6 +493,10 @@ void AEnemy::AttackMontage5()
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	AnimInstance->Montage_JumpToSection(FName("Attack5"), AttackMontage);
 	NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NI_SHOWKWAVE, SpawnLocation->GetComponentLocation(), SpawnLocation->GetComponentRotation());
+	// 공격 시 머터리얼 색 변경
+	dynamicMAT->SetVectorParameterValue(FName("Hit color"), FVector4(0, 0, 0,100));
+	// 두번째 색 변경
+	dynamicMAT1->SetVectorParameterValue(FName("hit Color"), FVector4(0, 0, 0, 100));
 
 }
 
