@@ -25,6 +25,8 @@
 #include <../../../../../../../Source/Runtime/Engine/Classes/Kismet/KismetMathLibrary.h>
 #include <../../../../../../../Source/Runtime/Engine/Classes/Camera/CameraComponent.h>
 #include "EngineUtils.h"
+#include "BaseFloatingText.h"
+#include "Components/TextRenderComponent.h"
 
 
 
@@ -71,6 +73,7 @@ AEnemy::AEnemy()
 	SpawnLocation = CreateDefaultSubobject<USceneComponent>(TEXT("bullet spawn point"));
 	SpawnLocation->SetupAttachment(GetMesh());
 
+
 	Dash = CreateDefaultSubobject<UNiagaraComponent>(TEXT("niagara comp"));
 	Dash->SetupAttachment(GetCapsuleComponent());
 
@@ -110,6 +113,7 @@ void AEnemy::BeginPlay()
 		//EquippedWeapon = DefaultWeapon;
 	}
 	*/
+
 
 	// 체력변수 초기화
 	// 체력 변수를 초기화한다.
@@ -194,6 +198,8 @@ void AEnemy::Tick(float DeltaTime)
 			bLookTarget = false;
 		}
 	}
+
+	
 
 }
 
@@ -525,9 +531,11 @@ void AEnemy::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Othe
 	if (EnemyoverlapOn == true)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("TakeDamegeEnemy"));
+		
 		UGameplayStatics::ApplyDamage(OtherActor, 30, EnemyController, this, DamageType);
 		enemy = Cast<AEnemy>(OtherActor);
 		EnemyoverlapOn = false;
+
 	}
 
 }

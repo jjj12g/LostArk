@@ -71,8 +71,8 @@ public:
 	class UMaterialInstanceDynamic* dynamicMAT;
 
 	class UMaterialInstanceDynamic* dynamicMAT1;
-
 	
+
 
 	UPROPERTY(BlueprintReadOnly)
 	EEnemyState EnemyState = EEnemyState::EES_Patrolling; //애니메이션 순찰에들어감
