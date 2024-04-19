@@ -92,6 +92,10 @@ protected:
 	UPROPERTY(EditAnywhere)
 	int32 MaxHP = 100;
 	FORCEINLINE int32 GetcurrentHP() { return currentHP; };
+	
+	
+	UPROPERTY(EditAnywhere)
+	int MaxMP = 100;
 
 	UPROPERTY()
 	class UHealthBarWidget* PlayerWidget;
@@ -308,6 +312,7 @@ private:   //나만 사용가능하다는 뜻 , 외부에서 호출할게 아니면 여기서 작성하는게
 	FVector CachedDestination;
 	
 	int32 currentHP = 0;
+	int32 currentMP = 0;
 
 	bool q;
 	bool w;

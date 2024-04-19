@@ -35,6 +35,9 @@ protected:
 	float BaseDamage = 1000;
 
 	UPROPERTY(EditAnywhere, Category = "mysettings")
+	int32 useMP = 10;
+
+	UPROPERTY(EditAnywhere, Category = "mysettings")
 	TSubclassOf<UDamageType> DamageType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mysettings")

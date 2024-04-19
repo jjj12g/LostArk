@@ -163,7 +163,7 @@ void AEnemy::Tick(float DeltaTime)
 	if (breath1 == true)
 	{
 		if (NI_breath != nullptr)
-			NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NI_breath, SpawnLocation->GetComponentLocation(), SpawnLocation->GetComponentRotation());
+			NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NI_breath, SpawnLocation->GetComponentLocation(), SpawnLocation->GetComponentRotation(), FVector(2.0f));
 			ShootBullet();
 		breath1 = false;
 	}

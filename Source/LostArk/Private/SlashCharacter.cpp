@@ -122,6 +122,8 @@ void ASlashCharacter::BeginPlay()
 	// 기본 체력 ui
 	currentHP = MaxHP;
 	PlayerWidget = Cast<UHealthBarWidget>(HealthBarWidget->GetWidget());
+
+	currentMP = MaxMP;
 }
 
 // 스킬 설정 및 위치 설정 -----------------------------------------------------------------------------------------------------
@@ -149,6 +151,8 @@ AActor* ASlashCharacter::ShootBullet2()
 	SpawnParams.Instigator = this;
 	AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn2, CachedDestination, toward.Rotation(), SpawnParams);
 	//AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn2, SpawnLocation->GetComponentLocation(), GetActorRotation(), SpawnParams);
+	currentMP -= 30;
+	
 	return SpawandActor;
 }
 
