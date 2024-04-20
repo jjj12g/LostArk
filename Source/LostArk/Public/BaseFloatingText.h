@@ -23,6 +23,13 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TEXT")
 	class UTextRenderComponent* damageText;
 
+	UPROPERTY(EditAnywhere, Category="MySetting|Variables")
+	TSubclassOf<class AMybulletActor> bullet_bp;
+
+	UPROPERTY()
+	class AActor* target;
+
+	float textingDamage();
 
 
 protected:

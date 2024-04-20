@@ -17,6 +17,16 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
+	//진원
+	UPROPERTY(EditAnywhere, Category="MySetting|Variables")
+	TSubclassOf<class ABaseFloatingText> Floating_bp;
+
+
+	class ABaseFloatingText* test;
+	
+	UPROPERTY(EditAnywhere, Category = "Mysettings")
+	float BaseDamage = 1000;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -30,9 +40,6 @@ protected:
 	// 공격 날아가는 것 발사체 이동
 	UPROPERTY(EditAnywhere, Category = "mysettings")
 	class UProjectileMovementComponent* ProjectileMovement;
-
-	UPROPERTY(EditAnywhere, Category = "mysettings")
-	float BaseDamage = 1000;
 
 	UPROPERTY(EditAnywhere, Category = "mysettings")
 	int32 useMP = 10;

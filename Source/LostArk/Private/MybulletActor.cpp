@@ -50,14 +50,23 @@ void AMybulletActor::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 	BulletHit();
 
 	AController* Playerc = GetInstigator()->GetController();
-	UGameplayStatics::ApplyDamage(OtherActor, BaseDamage, Playerc, this, DamageType);
-	//AMybulletActor* 
+	if (Playerc != nullptr) {
+		UGameplayStatics::ApplyDamage(OtherActor, BaseDamage, Playerc, this, DamageType);
+	}
+	
 	
 
 	if (player != nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("nnnnnn"));
 		player->bcamerashake();
+	}
+
+	// Áø¿ø
+	if (BaseDamage)
+	{
+		//test->damageAmount = BaseDamage;
+		GetWorld()->SpawnActor <ABaseFloatingText>(Floating_bp, GetActorLocation(), GetActorRotation());
 	}
 
 

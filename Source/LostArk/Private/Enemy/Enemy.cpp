@@ -164,6 +164,7 @@ void AEnemy::Tick(float DeltaTime)
 	{
 		if (NI_breath != nullptr)
 			NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NI_breath, SpawnLocation->GetComponentLocation(), SpawnLocation->GetComponentRotation(), FVector(2.0f));
+			// 슛 불릿 위치 타이밍맞게 옮겨주기
 			ShootBullet();
 		breath1 = false;
 	}
@@ -309,7 +310,7 @@ void AEnemy::Attack()
 		if (AnimInstance && AttackMontage)
 		{
 			AnimInstance->Montage_Play(AttackMontage);
-			const int32 Selection = FMath::RandRange(0, 0); // 0~2까지가 3개
+			const int32 Selection = FMath::RandRange(6, 6); // 0~2까지가 3개
 			FName SectionName = FName();
 			switch (Selection)
 			{
@@ -317,29 +318,37 @@ void AEnemy::Attack()
 			case 0:
 				AttackMontage1();
 				break;
+
 				// 브레스
 			case 1:
 				AttackMontage2();
 				break;
+
 				// 위로 한바퀴
 			case 2:
 				AttackMontage3();
 				break;
+
 				// 바닥찍고 꼬리치기
 			case 3:
 				AttackMontage4();
 				break;
+
 				// 바닥 3번찍기
 			case 4:
 				AttackMontage5();
 				break;
+
 				// 양옆 감전날개
 			case 5:
 				AttackMontage6();
 				break;
+
+				// 느린비 
 			case 6:
 				AttackMontage7();
 				break;
+
 			case 7:
 				AttackMontage8();
 				break;
@@ -358,7 +367,7 @@ void AEnemy::Attack()
 		if (AnimInstance && AttackMontage)
 		{
 			AnimInstance->Montage_Play(AttackMontage);
-			const int32 Selection = FMath::RandRange(4, 4); // 0~2까지가 3개
+			const int32 Selection = FMath::RandRange(6, 6); // 0~2까지가 3개
 			FName SectionName = FName();
 			switch (Selection)
 			{
@@ -366,29 +375,37 @@ void AEnemy::Attack()
 			case 0:
 				AttackMontage1();
 				break;
+
 				// 브레스
 			case 1:
 				AttackMontage2();
 				break;
+
 				// 위로 한바퀴
 			case 2:
 				AttackMontage3();
 				break;
+
 				// 바닥찍고 꼬리치기
 			case 3:
 				AttackMontage4();
 				break;
+
 				// 바닥 3번찍기
 			case 4:
 				AttackMontage5();
 				break;
+
 				// 양옆 감전날개
 			case 5:
 				AttackMontage6();
 				break;
+
+				// 느린비
 			case 6:
 				AttackMontage7();
 				break;
+
 			case 7:
 				AttackMontage8();
 				break;

@@ -68,6 +68,18 @@ void UEnemyAnimInstance::AnimNotify_AttackEnd()
 	enemy->look = true;
 }
 
+void UEnemyAnimInstance::AnimNotify_rain()
+{
+	UE_LOG(LogTemp, Warning, TEXT("rain11111111"));
+
+}
+
+void UEnemyAnimInstance::AnimNotify_rain1()
+{
+	UE_LOG(LogTemp, Warning, TEXT("rain222222222222"));
+
+}
+
 
 
 

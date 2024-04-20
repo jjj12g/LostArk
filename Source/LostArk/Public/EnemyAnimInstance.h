@@ -55,9 +55,11 @@ public:
 	UFUNCTION()
 	void AnimNotify_AttackEnd();
 
+	UFUNCTION()
+	void AnimNotify_rain();
 
-
-
+	UFUNCTION()
+	void AnimNotify_rain1();
 
 
 };
