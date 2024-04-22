@@ -19,7 +19,7 @@
 #include <../../../../../../../Plugins/FX/Niagara/Source/Niagara/Public/NiagaraFunctionLibrary.h>
 #include "MybulletActor.h"
 
-#include "../../../../../../../Program Files/Epic Games/UE_5.3/Engine/Plugins/Runtime/ModelViewViewModel/Source/ModelViewViewModelDebuggerEditor/Private/Widgets/SMainDebugTab.h"
+//#include "../../../../../../../Program Files/Epic Games/UE_5.3/Engine/Plugins/Runtime/ModelViewViewModel/Source/ModelViewViewModelDebuggerEditor/Private/Widgets/SMainDebugTab.h"
 #include "PlayerAnimInstance.h"
 #include "HUD/HealthBarComponent.h"
 #include <../../../../../../../Source/Runtime/Engine/Classes/Kismet/KismetMathLibrary.h>
@@ -68,15 +68,8 @@ ASlashCharacter::ASlashCharacter()
 	cameraComp->SetRelativeLocation(FVector(30, 0, -550));
 	cameraComp->SetRelativeRotation(FRotator(37, 0, 0));
 
-
-	PrimaryActorTick.bCanEverTick = true;
-	PrimaryActorTick.bStartWithTickEnabled = true;
-
-
 	SpawnLocation = CreateDefaultSubobject<USceneComponent>(TEXT("bullet spawn point"));
 	SpawnLocation->SetupAttachment(GetMesh());
-
-
 
 }
 
@@ -249,23 +242,52 @@ float ASlashCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 
 	currentHP = FMath::Clamp(currentHP - DamageAmount, 0, MaxHP);
 	
-	
-	
-	
-
 	if (PlayerWidget != nullptr)
 	{
 
 		PlayerWidget->SetHealthBar((float)currentHP / (float)MaxHP, FLinearColor(1.0f, 0.13f, 0.05f, 1.0f));
 		
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		if (AnimInstance && HitbrathMotage)
+		{
+			AnimInstance->Montage_Play(HitbrathMotage);
+			const int32 Selection = FMath::RandRange(0, 0); // 0~2까지가 3개
+			FName SectionName = FName();
+			switch (Selection)
+			{
+				
+			case 0:
+				hitreact();
+				break;
+			}
+		}
 	}
 
 	//currentHP -= DamageAmount;
 	if (currentHP <= 0)
 	{
 		pc->PlayerCameraManager->StartCameraFade(0, 1, 1.5f, FLinearColor::Black);
+		
+		CharacterState = ECharacterState::ECS_Die;
+
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		if (AnimInstance && DeathMotages)
+		{
+			AnimInstance->Montage_Play(DeathMotages);
+			const int32 Selection = FMath::RandRange(0, 0); // 0~2까지가 3개
+			FName SectionName = FName();
+			switch (Selection)
+			{
+
+			case 0:
+				DeathMontage();
+				break;
+			}
+		}
 
 	}
+
+
 	//return DamageAmount;
 	
 	/*
@@ -288,8 +310,6 @@ float ASlashCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 			//Cast<ARealLostArkModeBase>(GetWorld()->GetAuthGameMode())->RespawnPlayer(pc, this);
 			//}), 1.5f, false);
 	}*/
-
-		
 
 	//}
 	return DamageAmount;
@@ -365,6 +385,8 @@ void ASlashCharacter::Tick(float DeltaTime)
 		bcamerashake();
 		camrashake = false;
 	}
+
+
 }
 
 
@@ -410,6 +432,7 @@ void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 
 }
+
 void ASlashCharacter::Move(FVector direction, float deltaTime)
 {
 	// direction의 방향으로 이동한다.
@@ -693,10 +716,27 @@ void ASlashCharacter::SetInputJemp(const FInputActionValue& value)
 
 	}
 }
+// 히트
+void ASlashCharacter::hitreact()
+{
+	UE_LOG(LogTemp, Warning, TEXT("hit"));
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	AnimInstance->Montage_JumpToSection(FName("hit"), HitbrathMotage);
+	
+}
+
+// 데스
+void ASlashCharacter::DeathMontage()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Death"));
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	AnimInstance->Montage_JumpToSection(FName("Death"), DeathMotages);
+
+}
 
 void ASlashCharacter::Shoot(const FInputActionValue& value)
 {
-
+	
 
 	Attack->PullTrigger();
 

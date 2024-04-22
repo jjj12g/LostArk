@@ -51,6 +51,11 @@ void UPlayerAnimInstance::AnimNotify_nnSky1()
 //	player->ShootBullet();
 //}
 
+void UPlayerAnimInstance::AnimNotify_hit()
+{
+	UE_LOG(LogTemp, Warning, (TEXT("bKeyPressed FALSE")));
+}
+
 void UPlayerAnimInstance::AnimNotify_nnBasic()
 {
 	player->ShootBullet();

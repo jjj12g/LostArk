@@ -29,7 +29,8 @@
 #include "Components/TextRenderComponent.h"
 #include "MybulletActor.h"
 #include <../../../../../../../Source/Runtime/Engine/Classes/Engine/World.h>
-
+#include "textnibox.h" // 테스트
+#include "slowhitActor.h"
 
 
 
@@ -79,6 +80,7 @@ AEnemy::AEnemy()
 	Dash = CreateDefaultSubobject<UNiagaraComponent>(TEXT("niagara comp"));
 	Dash->SetupAttachment(GetCapsuleComponent());
 
+	
 }
 
 void AEnemy::BeginPlay()
@@ -116,6 +118,11 @@ void AEnemy::BeginPlay()
 	}
 	*/
 
+	
+
+
+
+
 
 	// 체력변수 초기화
 	// 체력 변수를 초기화한다.
@@ -130,7 +137,7 @@ void AEnemy::BeginPlay()
 	}
 
 	MoveToTarget(target);
-	EnemyState = EEnemyState::EES_NoState;
+	EnemyState = EEnemyState::EES_Patrolling;
 }
 
 void AEnemy::Tick(float DeltaTime)
@@ -152,20 +159,24 @@ void AEnemy::Tick(float DeltaTime)
 
 	//UE_LOG(LogTemp, Warning, TEXT("State Transition: %s"), *UEnum::GetValueAsString<EEnemyState>(EnemyState)); // 현재스테이터스 확인
 
-
 	// 러쉬어택
 	if (rush1 == true)
 	{
 		rushAttack(DeltaTime);
 	}
 
+	if (breathDamage)
+	{
+		ShootBullet();
+	 breathDamage = false;
+	}
 	// 브레스
 	if (breath1 == true)
 	{
 		if (NI_breath != nullptr)
 			NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NI_breath, SpawnLocation->GetComponentLocation(), SpawnLocation->GetComponentRotation(), FVector(2.0f));
 			// 슛 불릿 위치 타이밍맞게 옮겨주기
-			ShootBullet();
+			
 		breath1 = false;
 	}
 
@@ -178,7 +189,8 @@ void AEnemy::Tick(float DeltaTime)
 	if (look == true)
 	{
 		stackTime += DeltaTime;
-		if (stackTime >= 2.3f) {
+		if (stackTime >= 2.3f) 
+		{
 			stackTime = 0.0f;
 			UE_LOG(LogTemp, Warning, TEXT("look!"));
 			MoveToTarget(target);
@@ -199,13 +211,57 @@ void AEnemy::Tick(float DeltaTime)
 		{
 			rotTime = 0;
 			targetLoc = GetActorLocation() + GetActorForwardVector() * 1500;
+			threeAttack = true;
 			bLookTarget = false;
 		}
 	}
 
-	
+	// 느린비 slowrains로 함수로 만들까 생각
+	if (btestTarget)
+	{
+		teste();
+		GetWorld()->SpawnActor<Atextnibox>(testspawn, GetActorLocation()+e1, GetActorRotation());
+		GetWorld()->SpawnActor<Atextnibox>(testspawn, GetActorLocation()+e2, GetActorRotation());
+		GetWorld()->SpawnActor<Atextnibox>(testspawn, GetActorLocation()+e3, GetActorRotation());
+		GetWorld()->SpawnActor<Atextnibox>(testspawn, GetActorLocation()+e4, GetActorRotation());
+		GetWorld()->SpawnActor<Atextnibox>(testspawn, GetActorLocation()+e5, GetActorRotation());
+		GetWorld()->SpawnActor<Atextnibox>(testspawn, GetActorLocation()+e6, GetActorRotation());
+		GetWorld()->SpawnActor<Atextnibox>(testspawn, GetActorLocation() + e7, GetActorRotation());
+		GetWorld()->SpawnActor<Atextnibox>(testspawn, GetActorLocation() + e8, GetActorRotation());
+		GetWorld()->SpawnActor<Atextnibox>(testspawn, GetActorLocation() + e9, GetActorRotation());
+		GetWorld()->SpawnActor<Atextnibox>(testspawn, GetActorLocation() + e10, GetActorRotation());
 
-}
+		// 밑에 히트 스폰
+		GetWorld()->SpawnActor<AslowhitActor>(testhitbullet, GetActorLocation() + e1 + FVector(0,0,-266), GetActorRotation());
+		GetWorld()->SpawnActor<AslowhitActor>(testhitbullet, GetActorLocation() + e2 + FVector(0, 0, -266), GetActorRotation());
+		GetWorld()->SpawnActor<AslowhitActor>(testhitbullet, GetActorLocation() + e3 + FVector(0, 0, -266), GetActorRotation());
+		GetWorld()->SpawnActor<AslowhitActor>(testhitbullet, GetActorLocation() + e4 + FVector(0, 0, -266), GetActorRotation());
+		GetWorld()->SpawnActor<AslowhitActor>(testhitbullet, GetActorLocation() + e5 + FVector(0, 0, -266), GetActorRotation());
+		GetWorld()->SpawnActor<AslowhitActor>(testhitbullet, GetActorLocation() + e6 + FVector(0, 0, -266), GetActorRotation());
+		GetWorld()->SpawnActor<AslowhitActor>(testhitbullet, GetActorLocation() + e7 + FVector(0, 0, -266), GetActorRotation());
+		GetWorld()->SpawnActor<AslowhitActor>(testhitbullet, GetActorLocation() + e8 + FVector(0, 0, -266), GetActorRotation());
+		GetWorld()->SpawnActor<AslowhitActor>(testhitbullet, GetActorLocation() + e9 + FVector(0, 0, -266), GetActorRotation());
+		GetWorld()->SpawnActor<AslowhitActor>(testhitbullet, GetActorLocation() + e10 + FVector(0, 0, -266), GetActorRotation());
+		//UE_LOG(LogTemp, Warning, TEXT("123123"));
+		btestTarget = false;
+	}
+	
+		if (threeAttack)
+		{
+			if (threeAttacks)
+			{ 
+			NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NI_SHOWKWAVE, SpawnLocation->GetComponentLocation(), SpawnLocation->GetComponentRotation());
+
+			threeAttack = false;
+			threeAttacks = false;
+			}
+		}
+
+
+}	
+
+
+
 
 // 데미지 , 남은체력 계산
 float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigetor, AActor* DamageCauser)
@@ -304,13 +360,14 @@ void AEnemy::Attack()
 	look = false;
 	dontMove = true;
 
+	
 	if (FVector::Distance(target->GetActorLocation(), GetActorLocation()) > attackDistance)
 	{
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 		if (AnimInstance && AttackMontage)
 		{
 			AnimInstance->Montage_Play(AttackMontage);
-			const int32 Selection = FMath::RandRange(6, 6); // 0~2까지가 3개
+			const int32 Selection = FMath::RandRange(1, 1); // 0~2까지가 3개
 			FName SectionName = FName();
 			switch (Selection)
 			{
@@ -359,6 +416,7 @@ void AEnemy::Attack()
 				AttackMontage10();
 				break;
 			}
+			threeAttack = false;
 		}
 	}
 	else
@@ -367,7 +425,7 @@ void AEnemy::Attack()
 		if (AnimInstance && AttackMontage)
 		{
 			AnimInstance->Montage_Play(AttackMontage);
-			const int32 Selection = FMath::RandRange(6, 6); // 0~2까지가 3개
+			const int32 Selection = FMath::RandRange(1, 1); // 0~2까지가 3개
 			FName SectionName = FName();
 			switch (Selection)
 			{
@@ -416,8 +474,10 @@ void AEnemy::Attack()
 				AttackMontage10();
 				break;
 			}
+			threeAttack = false;
 		}
 	}
+	
 	//PlayAttackMontage();
 	//PlayRandomMontageSection(AttackMontage,AttackMontageSections);
 	//if (PlayRandomMontageSection)
@@ -446,6 +506,8 @@ void AEnemy::AttackMontage1()
 	//targetLoc = GetActorLocation() + GetActorForwardVector() * 1500;
 	//UE_LOG(LogTemp, Warning, TEXT("State Transition: %s"), *UEnum::GetValueAsString<EEnemyState>(EnemyState));
 }
+
+
 
 AActor* AEnemy::ShootBullet()
 {
@@ -509,7 +571,8 @@ void AEnemy::AttackMontage5()
 	UE_LOG(LogTemp, Warning, TEXT("attack5"));
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	AnimInstance->Montage_JumpToSection(FName("Attack5"), AttackMontage);
-	NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NI_SHOWKWAVE, SpawnLocation->GetComponentLocation(), SpawnLocation->GetComponentRotation());
+	
+	threeAttacks = true;
 	// 공격 시 머터리얼 색 변경
 	dynamicMAT->SetVectorParameterValue(FName("Hit color"), FVector4(0, 0, 0,100));
 	// 두번째 색 변경
@@ -525,11 +588,32 @@ void AEnemy::AttackMontage6()
 
 }
 
+// 느린비
 void AEnemy::AttackMontage7()
 {
 	UE_LOG(LogTemp, Warning, TEXT("attack7"));
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	AnimInstance->Montage_JumpToSection(FName("Attack7"), AttackMontage);
+
+	
+	btestTarget = true;
+	bteste = true;
+	
+}
+
+void AEnemy::teste()
+{
+	//  구체 위치
+	e1 = FVector(FMath::RandRange(-1500, 1500), FMath::RandRange(-1500, 1500), 0);
+	e2 = FVector(FMath::RandRange(-1500, 1500), FMath::RandRange(-1500, 1500), 0);
+	e3 = FVector(FMath::RandRange(-1500, 1500), FMath::RandRange(-1500, -300), 0);
+	e4 = FVector(FMath::RandRange(-1500, 1500), FMath::RandRange(-1500, 1500), 0);
+	e5 = FVector(FMath::RandRange(-1500, 1500), FMath::RandRange(-1500, 1500), 0);
+	e6 = FVector(FMath::RandRange(-1500, 1500), FMath::RandRange(-1500, 1500), 0);
+	e7 = FVector(FMath::RandRange(-1500, 1500), FMath::RandRange(-1500, 1500), 0);
+	e8 = FVector(FMath::RandRange(-1500, 1500), FMath::RandRange(-1500, 1500), 0);
+	e9 = FVector(FMath::RandRange(-1500, 1500), FMath::RandRange(-1500, 1500), 0);
+	e10 = FVector(FMath::RandRange(-1500, 1500), FMath::RandRange(-1500, 1500), 0);
 
 }
 
@@ -601,7 +685,6 @@ void AEnemy::PlayDeathMontages()
 		FName SectionName = FName();
 		switch (Selection)
 		{
-
 		case 0:
 			DeathMontage1();
 			break;

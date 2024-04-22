@@ -9,10 +9,9 @@ enum class ECharacterState : uint8 // 캐릭터의 현 상태에 따라 행동이 달라짐, 앞�
 {
 	ECS_Unequipped UMETA(DisplayName = "Unequipped"),      // 평상시상태, 값을 가짐 첫번째는 0 밑에한손무기는 1식으로 // 보통상태앞에ECS를 붙임 , UMETA매크로는 블루프린트에서 이름이 다른 형식으로 보이게 만들기위한 것
 	ECS_EquippedOneHandedWeapon UMETA(DisplayName = "Equipped One Handed Weapon"),  // 한손무기장착시
-	ECS_EquippedTwoHandedWeapon UMETA(DisplayName = "Equipped Two Handed Weapon") // 양손무기 장착시
-
+	ECS_EquippedTwoHandedWeapon UMETA(DisplayName = "Equipped Two Handed Weapon"), // 양손무기 장착시
+	ECS_Die,
 };
-
 
 
 

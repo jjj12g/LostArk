@@ -47,5 +47,9 @@ private:
 	//void AnimNotify_nnPierce1(); //찌르기 FencingMontage
 	
 	UFUNCTION()
+	void AnimNotify_hit(); //하늘에서 기모으기 SkyMontage
+
+
+	UFUNCTION()
 	void AnimNotify_nnBasic(); //평타 기본공격
 };

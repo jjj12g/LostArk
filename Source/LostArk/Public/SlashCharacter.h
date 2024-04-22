@@ -60,8 +60,6 @@ protected:
 	// 총알 발사 관련
 	
 
-	
-
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AMybulletActor> bullettospawn;
 
@@ -132,9 +130,7 @@ protected:
 	FRotator ShootRot;
 	FRotator Movement;
 	
-	
 
-	
 public:
 	virtual void Tick(float DeltaTime) override;
 
@@ -266,6 +262,14 @@ private:   //나만 사용가능하다는 뜻 , 외부에서 호출할게 아니면 여기서 작성하는게
 	UPROPERTY(VisibleAnywhere)
 	UHealthBarComponent* HealthBarWidget; //hp 바
 
+	UPROPERTY(EditDefaultsOnly, Category = "Montages")
+	UAnimMontage* HitbrathMotage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Montages")
+	UAnimMontage* DeathMotages;
+
+	void DeathMontage();
+
 		//이동
 	UFUNCTION(BlueprintCallable)
 	void Move(FVector direction, float deltaTime);    // 첫번째 매개변수는 값을 지정해주지 못함
@@ -302,6 +306,8 @@ private:   //나만 사용가능하다는 뜻 , 외부에서 호출할게 아니면 여기서 작성하는게
 	UFUNCTION()
 	void SetInputJemp(const FInputActionValue& value); // 점프 미완성	 
 	
+	void hitreact();
+
 	UPROPERTY()
 	class UPlayerAnimInstance* playerAnim;
 

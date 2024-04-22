@@ -8,6 +8,7 @@ void UEnemyAnimInstance::NativeInitializeAnimation()
 	Super::NativeInitializeAnimation();
 
 	enemy = Cast<AEnemy>(GetOwningActor());   // 전역 변수화
+	
 
 }
 
@@ -49,8 +50,13 @@ void UEnemyAnimInstance::AnimNotify_breath1()
 {
 	UE_LOG(LogTemp, Warning, TEXT("breath1"));
 	enemy->breath1 = true;
-	
+}
 
+void UEnemyAnimInstance::AnimNotify_breathAttack()
+{
+	
+	UE_LOG(LogTemp, Warning, TEXT("breathAttackDamage"));
+	enemy->breathDamage = true;
 }
 
 void UEnemyAnimInstance::AnimNotify_OverlapOn()
@@ -71,14 +77,19 @@ void UEnemyAnimInstance::AnimNotify_AttackEnd()
 void UEnemyAnimInstance::AnimNotify_rain()
 {
 	UE_LOG(LogTemp, Warning, TEXT("rain11111111"));
+	
 
 }
 
 void UEnemyAnimInstance::AnimNotify_rain1()
 {
 	UE_LOG(LogTemp, Warning, TEXT("rain222222222222"));
+	
 
 }
+
+
+
 
 
 

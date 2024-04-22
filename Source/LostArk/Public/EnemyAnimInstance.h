@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
 #include "enemy/Enemy.h"
+#include "textnibox.h"
 #include "EnemyAnimInstance.generated.h"
 
 /**
@@ -20,8 +21,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MySettings")
 	class AEnemy* enemy;  // 처음부터 에너미를 받아서 변수를 읽어옴
 
+
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MySettings")
-	EEnemyState currentState;  // 처음부터 에너미를 받아서 변수를 읽어옴
+	EEnemyState currentState;  // 에너미 스테이트를 받아옴
 
 
 	virtual void NativeInitializeAnimation() override;   // 비긴플레이에 해당
@@ -50,6 +53,9 @@ public:
 	void AnimNotify_breath1();
 
 	UFUNCTION()
+	void  AnimNotify_breathAttack();
+
+	UFUNCTION()
 	void AnimNotify_OverlapOn();
 
 	UFUNCTION()
@@ -60,6 +66,7 @@ public:
 
 	UFUNCTION()
 	void AnimNotify_rain1();
+
 
 
 };

@@ -26,6 +26,9 @@ public:
 	UPROPERTY(EditAnywhere, Category="MySetting|Variables")
 	TSubclassOf<class AMybulletActor> bullet_bp;
 
+	UPROPERTY(EditAnywhere)
+	class AMybulletActor* bullet;
+
 	UPROPERTY()
 	class AActor* target;
 

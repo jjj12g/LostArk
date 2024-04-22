@@ -69,6 +69,11 @@ public:
 	UPROPERTY(EditAnywhere, Category = "MySettings|Components")
 	class UWidgetComponent* floatingWidgetComp;
 
+	UPROPERTY(EditAnywhere, Category = "MySettings")
+	class Atextnibox* testbullet;
+
+	UPROPERTY(EditAnywhere, Category = "MySettings")
+	class AslowhitActor* hitbullet;
 
 	USceneComponent* NiagaraSceneComp;
 
@@ -80,6 +85,20 @@ public:
 
 	class UMaterialInstanceDynamic* dynamicMAT1;
 	
+	//  구체 위치
+	FVector e1; 
+	FVector e2; 
+	FVector e3;
+	FVector e4; 
+	FVector e5;
+	FVector e6;
+	FVector e7;
+	FVector e8;
+	FVector e9;
+	FVector e10;
+
+	bool bteste = false;
+	void teste();
 
 	// 불릿 액터 관련
 	UPROPERTY(EditAnywhere, Category = "mysettings")
@@ -87,6 +106,11 @@ public:
 
 	AActor* ShootBullet();
 
+	UPROPERTY(EditAnywhere, Category = "mysettings")
+	TSubclassOf<Atextnibox> testspawn;
+
+	UPROPERTY(EditAnywhere, Category = "mysettings")
+	TSubclassOf<AslowhitActor> testhitbullet;
 
 
 	UPROPERTY(BlueprintReadOnly)
@@ -109,7 +133,14 @@ public:
 	float rotTime = 0;
 	FRotator rotStart;
 	FRotator rotTarget;
+	FVector loctarget;
 	bool bLookTarget = false;
+	bool btestTarget = false;
+	bool breathDamage = false;
+	// 3번공격
+	bool threeAttack = false;
+	bool threeAttacks = false;
+
 
 	// 공격범위
 	UPROPERTY(EditAnywhere, Category = "MySettings")
@@ -170,8 +201,6 @@ protected:
 	UPROPERTY(BlueprintReadOnly)
 	TEnumAsByte <EDeathPose> DeathPose; // 죽음 모션
 
-	
-
 	//void PlayHitReactMontage(const FName& SectionName);
 
 	UPROPERTY(EditAnywhere, Category = "MySettings")
@@ -214,7 +243,6 @@ private:
 
 	FRotator BillboradwidgetComponent(class AActor* camActor);
 	
-
 	UFUNCTION()
 	void PawnSeen(APawn* SeenPawn); // Callback for OnPawnSeen in UPawnSensingComponent
 

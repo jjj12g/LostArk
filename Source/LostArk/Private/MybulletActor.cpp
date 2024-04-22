@@ -9,13 +9,13 @@
 #include "NiagaraFunctionLibrary.h"
 #include "SlashCharacter.h"
 #include "EngineUtils.h"
+#include "BaseFloatingText.h"
 
 
 // Sets default values
 AMybulletActor::AMybulletActor()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bCanEverTick = true;
 
 	bulletFX = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Niagara"));
@@ -66,7 +66,13 @@ void AMybulletActor::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 	if (BaseDamage)
 	{
 		//test->damageAmount = BaseDamage;
-		GetWorld()->SpawnActor <ABaseFloatingText>(Floating_bp, GetActorLocation(), GetActorRotation());
+		ABaseFloatingText* floatingText = GetWorld()->SpawnActor <ABaseFloatingText>(Floating_bp, GetActorLocation(), GetActorRotation());
+		// 스폰한것에 나의 값을 넣어주는 법!
+		if (floatingText != nullptr)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("this"));
+			floatingText->bullet = this;
+		}
 	}
 
 
