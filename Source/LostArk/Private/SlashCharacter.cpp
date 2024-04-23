@@ -156,7 +156,7 @@ AActor* ASlashCharacter::ShootBullet3()
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Instigator = this;
-	AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn3, CachedDestination, toward.Rotation(), SpawnParams);
+	AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn3, SpawnLocation->GetComponentLocation(), toward.Rotation(), SpawnParams);
 	//AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn2, SpawnLocation->GetComponentLocation(), GetActorRotation(), SpawnParams);
 	return SpawandActor;
 }
@@ -499,18 +499,18 @@ void ASlashCharacter::FireBullet(const FInputActionValue& value)
 			PlayAnimMontage(basic_montage);					
 		}
 
-		//if (q && !bPlayerIsAttacking)
-		//{
+		if (q && !bPlayerIsAttacking)
+		{
 
-		//	UE_LOG(LogTemp, Warning, (TEXT("Q_SKILL")));
+			UE_LOG(LogTemp, Warning, (TEXT("Q_SKILL")));
 
-		//	bPlayerIsAttacking = true;
+			bPlayerIsAttacking = true;
 
-		//	// ·£´ýÀ¸·Î ¸ùÅ¸ÁÖ ½ÇÇà
-		//	int32 num = FMath::RandRange(1, 4);
-		//	FString sectionName = FString("HitGround") + FString::FromInt(num);
-		//	PlayAnimMontage(hitground_montage, 1.3, FName(sectionName));
-		//}
+			// ·£´ýÀ¸·Î ¸ùÅ¸ÁÖ ½ÇÇà
+			int32 num = FMath::RandRange(1, 3);
+			FString sectionName = FString("Fencing") + FString::FromInt(num);
+			PlayAnimMontage(fencing_montage, 1.3, FName(sectionName));
+		}
 
 		//if (w && !bPlayerIsAttacking)
 		//{
@@ -520,9 +520,9 @@ void ASlashCharacter::FireBullet(const FInputActionValue& value)
 		//	bPlayerIsAttacking = true;
 
 		//	// ·£´ýÀ¸·Î ¸ùÅ¸ÁÖ ½ÇÇà
-		//	int32 num = FMath::RandRange(1, 4);
-		//	FString sectionName = FString("HitGround") + FString::FromInt(num);
-		//	PlayAnimMontage(hitground_montage, 1.3, FName(sectionName));
+		//	int32 num = FMath::RandRange(1, 3);
+		//	FString sectionName = FString("Straight") + FString::FromInt(num);
+		//	PlayAnimMontage(straight_montage, 1.3, FName(sectionName));
 		//}
 
 		if (e && !bPlayerIsAttacking)

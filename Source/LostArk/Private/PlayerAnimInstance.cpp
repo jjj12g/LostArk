@@ -46,6 +46,16 @@ void UPlayerAnimInstance::AnimNotify_nnSky1()
 	player->ShootBullet5();
 }
 
+// void UPlayerAnimInstance::AnimNotify_nnShoot1()
+//{
+//	player->ShootBullet4();
+//}
+
+void UPlayerAnimInstance::AnimNotify_nnPierce1()
+{
+	player->ShootBullet3();
+}
+
 //void UPlayerAnimInstance::AnimNotify_nnPierce1()
 //{
 //	player->ShootBullet();
