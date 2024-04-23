@@ -151,60 +151,60 @@ AActor* ASlashCharacter::ShootBullet2()
 
 AActor* ASlashCharacter::ShootBullet3()
 {
-	FVector toward = targetPos - GetActorLocation();
+	FVector toward = CachedDestination - GetActorLocation();
 	FVector loc = GetActorLocation();
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Instigator = this;
-	AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn3, SpawnLocation->GetComponentLocation(), toward.Rotation(), SpawnParams);
+	AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn3, CachedDestination, toward.Rotation(), SpawnParams);
 	//AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn2, SpawnLocation->GetComponentLocation(), GetActorRotation(), SpawnParams);
 	return SpawandActor;
 }
 
 AActor* ASlashCharacter::ShootBullet4()
 {
-	FVector toward = targetPos - GetActorLocation();
+	FVector toward = CachedDestination - GetActorLocation();
 	FVector loc = GetActorLocation();
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Instigator = this;
-	AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn4, SpawnLocation->GetComponentLocation(), toward.Rotation(), SpawnParams);
+	AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn4, CachedDestination, toward.Rotation(), SpawnParams);
 	//AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn2, SpawnLocation->GetComponentLocation(), GetActorRotation(), SpawnParams);
 	return SpawandActor;
 }
 
 AActor* ASlashCharacter::ShootBullet5()
 {
-	FVector toward = targetPos - GetActorLocation();
+	FVector toward = CachedDestination - GetActorLocation();
 	FVector loc = GetActorLocation();
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Instigator = this;
-	AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn5, SpawnLocation->GetComponentLocation(), toward.Rotation(), SpawnParams);
+	AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn5, CachedDestination, toward.Rotation(), SpawnParams);
 	//AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn2, SpawnLocation->GetComponentLocation(), GetActorRotation(), SpawnParams);
 	return SpawandActor;
 }
 
 AActor* ASlashCharacter::ShootBullet6()
 {
-	FVector toward = targetPos - GetActorLocation();
+	FVector toward = CachedDestination - GetActorLocation();
 	FVector loc = GetActorLocation();
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Instigator = this;
-	AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn6, SpawnLocation->GetComponentLocation(), toward.Rotation(), SpawnParams);
+	AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn6, CachedDestination, toward.Rotation(), SpawnParams);
 	//AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn2, SpawnLocation->GetComponentLocation(), GetActorRotation(), SpawnParams);
 	return SpawandActor;
 }
 
 AActor* ASlashCharacter::ShootBullet7()
 {
-	FVector toward = targetPos - GetActorLocation();
+	FVector toward = CachedDestination - GetActorLocation();
 	FVector loc = GetActorLocation();
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Instigator = this;
-	AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn7, SpawnLocation->GetComponentLocation(), toward.Rotation(), SpawnParams);
+	AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn7, CachedDestination, toward.Rotation(), SpawnParams);
 	//AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn2, SpawnLocation->GetComponentLocation(), GetActorRotation(), SpawnParams);
 	return SpawandActor;
 }

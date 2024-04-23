@@ -2,6 +2,7 @@
 
 
 #include "RealLostArkModeBase.h"
+#include "MainWidget.h"
 
 void ARealLostArkModeBase::RespawnPlayer(AController* newplayer, APawn* previouspawn)
 {
@@ -13,4 +14,19 @@ void ARealLostArkModeBase::RespawnPlayer(AController* newplayer, APawn* previous
 
 	// 기존의 폰을 제거한다.
 	previouspawn->Destroy();
+}
+
+void ARealLostArkModeBase::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (mainWidget_bp != nullptr)
+	{
+		mainWidget_inst = CreateWidget<UMainWidget>(GetWorld(), mainWidget_bp);
+
+		if (mainWidget_inst)
+		{
+			mainWidget_inst->AddToViewport(0);
+		}
+	}
 }

@@ -40,7 +40,7 @@ void AMybulletActor::BeginPlay()
 
 	Collisionsphere->OnComponentBeginOverlap.AddDynamic(this, &AMybulletActor::BeginOverlap);
 
-	SetLifeSpan(2.0f);
+	SetLifeSpan(5.0f);
 
 }
 
@@ -77,14 +77,14 @@ void AMybulletActor::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 
 
 
-	/*bullet = Cast<AMybulletActor>(OtherActor);
+	bullet = Cast<AMybulletActor>(OtherActor);
 
 	if (bullet != nullptr && !GetWorld()->GetTimerManager().IsTimerActive(skillDelay))
 	{
 		GetWorld()->GetTimerManager().SetTimer(skillDelay, FTimerDelegate::CreateLambda([&]() {
 			bullet-> Destroy();
-			}), 3.0f, false);
-	}*/
+			}), 5.0f, false);
+	}
 	
 
 }
