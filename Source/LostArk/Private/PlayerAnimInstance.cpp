@@ -18,9 +18,9 @@ void UPlayerAnimInstance::NativeInitializeAnimation()
 
 void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
-	 Super::NativeUpdateAnimation(DeltaSeconds);
-	 
-	 
+	Super::NativeUpdateAnimation(DeltaSeconds);
+
+
 }
 
 void UPlayerAnimInstance::AnimNotify_nnIdle()
@@ -30,23 +30,34 @@ void UPlayerAnimInstance::AnimNotify_nnIdle()
 	player->bPlayerIsAttacking = false;
 	player->bKeyPressed = false;
 	player->bAttackEnabled = false;
-	if(!player->bKeyPressed)
+	if (!player->bKeyPressed)
 	{
 		UE_LOG(LogTemp, Warning, (TEXT("bKeyPressed FALSE")));
 	}
 }
 
-void UPlayerAnimInstance::AnimNotify_nnHit1()
+void UPlayerAnimInstance::AnimNotify_nnHit1() // 번개 E
 {
-	// 트루일때 리턴
-	
 	player->ShootBullet2();
-	
+	UE_LOG(LogTemp, Warning, (TEXT("Thunder E")));
 }
 
-void UPlayerAnimInstance::AnimNotify_nnSky1()
+void UPlayerAnimInstance::AnimNotify_nnSky1() // 메테오 R
 {
 	player->ShootBullet5();
+	UE_LOG(LogTemp, Warning, (TEXT("Meteor R")));
+}
+
+void UPlayerAnimInstance::AnimNotify_nnShoot1() // W
+{
+	player->ShootBullet2();
+	UE_LOG(LogTemp, Warning, (TEXT("Niagara W")));
+}
+
+void UPlayerAnimInstance::AnimNotify_nnPierce1() // Q 불
+{
+	player->ShootBullet3();
+	UE_LOG(LogTemp, Warning, (TEXT("Fire Q")));
 }
 
 //void UPlayerAnimInstance::AnimNotify_nnPierce1()
@@ -54,14 +65,12 @@ void UPlayerAnimInstance::AnimNotify_nnSky1()
 //	player->ShootBullet();
 //}
 
-void UPlayerAnimInstance::AnimNotify_hit()
+void UPlayerAnimInstance::AnimNotify_hit() // 피격 몽타주
 {
 	UE_LOG(LogTemp, Warning, (TEXT("bKeyPressed FALSE")));
 }
 
-void UPlayerAnimInstance::AnimNotify_nnBasic()
+void UPlayerAnimInstance::AnimNotify_nnBasic() // 기본평타
 {
-
 	player->ShootBullet();
-	
 }

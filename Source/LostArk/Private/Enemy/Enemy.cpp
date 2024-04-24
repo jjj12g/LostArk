@@ -31,6 +31,7 @@
 #include <../../../../../../../Source/Runtime/Engine/Classes/Engine/World.h>
 #include "textnibox.h" // Å×½ºÆ®
 #include "slowhitActor.h"
+#include <../../../../../../../Source/Runtime/Engine/Classes/Animation/AnimInstance.h>
 
 
 

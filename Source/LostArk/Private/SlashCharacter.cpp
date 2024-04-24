@@ -26,6 +26,9 @@
 #include <HealthBarWidget.h>
 #include "RealLostArkModeBase.h"
 #include "Enemy/Enemy.h"
+#include <../../../../../../../Source/Runtime/Engine/Classes/Animation/AnimInstance.h>
+#include <../../../../../../../Source/Runtime/Engine/Classes/Engine/DamageEvents.h>
+#include <../../../../../../../Source/Runtime/Core/Public/Math/Color.h>
 
 
 ASlashCharacter::ASlashCharacter()
@@ -185,12 +188,12 @@ AActor* ASlashCharacter::ShootBullet4()
 
 AActor* ASlashCharacter::ShootBullet5()
 {
-	FVector toward = targetPos - GetActorLocation();
+	FVector toward = CachedDestination - GetActorLocation();
 	FVector loc = GetActorLocation();
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Instigator = this;
-	AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn5, SpawnLocation->GetComponentLocation(), toward.Rotation(), SpawnParams);
+	AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn5, CachedDestination, toward.Rotation(), SpawnParams);
 	//AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn2, SpawnLocation->GetComponentLocation(), GetActorRotation(), SpawnParams);
 	return SpawandActor;
 }
@@ -278,7 +281,7 @@ float ASlashCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 	{
 		pc->PlayerCameraManager->StartCameraFade(0, 1, 1.5f, FLinearColor::Black);
 		
-		CharacterState = ECharacterState::ECS_Die;
+		//CharacterState = ECharacterState::ECS_Die;
 
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 		if (AnimInstance && DeathMotages)
@@ -443,10 +446,12 @@ void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		enhancedInputComponent->BindAction(ia_w, ETriggerEvent::Started, this, &ASlashCharacter::W);
 		enhancedInputComponent->BindAction(ia_w, ETriggerEvent::Completed, this, &ASlashCharacter::W);
 
-		enhancedInputComponent->BindAction(ia_e, ETriggerEvent::Triggered, this, &ASlashCharacter::FireBullet2);
+		enhancedInputComponent->BindAction(ia_e, ETriggerEvent::Started, this, &ASlashCharacter::FireBullet2);
 		enhancedInputComponent->BindAction(ia_e, ETriggerEvent::Completed, this, &ASlashCharacter::FireBullet2);
 
 		enhancedInputComponent->BindAction(ia_r, ETriggerEvent::Started, this, &ASlashCharacter::R);
+		enhancedInputComponent->BindAction(ia_r, ETriggerEvent::Completed, this, &ASlashCharacter::R);
+
 		enhancedInputComponent->BindAction(ia_a, ETriggerEvent::Started, this, &ASlashCharacter::A);
 		enhancedInputComponent->BindAction(ia_s, ETriggerEvent::Started, this, &ASlashCharacter::S);
 		enhancedInputComponent->BindAction(ia_d, ETriggerEvent::Started, this, &ASlashCharacter::D);
@@ -498,7 +503,7 @@ void ASlashCharacter::FireBullet(const FInputActionValue& value)
 
 	if (bAttackEnabled)
 	{
-		UE_LOG(LogTemp, Warning, (TEXT("Click")));
+		UE_LOG(LogTemp, Warning, (TEXT("L Clicked")));
 	}
 
 	FVector WorldPosition, WorldDirection;
@@ -519,63 +524,53 @@ void ASlashCharacter::FireBullet(const FInputActionValue& value)
 		if (!bKeyPressed && !bPlayerIsAttacking)
 		{
 			bPlayerIsAttacking = true;
-			
-			PlayAnimMontage(basic_montage);					
+
+			PlayAnimMontage(basic_montage);
 		}
 
-		//if (q && !bPlayerIsAttacking)
-		//{
+		if (q && !bPlayerIsAttacking)
+		{
 
-		//	UE_LOG(LogTemp, Warning, (TEXT("Q_SKILL")));
+			UE_LOG(LogTemp, Warning, (TEXT("Q Mont")));
 
-		//	bPlayerIsAttacking = true;
+			bPlayerIsAttacking = true;
 
-		//	// 랜덤으로 몽타주 실행
-		//	int32 num = FMath::RandRange(1, 4);
-		//	FString sectionName = FString("HitGround") + FString::FromInt(num);
-		//	PlayAnimMontage(hitground_montage, 1.3, FName(sectionName));
-		//}
+			// 랜덤으로 몽타주 실행
+			int32 num = FMath::RandRange(1, 3);
+			FString sectionName = FString("Fencing") + FString::FromInt(num);
+			PlayAnimMontage(fencing_montage, 1.3, FName(sectionName));
+		}
 
-		//if (w && !bPlayerIsAttacking)
-		//{
+		if (w && !bPlayerIsAttacking)
+		{
 
-		//	UE_LOG(LogTemp, Warning, (TEXT("W_SKILL")));
+			UE_LOG(LogTemp, Warning, (TEXT("W Mont")));
 
-		//	bPlayerIsAttacking = true;
+			bPlayerIsAttacking = true;
 
-		//	// 랜덤으로 몽타주 실행
-		//	int32 num = FMath::RandRange(1, 4);
-		//	FString sectionName = FString("HitGround") + FString::FromInt(num);
-		//	PlayAnimMontage(hitground_montage, 1.3, FName(sectionName));
-		//}
+			// 랜덤으로 몽타주 실행
+			int32 num = FMath::RandRange(1, 8);
+			FString sectionName = FString("Straight") + FString::FromInt(num);
+			PlayAnimMontage(straight_montage, 1.3, FName(sectionName));
+		}
 
 		if (e && !bPlayerIsAttacking)
 		{
-			
-			UE_LOG(LogTemp, Warning, (TEXT("E_SKILL")));
-			
+
+			UE_LOG(LogTemp, Warning, (TEXT("E Mont")));
+
 			bPlayerIsAttacking = true;
 
-			if (!bskillCollTime)
-			{
 			// 랜덤으로 몽타주 실행
 			int32 num = FMath::RandRange(1, 4);
-			FString sectionName = FString("HitGround") + FString::FromInt(num); 
+			FString sectionName = FString("HitGround") + FString::FromInt(num);
 			PlayAnimMontage(hitground_montage, 1.3, FName(sectionName));
-			bskillCollTime = true;
-			}
-			else
-			{
-				bPlayerIsAttacking = false;
-				bKeyPressed = false;
-				bAttackEnabled = false;
-			}
 		}
 
 		if (r && !bPlayerIsAttacking)
 		{
 
-			UE_LOG(LogTemp, Warning, (TEXT("R_SKILL")));
+			UE_LOG(LogTemp, Warning, (TEXT("R Mont")));
 
 			bPlayerIsAttacking = true;
 
@@ -590,18 +585,17 @@ void ASlashCharacter::FireBullet(const FInputActionValue& value)
 // 스킬  QWERASDF 애니메이션 넣는 곳-----------------------------------------------------------
 void ASlashCharacter::Q(const FInputActionValue& value)
 {
-	
-		q = value.Get<bool>();
+	q = value.Get<bool>();
 
-		if (q)
-		{
-			bKeyPressed = true;
-		}
-		else
-		{
-			bKeyPressed = false;
-		}
-	
+	if (q)
+	{
+		bKeyPressed = true;
+		UE_LOG(LogTemp, Warning, (TEXT("Q preseed")));
+	}
+	else
+	{
+		bKeyPressed = false;
+	}
 }
 
 void ASlashCharacter::W(const FInputActionValue& value)
@@ -611,6 +605,7 @@ void ASlashCharacter::W(const FInputActionValue& value)
 	if (w)
 	{
 		bKeyPressed = true;
+		UE_LOG(LogTemp, Warning, (TEXT("W pressed")));
 	}
 	else
 	{
@@ -619,17 +614,18 @@ void ASlashCharacter::W(const FInputActionValue& value)
 }
 
 void ASlashCharacter::FireBullet2(const FInputActionValue& value)
-{	
-		e = value.Get<bool>();
+{
+	e = value.Get<bool>();
 
-		if (e)
-		{
+	if (e)
+	{
 		bKeyPressed = true;
-		}
-		else
-		{
-			bKeyPressed = false;
-		}		
+		UE_LOG(LogTemp, Warning, (TEXT("E preseed")));
+	}
+	else
+	{
+		bKeyPressed = false;
+	}
 }
 
 void ASlashCharacter::R(const FInputActionValue& value)
@@ -639,6 +635,7 @@ void ASlashCharacter::R(const FInputActionValue& value)
 	if (r)
 	{
 		bKeyPressed = true;
+		UE_LOG(LogTemp, Warning, (TEXT("R preseed")));
 	}
 	else
 	{

@@ -77,14 +77,14 @@ void AMybulletActor::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 
 
 
-	bullet = Cast<AMybulletActor>(OtherActor);
+	//bullet = Cast<AMybulletActor>(OtherActor);
 
-	if (bullet != nullptr && !GetWorld()->GetTimerManager().IsTimerActive(skillDelay))
-	{
-		GetWorld()->GetTimerManager().SetTimer(skillDelay, FTimerDelegate::CreateLambda([&]() {
-			bullet-> Destroy();
-			}), 5.0f, false);
-	}
+	//if (bullet != nullptr && !GetWorld()->GetTimerManager().IsTimerActive(skillDelay))
+	//{
+	//	GetWorld()->GetTimerManager().SetTimer(skillDelay, FTimerDelegate::CreateLambda([&]() {
+	//		bullet-> Destroy();
+	//		}), 5.0f, false);
+	//}
 	
 
 }

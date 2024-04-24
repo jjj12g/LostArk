@@ -40,11 +40,11 @@ private:
 	UFUNCTION()
 	void AnimNotify_nnSky1(); //하늘에서 기모으기 SkyMontage
 
-	//UFUNCTION()
-	//void AnimNotify_nnShoot1(); //평타 StraightForwardMontage
+	UFUNCTION()
+	void AnimNotify_nnShoot1(); //평타 StraightForwardMontage
 
-	//UFUNCTION()
-	//void AnimNotify_nnPierce1(); //찌르기 FencingMontage
+	UFUNCTION()
+	void AnimNotify_nnPierce1(); //찌르기 FencingMontage
 	
 	UFUNCTION()
 	void AnimNotify_hit(); //하늘에서 기모으기 SkyMontage
