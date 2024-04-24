@@ -367,7 +367,7 @@ void AEnemy::Attack()
 		if (AnimInstance && AttackMontage)
 		{
 			AnimInstance->Montage_Play(AttackMontage);
-			const int32 Selection = FMath::RandRange(1, 6); // 0~2까지가 3개
+			const int32 Selection = FMath::RandRange(1, 1); // 0~2까지가 3개
 			FName SectionName = FName();
 			switch (Selection)
 			{
@@ -425,7 +425,7 @@ void AEnemy::Attack()
 		if (AnimInstance && AttackMontage)
 		{
 			AnimInstance->Montage_Play(AttackMontage);
-			const int32 Selection = FMath::RandRange(1, 6); // 0~2까지가 3개
+			const int32 Selection = FMath::RandRange(1, 1); // 0~2까지가 3개
 			FName SectionName = FName();
 			switch (Selection)
 			{

@@ -123,6 +123,8 @@ void ASlashCharacter::BeginPlay()
 
 AActor* ASlashCharacter::ShootBullet()
 {
+	
+	// 최대초와 현재초를 나눠서 퍼센트값에 넣어줘야함. -> float 변수?
 
 	FVector toward = CachedDestination - GetActorLocation();
 	FVector loc = GetActorLocation();
@@ -131,12 +133,20 @@ AActor* ASlashCharacter::ShootBullet()
 	SpawnParams.Instigator = this;
 	AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn, SpawnLocation->GetComponentLocation(), toward.Rotation(), SpawnParams);
 	//AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn, SpawnLocation->GetComponentLocation(), GetActorRotation(), SpawnParams);
-	return SpawandActor;
+	
+	if (WSound != nullptr)
+	{
+		UGameplayStatics::PlaySound2D(GetWorld(), WSound);
+		UE_LOG(LogTemp,Warning,TEXT("Wsound!!"));
+	}
 
+	return SpawandActor;
 }
 
 AActor* ASlashCharacter::ShootBullet2()
 {
+	
+
 	FVector toward = CachedDestination - GetActorLocation();
 	FVector loc = GetActorLocation();
 
@@ -151,7 +161,7 @@ AActor* ASlashCharacter::ShootBullet2()
 
 AActor* ASlashCharacter::ShootBullet3()
 {
-	FVector toward = CachedDestination - GetActorLocation();
+	FVector toward = targetPos - GetActorLocation();
 	FVector loc = GetActorLocation();
 
 	FActorSpawnParameters SpawnParams;
@@ -163,48 +173,48 @@ AActor* ASlashCharacter::ShootBullet3()
 
 AActor* ASlashCharacter::ShootBullet4()
 {
-	FVector toward = CachedDestination - GetActorLocation();
+	FVector toward = targetPos - GetActorLocation();
 	FVector loc = GetActorLocation();
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Instigator = this;
-	AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn4, CachedDestination, toward.Rotation(), SpawnParams);
+	AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn4, SpawnLocation->GetComponentLocation(), toward.Rotation(), SpawnParams);
 	//AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn2, SpawnLocation->GetComponentLocation(), GetActorRotation(), SpawnParams);
 	return SpawandActor;
 }
 
 AActor* ASlashCharacter::ShootBullet5()
 {
-	FVector toward = CachedDestination - GetActorLocation();
+	FVector toward = targetPos - GetActorLocation();
 	FVector loc = GetActorLocation();
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Instigator = this;
-	AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn5, CachedDestination, toward.Rotation(), SpawnParams);
+	AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn5, SpawnLocation->GetComponentLocation(), toward.Rotation(), SpawnParams);
 	//AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn2, SpawnLocation->GetComponentLocation(), GetActorRotation(), SpawnParams);
 	return SpawandActor;
 }
 
 AActor* ASlashCharacter::ShootBullet6()
 {
-	FVector toward = CachedDestination - GetActorLocation();
+	FVector toward = targetPos - GetActorLocation();
 	FVector loc = GetActorLocation();
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Instigator = this;
-	AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn6, CachedDestination, toward.Rotation(), SpawnParams);
+	AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn6, SpawnLocation->GetComponentLocation(), toward.Rotation(), SpawnParams);
 	//AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn2, SpawnLocation->GetComponentLocation(), GetActorRotation(), SpawnParams);
 	return SpawandActor;
 }
 
 AActor* ASlashCharacter::ShootBullet7()
 {
-	FVector toward = CachedDestination - GetActorLocation();
+	FVector toward = targetPos - GetActorLocation();
 	FVector loc = GetActorLocation();
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Instigator = this;
-	AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn7, CachedDestination, toward.Rotation(), SpawnParams);
+	AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn7, SpawnLocation->GetComponentLocation(), toward.Rotation(), SpawnParams);
 	//AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn2, SpawnLocation->GetComponentLocation(), GetActorRotation(), SpawnParams);
 	return SpawandActor;
 }
@@ -239,7 +249,7 @@ AActor* ASlashCharacter::ShootBullet9()
 
 float ASlashCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-
+	bAttackEnabled = false;
 	currentHP = FMath::Clamp(currentHP - DamageAmount, 0, MaxHP);
 	
 	if (PlayerWidget != nullptr)
@@ -362,8 +372,6 @@ void ASlashCharacter::Tick(float DeltaTime)
 
 	//PlayerCharacter->SetActorRotation(ShootRot);
 
-
-
 	if (bPlayerIsInvisible) // 플레이어가 쉬프트 투명 상태라면,
 	{		
 		// targetPos 목표 위치에 도달했을 때
@@ -384,6 +392,21 @@ void ASlashCharacter::Tick(float DeltaTime)
 	{
 		bcamerashake();
 		camrashake = false;
+	}
+
+	// 트루일때 타이머 실행-> 몇초뒤 펄스로 변경 -> 틱에서 실행
+	if (bskillCollTime)
+	{
+		skillCollTimer += DeltaTime;
+		if (skillCollTimer < 10.0f)
+		{
+			
+		}
+		else
+		{
+			skillCollTimer = 0;
+			bskillCollTime = false;
+		}
 	}
 
 
@@ -418,6 +441,7 @@ void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		enhancedInputComponent->BindAction(ia_q, ETriggerEvent::Completed, this, &ASlashCharacter::Q);
 
 		enhancedInputComponent->BindAction(ia_w, ETriggerEvent::Started, this, &ASlashCharacter::W);
+		enhancedInputComponent->BindAction(ia_w, ETriggerEvent::Completed, this, &ASlashCharacter::W);
 
 		enhancedInputComponent->BindAction(ia_e, ETriggerEvent::Triggered, this, &ASlashCharacter::FireBullet2);
 		enhancedInputComponent->BindAction(ia_e, ETriggerEvent::Completed, this, &ASlashCharacter::FireBullet2);
@@ -499,18 +523,18 @@ void ASlashCharacter::FireBullet(const FInputActionValue& value)
 			PlayAnimMontage(basic_montage);					
 		}
 
-		if (q && !bPlayerIsAttacking)
-		{
+		//if (q && !bPlayerIsAttacking)
+		//{
 
-			UE_LOG(LogTemp, Warning, (TEXT("Q_SKILL")));
+		//	UE_LOG(LogTemp, Warning, (TEXT("Q_SKILL")));
 
-			bPlayerIsAttacking = true;
+		//	bPlayerIsAttacking = true;
 
-			// 랜덤으로 몽타주 실행
-			int32 num = FMath::RandRange(1, 3);
-			FString sectionName = FString("Fencing") + FString::FromInt(num);
-			PlayAnimMontage(fencing_montage, 1.3, FName(sectionName));
-		}
+		//	// 랜덤으로 몽타주 실행
+		//	int32 num = FMath::RandRange(1, 4);
+		//	FString sectionName = FString("HitGround") + FString::FromInt(num);
+		//	PlayAnimMontage(hitground_montage, 1.3, FName(sectionName));
+		//}
 
 		//if (w && !bPlayerIsAttacking)
 		//{
@@ -520,9 +544,9 @@ void ASlashCharacter::FireBullet(const FInputActionValue& value)
 		//	bPlayerIsAttacking = true;
 
 		//	// 랜덤으로 몽타주 실행
-		//	int32 num = FMath::RandRange(1, 3);
-		//	FString sectionName = FString("Straight") + FString::FromInt(num);
-		//	PlayAnimMontage(straight_montage, 1.3, FName(sectionName));
+		//	int32 num = FMath::RandRange(1, 4);
+		//	FString sectionName = FString("HitGround") + FString::FromInt(num);
+		//	PlayAnimMontage(hitground_montage, 1.3, FName(sectionName));
 		//}
 
 		if (e && !bPlayerIsAttacking)
@@ -532,10 +556,20 @@ void ASlashCharacter::FireBullet(const FInputActionValue& value)
 			
 			bPlayerIsAttacking = true;
 
+			if (!bskillCollTime)
+			{
 			// 랜덤으로 몽타주 실행
 			int32 num = FMath::RandRange(1, 4);
 			FString sectionName = FString("HitGround") + FString::FromInt(num); 
-			PlayAnimMontage(hitground_montage, 1.3, FName(sectionName));			
+			PlayAnimMontage(hitground_montage, 1.3, FName(sectionName));
+			bskillCollTime = true;
+			}
+			else
+			{
+				bPlayerIsAttacking = false;
+				bKeyPressed = false;
+				bAttackEnabled = false;
+			}
 		}
 
 		if (r && !bPlayerIsAttacking)
@@ -556,16 +590,18 @@ void ASlashCharacter::FireBullet(const FInputActionValue& value)
 // 스킬  QWERASDF 애니메이션 넣는 곳-----------------------------------------------------------
 void ASlashCharacter::Q(const FInputActionValue& value)
 {
-	q = value.Get<bool>();
+	
+		q = value.Get<bool>();
 
-	if (q)
-	{
-		bKeyPressed = true;
-	}
-	else
-	{
-		bKeyPressed = false;
-	}
+		if (q)
+		{
+			bKeyPressed = true;
+		}
+		else
+		{
+			bKeyPressed = false;
+		}
+	
 }
 
 void ASlashCharacter::W(const FInputActionValue& value)
@@ -584,17 +620,16 @@ void ASlashCharacter::W(const FInputActionValue& value)
 
 void ASlashCharacter::FireBullet2(const FInputActionValue& value)
 {	
-	
-	e = value.Get<bool>();
+		e = value.Get<bool>();
 
-	if (e)
-	{
-	bKeyPressed = true;
-	}
-	else
-	{
-		bKeyPressed = false;
-	}		
+		if (e)
+		{
+		bKeyPressed = true;
+		}
+		else
+		{
+			bKeyPressed = false;
+		}		
 }
 
 void ASlashCharacter::R(const FInputActionValue& value)

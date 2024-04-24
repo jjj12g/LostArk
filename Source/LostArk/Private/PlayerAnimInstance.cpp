@@ -38,7 +38,10 @@ void UPlayerAnimInstance::AnimNotify_nnIdle()
 
 void UPlayerAnimInstance::AnimNotify_nnHit1()
 {
+	// 트루일때 리턴
+	
 	player->ShootBullet2();
+	
 }
 
 void UPlayerAnimInstance::AnimNotify_nnSky1()
@@ -46,14 +49,9 @@ void UPlayerAnimInstance::AnimNotify_nnSky1()
 	player->ShootBullet5();
 }
 
-// void UPlayerAnimInstance::AnimNotify_nnShoot1()
-//{
-//	player->ShootBullet4();
-//}
-
-void UPlayerAnimInstance::AnimNotify_nnPierce1()
+void UPlayerAnimInstance::AnimNotify_nnShoot1()
 {
-	player->ShootBullet3();
+
 }
 
 //void UPlayerAnimInstance::AnimNotify_nnPierce1()
@@ -68,5 +66,7 @@ void UPlayerAnimInstance::AnimNotify_hit()
 
 void UPlayerAnimInstance::AnimNotify_nnBasic()
 {
+
 	player->ShootBullet();
+	
 }

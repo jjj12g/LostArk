@@ -52,8 +52,19 @@ public:
 
 	
 	bool camrashake = false;
+	bool bskillCollTime = false;
+	
+	UPROPERTY(EditAnywhere, Category = "MySettings") // 사운드
+	class USoundBase* QSound;
 
+	UPROPERTY(EditAnywhere, Category = "MySettings") // 사운드
+	class USoundBase* WSound;
 
+	UPROPERTY(EditAnywhere, Category = "MySettings") // 사운드
+	class USoundBase* ESound;
+
+	UPROPERTY(EditAnywhere, Category = "MySettings") // 사운드
+	class USoundBase* RSound;
 
 protected:
 	virtual void BeginPlay() override;
@@ -94,6 +105,9 @@ protected:
 	
 	UPROPERTY(EditAnywhere)
 	int MaxMP = 100;
+	
+	UPROPERTY()
+	float skillCollTimer = 0.0f;
 
 	UPROPERTY()
 	class UHealthBarWidget* PlayerWidget;
