@@ -26,6 +26,8 @@
 #include <HealthBarWidget.h>
 #include "RealLostArkModeBase.h"
 #include "Enemy/Enemy.h"
+#include "MainWidget.h"
+#include "Blueprint/UserWidget.h"
 #include <../../../../../../../Source/Runtime/Engine/Classes/Animation/AnimInstance.h>
 #include <../../../../../../../Source/Runtime/Engine/Classes/Engine/DamageEvents.h>
 #include <../../../../../../../Source/Runtime/Core/Public/Math/Color.h>
@@ -74,6 +76,11 @@ ASlashCharacter::ASlashCharacter()
 	SpawnLocation = CreateDefaultSubobject<USceneComponent>(TEXT("bullet spawn point"));
 	SpawnLocation->SetupAttachment(GetMesh());
 
+	mainWidget_bp = nullptr;
+
+	mainWidget_inst = nullptr;
+
+
 }
 
 
@@ -115,11 +122,37 @@ void ASlashCharacter::BeginPlay()
 	targetPos = GetActorLocation();  // 일단 캐릭터의 위치에서부터 이동
 
 	Tags.Add(FName("SlashCharacter")); // 캐릭터 태그이름	
+
+
 	// 기본 체력 ui
 	currentHP = MaxHP;
 	PlayerWidget = Cast<UHealthBarWidget>(HealthBarWidget->GetWidget());
 
 	currentMP = MaxMP;
+
+	CurrentNum = MaxHealthNum;
+
+	MPNum = MaxMPNum;
+
+	PortionNumber;
+
+
+	// main 위젯 생성 hp mp 실시간 설정
+
+	if (mainWidget_bp != nullptr)
+	{
+		mainWidget_inst = CreateWidget<UMainWidget>(GetWorld(), mainWidget_bp);
+
+		if (mainWidget_inst)
+		{
+			mainWidget_inst->AddToViewport(0);
+		}
+	}
+
+	mainWidget_inst->SetHealth(currentHP, MaxHP);
+	mainWidget_inst->SetPower(currentMP, MaxMP);
+	mainWidget_inst->SetMPNum(MPNum, MaxMPNum);
+	mainWidget_inst->SetPortionNUMS(currentHP,CurrentNum, PortionNumber);
 }
 
 // 스킬 설정 및 위치 설정 -----------------------------------------------------------------------------------------------------
@@ -157,7 +190,21 @@ AActor* ASlashCharacter::ShootBullet2()
 	SpawnParams.Instigator = this;
 	AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn2, CachedDestination, toward.Rotation(), SpawnParams);
 	//AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn2, SpawnLocation->GetComponentLocation(), GetActorRotation(), SpawnParams);
+	
+	// 스킬 사용 시 마나 사용
 	currentMP -= 30;
+
+	if (mainWidget_inst != nullptr)
+	{
+		mainWidget_inst->SetPower(currentMP, MaxMP);
+	}
+
+	MPNum -= 30;
+
+	if (mainWidget_inst != nullptr)
+	{
+		mainWidget_inst->SetMPNum(MPNum, MaxMPNum);
+	}
 	
 	return SpawandActor;
 }
@@ -171,7 +218,35 @@ AActor* ASlashCharacter::ShootBullet3()
 	SpawnParams.Instigator = this;
 	AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn3, SpawnLocation->GetComponentLocation(), toward.Rotation(), SpawnParams);
 	//AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn2, SpawnLocation->GetComponentLocation(), GetActorRotation(), SpawnParams);
+	
+
+	// 스킬 사용 시 마나 사용
+	currentMP -= 20;
+
+	if (mainWidget_inst != nullptr)
+	{
+		mainWidget_inst->SetPower(currentMP, MaxMP);
+	}
+
+	MPNum -= 20;
+
+	if (mainWidget_inst != nullptr)
+	{
+		mainWidget_inst->SetMPNum(MPNum, MaxMPNum);
+	}
+
+	// 스킬 사용 체력 회복 테스스트
+	PortionNumber -= 1;
+	currentHP + 0.1;
+	CurrentNum += 20;
+
+	if (mainWidget_inst != nullptr)
+	{
+			mainWidget_inst->SetPortionNUMS(currentHP, CurrentNum, PortionNumber);
+	}
+
 	return SpawandActor;
+
 }
 
 AActor* ASlashCharacter::ShootBullet4()
@@ -183,6 +258,22 @@ AActor* ASlashCharacter::ShootBullet4()
 	SpawnParams.Instigator = this;
 	AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn4, SpawnLocation->GetComponentLocation(), toward.Rotation(), SpawnParams);
 	//AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn2, SpawnLocation->GetComponentLocation(), GetActorRotation(), SpawnParams);
+	
+	// 스킬 사용 시 마나 사용
+	currentMP -= 25;
+
+	if (mainWidget_inst != nullptr)
+	{
+		mainWidget_inst->SetPower(currentMP, MaxMP);
+	}
+
+	MPNum -= 25;
+
+	if (mainWidget_inst != nullptr)
+	{
+		mainWidget_inst->SetMPNum(MPNum, MaxMPNum);
+	}
+	
 	return SpawandActor;
 }
 
@@ -195,6 +286,22 @@ AActor* ASlashCharacter::ShootBullet5()
 	SpawnParams.Instigator = this;
 	AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn5, CachedDestination, toward.Rotation(), SpawnParams);
 	//AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn2, SpawnLocation->GetComponentLocation(), GetActorRotation(), SpawnParams);
+	// 스킬 사용 시 마나 사용
+	currentMP -= 50;
+
+	if (mainWidget_inst != nullptr)
+	{
+		mainWidget_inst->SetPower(currentMP, MaxMP);
+	}
+
+	MPNum -= 50;
+
+	if (mainWidget_inst != nullptr)
+	{
+		mainWidget_inst->SetMPNum(MPNum, MaxMPNum);
+	}
+
+
 	return SpawandActor;
 }
 
@@ -246,6 +353,26 @@ AActor* ASlashCharacter::ShootBullet9()
 	return SpawandActor;
 }
 
+void ASlashCharacter::OnRepHealth()
+{
+	if (mainWidget_inst)
+	{
+		mainWidget_inst->SetHealth(currentHP, MaxHP);
+	}
+
+}
+
+void ASlashCharacter::UpdateHealth(float DamageAmount)
+{
+	currentHP = FMath::Clamp(currentHP - DamageAmount, 0, MaxHP);
+
+	if (currentHP == 0.f)
+	{
+
+	}
+
+}
+
 //--------------------------------------------------------------------------------------------------------------------------------- 스킬 설정 위치-----
 
 // 데미지 시스템
@@ -254,6 +381,20 @@ float ASlashCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 {
 	bAttackEnabled = false;
 	currentHP = FMath::Clamp(currentHP - DamageAmount, 0, MaxHP);
+	currentHP = FMath::Clamp(currentHP - DamageAmount, 0, MaxHP);
+	CurrentNum = FMath::Clamp(CurrentNum - DamageAmount, 0, MaxHealthNum);
+
+	if (mainWidget_inst != nullptr)
+	{
+		mainWidget_inst->SetHealth(currentHP, MaxHP);
+	}
+
+	if (mainWidget_inst != nullptr)
+	{
+		mainWidget_inst->SetHealthNum(CurrentNum, MaxHealthNum);
+	}
+
+
 	
 	if (PlayerWidget != nullptr)
 	{
@@ -412,6 +553,25 @@ void ASlashCharacter::Tick(float DeltaTime)
 		}
 	}
 
+	if (manaTime < 5.0f)
+	{
+		manaTime += DeltaTime;
+	}
+	else
+	{
+
+		if (mainWidget_inst != nullptr)
+		{
+			mainWidget_inst->SetPower(currentMP, MaxMP);
+			mainWidget_inst->SetMPNum(MPNum, MaxMPNum);
+		}
+
+		manaTime = 0;
+		currentMP += 5;
+		MPNum += 5;
+
+	}
+
 
 }
 
@@ -489,6 +649,10 @@ void ASlashCharacter::ShiftStarted(const FInputActionValue& value)
 		GetCharacterMovement()->MaxWalkSpeed = 1500;
 		GetCharacterMovement()->MaxAcceleration = 4000;
 		
+		
+
+
+
 		// 플레이어는 투명상태 : true로 설정
 		bPlayerIsInvisible = true;
 	}

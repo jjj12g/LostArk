@@ -27,6 +27,9 @@ AMybulletActor::AMybulletActor()
 
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
 	ProjectileMovement->ProjectileGravityScale = 0;
+	
+
+
 }
 
 void AMybulletActor::BeginPlay()
@@ -48,6 +51,13 @@ void AMybulletActor::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 {
 	UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, impactparticle, GetActorLocation());
 	BulletHit();
+
+	ASlashCharacter* target = Cast<ASlashCharacter>(OtherActor);
+	ASlashCharacter* Shooter = GetInstigator<ASlashCharacter>();
+	if (target && target != Shooter && target->GetLocalRole() == ROLE_Authority)
+	{
+		target->UpdateHealth(HealthDelta);
+	}
 
 	AController* Playerc = GetInstigator()->GetController();
 	if (Playerc != nullptr) {

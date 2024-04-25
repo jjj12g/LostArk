@@ -15,22 +15,62 @@ class LOSTARK_API UMainWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
-		void SetOwnerPlayer(ASlashCharacter* player) { OwnerPlayer = player;}
+		//void SetOwnerPlayer(ASlashCharacter* player) { OwnerPlayer = player;}
+
+		void  SetHealthBar(float value, FLinearColor lowHealthColor);
+
+public:
+
+
+	void SetHealth(float CurrentHP, float MaxHP);
+
+	void SetPower(float currentMp, float MaxMP);
+
+	void SetHealthNum(float CurrentNum, float MaxHealthNum);
+
+	void SetMPNum(float MPNum, float MaxMPNum);
+
+	void SetPortionNUMS(float CurrentHP, float CurrentNum, float PortionNumber);
+
+	UPROPERTY(EditAnywhere ,meta = ( BindWidget ))
+	class UProgressBar* HealthBar;
+
+	UPROPERTY(EditAnywhere ,meta = ( BindWidget ))
+	class UProgressBar* MPBar;
+
+	UPROPERTY(EditAnywhere ,meta = ( BindWidget ))
+	class UTextBlock* CurrentHealthLabel;
+
+	UPROPERTY(EditAnywhere ,meta = ( BindWidget ))
+	class UTextBlock* MaxHealthLabel;
+
+	UPROPERTY(EditAnywhere ,meta = ( BindWidget ))
+	class UTextBlock* CurrentMPLabel;
+
+	UPROPERTY(EditAnywhere ,meta = ( BindWidget ))
+	class UTextBlock* MaxMPLabel;
+
+	UPROPERTY(EditAnywhere ,meta = ( BindWidget ))
+	class UImage* Portion;
+
+	UPROPERTY(EditAnywhere ,meta = ( BindWidget ))
+	class UTextBlock* PortionNum;
+
 
 protected:
 	
-
-
 	TWeakObjectPtr<ASlashCharacter> OwnerPlayer;
 
-	UPROPERTY(meta = ( BindWidget ))
+	/*UPROPERTY(EditAnywhere ,meta = ( BindWidget ))
 	class UProgressBar* HealthBar;
 
-	UPROPERTY(meta = (BindWidget))
+	UPROPERTY(EditAnywhere ,meta = ( BindWidget ))
 	class UTextBlock* CurrentHealthLabel;
 
-	UPROPERTY(meta = (BindWidget))
-	class UTextBlock* MaxHealthLabel;
+	UPROPERTY(EditAnywhere ,meta = ( BindWidget ))
+	class UTextBlock* MaxHealthLabel;*/
+
+	
 
 
 };

@@ -27,6 +27,16 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Mysettings")
 	float BaseDamage = 1000;
 
+		
+	// 체력 ui 관련 데미지
+
+	UPROPERTY(EditAnywhere)
+	float HealthDelta;
+
+	UPROPERTY(EditAnywhere)
+	float PowerDelta;
+
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

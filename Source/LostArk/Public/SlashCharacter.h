@@ -66,6 +66,19 @@ public:
 	UPROPERTY(EditAnywhere, Category = "MySettings") // 사운드
 	class USoundBase* RSound;
 
+	// 체력 관련 ui 설정
+
+	UPROPERTY(EditAnywhere, Category = "MySettings")
+	TSubclassOf<class UMainWidget> mainWidget_bp;
+
+	UPROPERTY()
+	class UMainWidget* mainWidget_inst; 
+
+	
+	void OnRepHealth();
+
+	void UpdateHealth(float DamageAmount);
+
 protected:
 	virtual void BeginPlay() override;
 	// 총알 발사 관련
@@ -98,19 +111,35 @@ protected:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AMybulletActor> bullettospawn9;
 
+
+	// 체력 값 변수 생성 및 설정
 	UPROPERTY(EditAnywhere)
-	int32 MaxHP = 100;
+	int32 MaxHP = 1000;
+
+	UPROPERTY(EditAnywhere)
+	int32 MaxHealthNum = 1000;
+	UPROPERTY(EditAnywhere)
+	int32 MaxMPNum = 3000;
+	UPROPERTY(EditAnywhere)
+	int MaxMP = 3000;
+
+	UPROPERTY(EditAnywhere)
+	int PortionNumber = 10;
+
+	float manaTime = 0;
+
 	FORCEINLINE int32 GetcurrentHP() { return currentHP; };
 	
-	
-	UPROPERTY(EditAnywhere)
-	int MaxMP = 100;
 	
 	UPROPERTY()
 	float skillCollTimer = 0.0f;
 
 	UPROPERTY()
 	class UHealthBarWidget* PlayerWidget;
+
+
+	class UMainWidget* mainHPWget;
+
 	// 캐릭터 컨트롤러 전역으로
 	UPROPERTY()
 	class APlayerController* pc;
@@ -333,6 +362,8 @@ private:   //나만 사용가능하다는 뜻 , 외부에서 호출할게 아니면 여기서 작성하는게
 	
 	int32 currentHP = 0;
 	int32 currentMP = 0;
+	int32 CurrentNum = 0;
+	int32 MPNum = 0;
 
 	bool q;
 	bool w;

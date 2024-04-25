@@ -50,7 +50,7 @@ void UPlayerAnimInstance::AnimNotify_nnSky1() // ╦чев©ю R
 
 void UPlayerAnimInstance::AnimNotify_nnShoot1() // W
 {
-	player->ShootBullet2();
+	player->ShootBullet4();
 	UE_LOG(LogTemp, Warning, (TEXT("Niagara W")));
 }
 

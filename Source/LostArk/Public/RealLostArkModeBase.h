@@ -16,11 +16,11 @@ class LOSTARK_API ARealLostArkModeBase : public AGameModeBase
 
 public:
 
-	UPROPERTY(EditAnywhere, Category = "MySettings")
+	/*UPROPERTY(EditAnywhere, Category = "MySettings")
 	TSubclassOf<class UMainWidget> mainWidget_bp;
 
 	UPROPERTY()
-	class UMainWidget* mainWidget_inst;
+	class UMainWidget* mainWidget_inst;*/
 
 
 	void RespawnPlayer(AController* newplayer, APawn* previouspawn);
