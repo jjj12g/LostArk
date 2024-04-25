@@ -237,7 +237,7 @@ AActor* ASlashCharacter::ShootBullet3()
 
 	// 스킬 사용 체력 회복 테스스트
 	PortionNumber -= 1;
-	currentHP + 0.1;
+	currentHP += 0.1;
 	CurrentNum += 20;
 
 	if (mainWidget_inst != nullptr)
@@ -401,20 +401,24 @@ float ASlashCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 
 		PlayerWidget->SetHealthBar((float)currentHP / (float)MaxHP, FLinearColor(1.0f, 0.13f, 0.05f, 1.0f));
 		
-		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-		if (AnimInstance && HitbrathMotage)
-		{
-			AnimInstance->Montage_Play(HitbrathMotage);
-			const int32 Selection = FMath::RandRange(0, 0); // 0~2까지가 3개
-			FName SectionName = FName();
-			switch (Selection)
-			{
-				
-			case 0:
-				hitreact();
-				break;
-			}
-		}
+		int32 num = FMath::RandRange(1, 3);
+		FString sectionName = FString("Damaged") + FString::FromInt(num);
+		PlayAnimMontage(damaged_montage, 1.3, FName(sectionName));
+
+		//UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		//if (AnimInstance && HitbrathMotage)
+		//{
+		//	AnimInstance->Montage_Play(HitbrathMotage);
+		//	const int32 Selection = FMath::RandRange(0, 0); // 0~2까지가 3개
+		//	FName SectionName = FName();
+		//	switch (Selection)
+		//	{
+		//		
+		//	case 0:
+		//		hitreact();
+		//		break;
+		//	}
+		//}
 	}
 
 	//currentHP -= DamageAmount;
@@ -424,20 +428,24 @@ float ASlashCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 		
 		//CharacterState = ECharacterState::ECS_Die;
 
-		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-		if (AnimInstance && DeathMotages)
-		{
-			AnimInstance->Montage_Play(DeathMotages);
-			const int32 Selection = FMath::RandRange(0, 0); // 0~2까지가 3개
-			FName SectionName = FName();
-			switch (Selection)
-			{
+		PlayAnimMontage(died_montage);
 
-			case 0:
-				DeathMontage();
-				break;
-			}
-		}
+		//CharacterState = ECharacterState::ECS_Die;
+
+		//UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		//if (AnimInstance && DeathMotages)
+		//{
+		//	AnimInstance->Montage_Play(DeathMotages);
+		//	const int32 Selection = FMath::RandRange(0, 0); // 0~2까지가 3개
+		//	FName SectionName = FName();
+		//	switch (Selection)
+		//	{
+
+		//	case 0:
+		//		DeathMontage();
+		//		break;
+		//	}
+		//}
 
 	}
 

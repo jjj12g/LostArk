@@ -18,20 +18,20 @@
 #include <../../../../../../../Source/Runtime/Engine/Classes/Kismet/GameplayStatics.h>
 #include <../../../../../../../Source/Runtime/Engine/Classes/Materials/MaterialInstance.h>
 #include <../../../../../../../Plugins/FX/Niagara/Source/Niagara/Public/NiagaraComponent.h>
-#include <../../../../../../../Source/Runtime/Engine/Classes/GameFramework/Character.h>
+#include <GameFramework/Character.h>
 #include "Components/CapsuleComponent.h"
 #include "SlashCharacter.h"
 #include "HealthBarWidget.h"
-#include <../../../../../../../Source/Runtime/Engine/Classes/Kismet/KismetMathLibrary.h>
-#include <../../../../../../../Source/Runtime/Engine/Classes/Camera/CameraComponent.h>
+#include <Kismet/KismetMathLibrary.h>
+#include <Camera/CameraComponent.h>
 #include "EngineUtils.h"
 #include "BaseFloatingText.h"
 #include "Components/TextRenderComponent.h"
 #include "MybulletActor.h"
-#include <../../../../../../../Source/Runtime/Engine/Classes/Engine/World.h>
+#include <Engine/World.h>
 #include "textnibox.h" // 테스트
 #include "slowhitActor.h"
-#include <../../../../../../../Source/Runtime/Engine/Classes/Animation/AnimInstance.h>
+#include <Animation/AnimInstance.h>
 
 
 
@@ -118,11 +118,6 @@ void AEnemy::BeginPlay()
 		//EquippedWeapon = DefaultWeapon;
 	}
 	*/
-
-	
-
-
-
 
 
 	// 체력변수 초기화

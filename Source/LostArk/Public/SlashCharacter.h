@@ -288,6 +288,12 @@ public:
 	UPROPERTY(EditAnywhere, Category="MySettings|Animations")
 	class UAnimMontage* basic_montage;
 
+	UPROPERTY(EditAnywhere, Category="MySettings|Animations")
+	class UAnimMontage* damaged_montage;
+
+	UPROPERTY(EditAnywhere, Category="MySettings|Animations")
+	class UAnimMontage* died_montage;
+
 	bool bKeyPressed;
 	bool bAttackEnabled;
 	bool bPlayerIsAttacking = false;
