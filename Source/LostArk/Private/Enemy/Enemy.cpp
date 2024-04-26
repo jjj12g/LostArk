@@ -18,20 +18,21 @@
 #include <../../../../../../../Source/Runtime/Engine/Classes/Kismet/GameplayStatics.h>
 #include <../../../../../../../Source/Runtime/Engine/Classes/Materials/MaterialInstance.h>
 #include <../../../../../../../Plugins/FX/Niagara/Source/Niagara/Public/NiagaraComponent.h>
-#include <GameFramework/Character.h>
+#include <../../../../../../../Source/Runtime/Engine/Classes/GameFramework/Character.h>
 #include "Components/CapsuleComponent.h"
 #include "SlashCharacter.h"
 #include "HealthBarWidget.h"
-#include <Kismet/KismetMathLibrary.h>
-#include <Camera/CameraComponent.h>
+#include <../../../../../../../Source/Runtime/Engine/Classes/Kismet/KismetMathLibrary.h>
+#include <../../../../../../../Source/Runtime/Engine/Classes/Camera/CameraComponent.h>
 #include "EngineUtils.h"
 #include "BaseFloatingText.h"
 #include "Components/TextRenderComponent.h"
 #include "MybulletActor.h"
-#include <Engine/World.h>
+#include <../../../../../../../Source/Runtime/Engine/Classes/Engine/World.h>
 #include "textnibox.h" // 테스트
 #include "slowhitActor.h"
-#include <Animation/AnimInstance.h>
+#include <../../../../../../../Source/Runtime/Engine/Classes/Animation/AnimInstance.h>
+
 
 
 
@@ -119,7 +120,6 @@ void AEnemy::BeginPlay()
 	}
 	*/
 
-
 	// 체력변수 초기화
 	// 체력 변수를 초기화한다.
 	currentHP = maxHP;
@@ -170,9 +170,10 @@ void AEnemy::Tick(float DeltaTime)
 	if (breath1 == true)
 	{
 		if (NI_breath != nullptr)
+			UGameplayStatics::PlaySound2D(GetWorld(), basewolfSound);
 			NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NI_breath, SpawnLocation->GetComponentLocation(), SpawnLocation->GetComponentRotation(), FVector(2.0f));
 			// 슛 불릿 위치 타이밍맞게 옮겨주기
-			
+			/*players->bknockBack = true;*/
 		breath1 = false;
 	}
 
@@ -253,6 +254,40 @@ void AEnemy::Tick(float DeltaTime)
 			}
 		}
 
+		if (btonado)
+		{
+			UGameplayStatics::PlaySound2D(GetWorld(),tonaedoSound);
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.Instigator = this;
+
+			AActor* tanadoActor = GetWorld()->SpawnActor<AtonaedoActor>(tanaedoActor, GetActorLocation(), GetActorRotation(), SpawnParams);
+			btonado = false;
+		}
+		if (bRotator)
+		{
+			SetActorRotation(GetActorRotation() + FRotator(0, -90, 0));
+			//UE_LOG(LogTemp, Warning, TEXT("rotator"));
+			bRotator = false;
+		}
+
+		if (bPizza)
+		{
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.Instigator = this;
+			//FRotator enemyRoc = GetActorRotation() + FRotator(0, 90, 0);
+			
+			AActor* pizza = GetWorld()->SpawnActor<AboomActor>(boomActor, GetActorLocation(), GetActorRotation(), SpawnParams);
+			UE_LOG(LogTemp, Warning, TEXT("pizza"));
+			bPizza = false;
+		}
+
+		if (bPizzaSound)
+		{
+			UGameplayStatics::PlaySound2D(GetWorld(), pizzeSound);
+			bPizzaSound =false;
+		}
+
+		
 
 }	
 
@@ -296,7 +331,7 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 }
 	
 
-
+	
 
 
 	// 히트 모션
@@ -363,7 +398,7 @@ void AEnemy::Attack()
 		if (AnimInstance && AttackMontage)
 		{
 			AnimInstance->Montage_Play(AttackMontage);
-			const int32 Selection = FMath::RandRange(1, 1); // 0~2까지가 3개
+			const int32 Selection = FMath::RandRange(6, 6); // 0~2까지가 3개
 			FName SectionName = FName();
 			switch (Selection)
 			{
@@ -392,24 +427,16 @@ void AEnemy::Attack()
 				AttackMontage5();
 				break;
 
-				// 양옆 감전날개
+				// 느린비 
 			case 5:
 				AttackMontage6();
 				break;
 
-				// 느린비 
+				// 피자
 			case 6:
 				AttackMontage7();
 				break;
-
-			case 7:
-				AttackMontage8();
-				break;
-			case 8:
-				AttackMontage9();
-				break;
 			default:
-				AttackMontage10();
 				break;
 			}
 			threeAttack = false;
@@ -421,7 +448,7 @@ void AEnemy::Attack()
 		if (AnimInstance && AttackMontage)
 		{
 			AnimInstance->Montage_Play(AttackMontage);
-			const int32 Selection = FMath::RandRange(1, 1); // 0~2까지가 3개
+			const int32 Selection = FMath::RandRange(6, 6); // 0~2까지가 3개
 			FName SectionName = FName();
 			switch (Selection)
 			{
@@ -450,24 +477,15 @@ void AEnemy::Attack()
 				AttackMontage5();
 				break;
 
-				// 양옆 감전날개
+				// 느린비
 			case 5:
 				AttackMontage6();
 				break;
 
-				// 느린비
+				// 피자
 			case 6:
 				AttackMontage7();
-				break;
-
-			case 7:
-				AttackMontage8();
-				break;
-			case 8:
-				AttackMontage9();
-				break;
 			default:
-				AttackMontage10();
 				break;
 			}
 			threeAttack = false;
@@ -484,6 +502,8 @@ void AEnemy::Attack()
 
 void AEnemy::AttackMontage1()
 {
+	UGameplayStatics::PlaySound2D(GetWorld(), RushSound);
+
 	UE_LOG(LogTemp, Warning, TEXT("attack1"));
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	AnimInstance->Montage_JumpToSection(FName("Attack1"), AttackMontage);
@@ -501,6 +521,7 @@ void AEnemy::AttackMontage1()
 	startLoc = GetActorLocation();
 	//targetLoc = GetActorLocation() + GetActorForwardVector() * 1500;
 	//UE_LOG(LogTemp, Warning, TEXT("State Transition: %s"), *UEnum::GetValueAsString<EEnemyState>(EnemyState));
+
 }
 
 
@@ -542,7 +563,7 @@ void AEnemy::AttackMontage2()
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	AnimInstance->Montage_JumpToSection(FName("Attack2"), AttackMontage);
 
-
+	UGameplayStatics::PlaySound2D(GetWorld(), braseSound);
 }
 
 void AEnemy::AttackMontage3()
@@ -551,6 +572,7 @@ void AEnemy::AttackMontage3()
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	AnimInstance->Montage_JumpToSection(FName("Attack3"), AttackMontage);
 
+	UGameplayStatics::PlaySound2D(GetWorld(), basewolfSound);
 }
 
 void AEnemy::AttackMontage4()
@@ -559,7 +581,7 @@ void AEnemy::AttackMontage4()
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	AnimInstance->Montage_JumpToSection(FName("Attack4"), AttackMontage);
 	
-
+	UGameplayStatics::PlaySound2D(GetWorld(), oneAttackRotSound);
 }
 
 void AEnemy::AttackMontage5()
@@ -574,26 +596,30 @@ void AEnemy::AttackMontage5()
 	// 두번째 색 변경
 	dynamicMAT1->SetVectorParameterValue(FName("hit Color"), FVector4(0, 0, 0, 100));
 
+
+	UGameplayStatics::PlaySound2D(GetWorld(), threeAttackSound);
 }
 
+// 느린비
 void AEnemy::AttackMontage6()
 {
 	UE_LOG(LogTemp, Warning, TEXT("attack6"));
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	AnimInstance->Montage_JumpToSection(FName("Attack6"), AttackMontage);
 
+	btestTarget = true;
+	bteste = true;
+
+	UGameplayStatics::PlaySound2D(GetWorld(), slowrainSound);
 }
 
-// 느린비
+// 피자
 void AEnemy::AttackMontage7()
 {
 	UE_LOG(LogTemp, Warning, TEXT("attack7"));
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	AnimInstance->Montage_JumpToSection(FName("Attack7"), AttackMontage);
 
-	
-	btestTarget = true;
-	bteste = true;
 	
 }
 

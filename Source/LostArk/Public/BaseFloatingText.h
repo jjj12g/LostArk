@@ -15,6 +15,9 @@ class LOSTARK_API ABaseFloatingText : public AActor
 public:	
 	ABaseFloatingText();
 
+	//UPROPERTY(VisibleAnywhere, Category="MySettings|Components")
+	//class UWidgetComponent* floatingWidgetComp;
+
 	virtual void Tick(float DeltaTime) override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Text", meta = (ExposeOnSpawn = "true"))
@@ -37,5 +40,15 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+
+
+private:
+
+	UPROPERTY()
+	class ASlashCharacter* player;
+
+	FRotator BillboardWidgetComponent(class AActor* camActor);
+
+	
 
 };

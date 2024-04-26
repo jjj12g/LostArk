@@ -7,6 +7,8 @@
 #include "interfaces/HitInterface.h"
 #include "CharacterTypes.h" // 캐릭터 죽음같은 애니메이션 동작넣을때 사용할것.
 #include "MybulletActor.h"
+#include "tonaedoActor.h"
+#include "boomActor.h"
 #include "Enemy.generated.h"
 
 
@@ -56,6 +58,22 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UNiagaraSystem* NI_SHOWKWAVE;
 
+
+	// 피자
+	UPROPERTY(EditAnywhere)
+	class UNiagaraSystem* NI_Pizee1;
+
+	UPROPERTY(EditAnywhere)
+	class UNiagaraSystem* NI_Pizza2;
+
+	UPROPERTY(EditAnywhere)
+	class UNiagaraSystem* NI_Pizza3;
+
+	UPROPERTY(EditAnywhere)
+	class UNiagaraSystem* NI_Pizza4;
+
+
+
 	UPROPERTY(EditDefaultsOnly)
 	USceneComponent* SpawnLocation;
 
@@ -104,6 +122,12 @@ public:
 	UPROPERTY(EditAnywhere, Category = "mysettings")
 	TSubclassOf<AMybulletActor> bullettospawn;
 
+	UPROPERTY(EditAnywhere, Category = "mysettings")
+	TSubclassOf<AtonaedoActor> tanaedoActor;
+
+	UPROPERTY(EditAnywhere, Category = "mysettings")
+	TSubclassOf<AboomActor> boomActor;
+
 	AActor* ShootBullet();
 
 	UPROPERTY(EditAnywhere, Category = "mysettings")
@@ -140,6 +164,21 @@ public:
 	// 3번공격
 	bool threeAttack = false;
 	bool threeAttacks = false;
+
+	// 피자패턴
+	bool bRotator = false;
+	bool bPizza = false;
+	bool btonado = false;
+	bool bPizzaSound = false;
+
+	bool bPizzaNI1 = false;
+	bool bPizzaNI2 = false;
+	bool bPizzaNI3 = false;
+	bool bPizzaNI4 = false;
+
+
+
+
 
 
 	// 공격범위
@@ -205,6 +244,33 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "MySettings")
 	int32 maxHP = 30;
+
+	UPROPERTY(EditAnywhere, Category = "MySettings") // 사운드
+		class USoundBase* RushSound;
+
+	UPROPERTY(EditAnywhere, Category = "MySettings") // 사운드
+		class USoundBase* braseSound;
+
+	UPROPERTY(EditAnywhere, Category = "MySettings") // 사운드
+		class USoundBase* threeAttackSound;
+
+	UPROPERTY(EditAnywhere, Category = "MySettings") // 사운드
+		class USoundBase* pizzeSound;
+
+	UPROPERTY(EditAnywhere, Category = "MySettings") // 사운드
+		class USoundBase* tonaedoSound;
+
+	UPROPERTY(EditAnywhere, Category = "MySettings") // 사운드
+		class USoundBase* vardathSound;
+
+	UPROPERTY(EditAnywhere, Category = "MySettings") // 사운드
+		class USoundBase* oneAttackRotSound;
+
+	UPROPERTY(EditAnywhere, Category = "MySettings") // 사운드
+		class USoundBase* basewolfSound;
+
+	UPROPERTY(EditAnywhere, Category = "MySettings") // 사운드
+		class USoundBase* slowrainSound;
 
 private:
 	/** AI behavior(행동) */

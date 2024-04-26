@@ -25,6 +25,8 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UNiagaraSystem* NI_slowRain;
 
+	UPROPERTY(EditAnywhere, Category = "MySettings")
+	class UBoxComponent* boxsComp;
 	
 
 
@@ -32,8 +34,7 @@ protected:
 	virtual void BeginPlay() override;
 
 
-	UPROPERTY(EditAnywhere, Category = "MySettings")
-	class UBoxComponent* boxComp;
+	
 
 	UPROPERTY(EditAnywhere, Category = "MySettings")
 	class UStaticMeshComponent* meshComp;

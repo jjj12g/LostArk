@@ -9,6 +9,7 @@ void UEnemyAnimInstance::NativeInitializeAnimation()
 
 	enemy = Cast<AEnemy>(GetOwningActor());   // 전역 변수화
 	
+	//player = Cast<ASlashCharacter>(GetOwningActor());
 
 }
 
@@ -72,6 +73,8 @@ void UEnemyAnimInstance::AnimNotify_AttackEnd()
 	enemy->EnemyoverlapOn = false;
 	enemy->dontMove = false;
 	enemy->look = true;
+
+	
 }
 
 void UEnemyAnimInstance::AnimNotify_rain()
@@ -86,6 +89,54 @@ void UEnemyAnimInstance::AnimNotify_rain1()
 	UE_LOG(LogTemp, Warning, TEXT("rain222222222222"));
 	
 
+}
+
+void UEnemyAnimInstance::AnimNotify_rotator()
+{
+
+	enemy->dontMove = false;
+	enemy->bRotator = true;
+
+}
+
+void UEnemyAnimInstance::AnimNotify_pizza()
+{
+	enemy->bPizza = true;
+
+}
+
+void UEnemyAnimInstance::AnimNotify_tanaedo()
+{
+	enemy->btonado = true;
+	UE_LOG(LogTemp,Warning,TEXT("tanaedo"));
+
+
+}
+
+void UEnemyAnimInstance::AnimNotify_pizzaStart()
+{
+	enemy->bPizzaSound = true;
+
+}
+
+void UEnemyAnimInstance::AnimNotify_pizzaOn1()
+{
+	enemy->bPizzaNI1 = true;
+}
+
+void UEnemyAnimInstance::AnimNotify_pizzaOn2()
+{
+	enemy->bPizzaNI2 = true;
+}
+
+void UEnemyAnimInstance::AnimNotify_pizzaOn3()
+{
+	enemy->bPizzaNI3 = true;
+}
+
+void UEnemyAnimInstance::AnimNotify_pizzaOn4()
+{
+	enemy->bPizzaNI4 = true;
 }
 
 

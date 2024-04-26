@@ -21,6 +21,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MySettings")
 	class AEnemy* enemy;  // 처음부터 에너미를 받아서 변수를 읽어옴
 
+	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MySettings")
+	//class ASlashCharacter* player;  // 처음부터 에너미를 받아서 변수를 읽어옴
 
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MySettings")
@@ -67,6 +69,28 @@ public:
 	UFUNCTION()
 	void AnimNotify_rain1();
 
+	UFUNCTION()
+	void AnimNotify_rotator(); 
 
+	UFUNCTION()
+	void AnimNotify_pizza(); 
+
+	UFUNCTION()
+	void AnimNotify_tanaedo(); 
+
+	UFUNCTION()
+	void AnimNotify_pizzaStart();
+
+	UFUNCTION()
+	void AnimNotify_pizzaOn1();
+
+	UFUNCTION()
+	void AnimNotify_pizzaOn2();
+
+	UFUNCTION()
+	void AnimNotify_pizzaOn3();
+
+	UFUNCTION()
+	void AnimNotify_pizzaOn4();
 
 };

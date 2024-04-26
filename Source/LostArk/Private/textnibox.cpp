@@ -13,13 +13,13 @@ Atextnibox::Atextnibox()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	boxComp = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Component"));
-	SetRootComponent(boxComp);
-	boxComp->SetGenerateOverlapEvents(true);
-
+	boxsComp = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Component"));
+	SetRootComponent(boxsComp);
+	boxsComp->SetGenerateOverlapEvents(true);
+	
 	// 스태틱 메시 컴포넌트를 생성하고 박스 컴포넌트의 자식 컴포넌트로 지정하기
 	meshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh Component"));
-	meshComp->SetupAttachment(boxComp);
+	meshComp->SetupAttachment(boxsComp);
 	
 	
 }
@@ -29,7 +29,7 @@ void Atextnibox::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	boxComp->OnComponentBeginOverlap.AddDynamic(this, &Atextnibox::BeginOverlap);
+	boxsComp->OnComponentBeginOverlap.AddDynamic(this, &Atextnibox::BeginOverlap);
 
 	slowStart = GetActorLocation();
 	loctarget = GetActorLocation() + FVector(0, 0, 700);
@@ -42,7 +42,7 @@ void Atextnibox::BeginPlay()
 
 void Atextnibox::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	UE_LOG(LogTemp, Warning, TEXT("111111111111111"));
+	//UE_LOG(LogTemp, Warning, TEXT("111111111111111"));
 	Destroy();
 
 }
@@ -63,11 +63,14 @@ void Atextnibox::Tick(float DeltaTime)
 			//UE_LOG(LogTemp, Warning, TEXT("111111111111111"));
 		}
 		else
-		{
+		{	
+			// 비 내려가게 설정.
+			//boxsComp->SetCollisionProfileName(FName("rainPreset"));
 			bslowDownTarget = true;
 			slowUPTime = 0;
 			//targetLoc = GetActorLocation() + GetActorForwardVector() * 1500;
 			bslowUPTarget = false;
+			
 		}
 	}
 
@@ -79,6 +82,7 @@ void Atextnibox::Tick(float DeltaTime)
 			{
 				SetActorLocation(FMath::Lerp(loctarget, downTarget, slowUPTime * 0.1));
 				//UE_LOG(LogTemp, Warning, TEXT("222222222222"));
+				
 			}
 			else
 			{	
