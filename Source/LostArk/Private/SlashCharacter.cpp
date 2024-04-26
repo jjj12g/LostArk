@@ -139,14 +139,14 @@ void ASlashCharacter::BeginPlay()
 
 	// main 위젯 생성 hp mp 실시간 설정
 
-	if (mainWidget_bp != nullptr)
+		if (mainWidget_bp != nullptr)
 	{
 		mainWidget_inst = CreateWidget<UMainWidget>(GetWorld(), mainWidget_bp);
 
-		if (mainWidget_inst)
+		/*if (mainWidget_inst)
 		{
 			mainWidget_inst->AddToViewport(0);
-		}
+		}*/
 	}
 
 	mainWidget_inst->SetHealth(currentHP, MaxHP);

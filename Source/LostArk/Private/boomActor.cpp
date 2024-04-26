@@ -18,7 +18,7 @@ AboomActor::AboomActor()
 
 
 	meshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh Component"));
-	meshComp->SetRootComponent(meshComp);
+	meshComp->SetupAttachment(RootComponent);;
 
 
 	boxComp = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Component"));
