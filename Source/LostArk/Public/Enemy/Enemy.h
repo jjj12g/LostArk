@@ -72,8 +72,6 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UNiagaraSystem* NI_Pizza4;
 
-
-
 	UPROPERTY(EditDefaultsOnly)
 	USceneComponent* SpawnLocation;
 
@@ -175,9 +173,9 @@ public:
 	bool bPizzaNI2 = false;
 	bool bPizzaNI3 = false;
 	bool bPizzaNI4 = false;
+	bool bPizzadamage = false;
 
-
-
+	
 
 
 
@@ -197,6 +195,9 @@ protected:
 	//virtual void HandleDamage(float DamageAmount) override;
 	 void PlayDeathMontages();
 	/** </ABaseCharacter> */
+
+	UPROPERTY(EditAnywhere)
+	 class AboomActor* boomtarget;
 
 	// 오버랩 이벤트
 	UFUNCTION()
@@ -243,7 +244,7 @@ protected:
 	//void PlayHitReactMontage(const FName& SectionName);
 
 	UPROPERTY(EditAnywhere, Category = "MySettings")
-	int32 maxHP = 30;
+	int32 maxHP = 30000;
 
 	UPROPERTY(EditAnywhere, Category = "MySettings") // 사운드
 		class USoundBase* RushSound;
@@ -272,7 +273,12 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "MySettings") // 사운드
 		class USoundBase* slowrainSound;
 
+	UPROPERTY(EditAnywhere, Category = "MySettings")
+	TSubclassOf<class UvidWidget> bp_vidWidget;
+
 private:
+
+	class UvidWidget* vidWidgetUI;
 	/** AI behavior(행동) */
 	void InitializeEnemy(); // 비긴플레이에서 실행할 초기화함수
 	void CheckPatrolTarget();

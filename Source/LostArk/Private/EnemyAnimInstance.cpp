@@ -101,7 +101,7 @@ void UEnemyAnimInstance::AnimNotify_rotator()
 
 void UEnemyAnimInstance::AnimNotify_pizza()
 {
-	enemy->bPizza = true;
+	//enemy->bPizza = true;
 
 }
 
@@ -137,6 +137,12 @@ void UEnemyAnimInstance::AnimNotify_pizzaOn3()
 void UEnemyAnimInstance::AnimNotify_pizzaOn4()
 {
 	enemy->bPizzaNI4 = true;
+}
+
+void UEnemyAnimInstance::AnimNotify_Pizzadamage()
+{
+	enemy->bPizza = true;
+
 }
 
 

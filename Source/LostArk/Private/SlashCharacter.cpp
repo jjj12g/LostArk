@@ -140,14 +140,15 @@ void ASlashCharacter::BeginPlay()
 	// main 위젯 생성 hp mp 실시간 설정
 
 		if (mainWidget_bp != nullptr)
-	{
+		{
 		mainWidget_inst = CreateWidget<UMainWidget>(GetWorld(), mainWidget_bp);
 
-		/*if (mainWidget_inst)
+		}
+		if (mainWidget_inst)
 		{
 			mainWidget_inst->AddToViewport(0);
-		}*/
-	}
+		}
+
 
 	mainWidget_inst->SetHealth(currentHP, MaxHP);
 	mainWidget_inst->SetPower(currentMP, MaxMP);
@@ -176,6 +177,7 @@ AActor* ASlashCharacter::ShootBullet()
 		UGameplayStatics::PlaySound2D(GetWorld(), BASESound);
 		UE_LOG(LogTemp, Warning, TEXT("BASESound !!"));
 	}
+
 
 	return SpawandActor;
 }
@@ -212,7 +214,7 @@ AActor* ASlashCharacter::ShootBullet2()
 
 AActor* ASlashCharacter::ShootBullet3()
 {
-	if (!skilluse) { return nullptr; }
+	
 	FVector toward = targetPos - GetActorLocation();
 	FVector loc = GetActorLocation();
 
@@ -312,11 +314,11 @@ AActor* ASlashCharacter::ShootBullet6()
 
 	// 스킬 사용 체력 회복 테스스트
 	PortionNumber -= 1;
-	currentHP += 0.1;
+	currentHP += 0.05;
 	CurrentNum += 20;
 
 
-	if (currentHP <= 1000 && CurrentNum <= 1000)
+	if (currentHP <= 3000 && CurrentNum <= 3000)
 	{
 		mainWidget_inst->SetPortionNUMS(currentHP, CurrentNum, PortionNumber);
 
@@ -355,11 +357,15 @@ AActor* ASlashCharacter::ShootBullet9()
 {
 	FVector toward = targetPos - GetActorLocation();
 	FVector loc = GetActorLocation();
+	
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Instigator = this;
 	AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn9, SpawnLocation->GetComponentLocation(), toward.Rotation(), SpawnParams);
 	//AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn2, SpawnLocation->GetComponentLocation(), GetActorRotation(), SpawnParams);
+	
+	
+	
 	return SpawandActor;
 }
 

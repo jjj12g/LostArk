@@ -93,4 +93,7 @@ public:
 	UFUNCTION()
 	void AnimNotify_pizzaOn4();
 
+	UFUNCTION()
+	void AnimNotify_Pizzadamage();
+
 };

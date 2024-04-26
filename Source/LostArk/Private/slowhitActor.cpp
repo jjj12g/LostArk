@@ -79,7 +79,7 @@ void AslowhitActor::Tick(float DeltaTime)
 			{
 				if (target != nullptr)
 				{ 
-					UGameplayStatics::ApplyDamage(target, 30, EnemyController, this, DamageType);
+					UGameplayStatics::ApplyDamage(target, 70, EnemyController, this, DamageType);
 					rainAttackTime = 0;
 					UE_LOG(LogTemp, Warning, TEXT("rain: %s"), *target->GetActorNameOrLabel());
 				}

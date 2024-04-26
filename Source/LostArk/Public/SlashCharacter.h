@@ -129,14 +129,14 @@ protected:
 	
 	// 체력 값 변수 생성 및 설정
 	UPROPERTY(EditAnywhere)
-	int32 MaxHP = 1000;
+	int32 MaxHP = 3000;
 
 	UPROPERTY(EditAnywhere)
-	int32 MaxHealthNum = 1000;
+	int32 MaxHealthNum = 3000;
 	UPROPERTY(EditAnywhere)
-	int32 MaxMPNum = 3000;
+	int32 MaxMPNum = 5000;
 	UPROPERTY(EditAnywhere)
-	int32 MaxMP = 3000;
+	int32 MaxMP = 5000;
 
 	int32 Currentcool = 0;
 	int32 Maxcool = 1;

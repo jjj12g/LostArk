@@ -10,19 +10,18 @@
 #include "EngineUtils.h"
 #include "NiagaraComponent.h"
 #include <../../../../../../../Plugins/FX/Niagara/Source/Niagara/Public/NiagaraFunctionLibrary.h>
+#include "SlashCharacter.h"
 
 // Sets default values
 AboomActor::AboomActor()
 {
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 
-
-	meshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh Component"));
-	meshComp->SetupAttachment(RootComponent);;
-
+	boxComp3 = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Component3"));
+	SetRootComponent(boxComp3);
 
 	boxComp = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Component"));
-	boxComp->SetupAttachment(RootComponent);;
+	boxComp->SetupAttachment(RootComponent);
 	boxComp->SetGenerateOverlapEvents(true);
 	
 	//boxComp->SetCollisionResponseToChannel(ECollisionChannel::ECC_EngineTraceChannel1, ECollisionResponse::ECR_Overlap);
@@ -44,10 +43,6 @@ void AboomActor::BeginPlay()
 
 	boxComp->OnComponentBeginOverlap.AddDynamic(this, &AboomActor::BeginOverlap);
 	
-	
-
-
-
 
 }
 
@@ -55,15 +50,39 @@ void AboomActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	boobTime += DeltaTime;
+	if (boobTime < 1.8f)
+	{
+	}
+	else
+	{
+		boobTime = 0;
+		Destroy();
+	}
+
+	if (bPizzaboom)
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("boommmmmmmmmmmmmmm"));
+		UGameplayStatics::ApplyDamage(target, 200, EnemyController, this, DamageType);
+		bPizzaboom = false;
+	}
+	
 }
 
 
 
 void AboomActor::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	
 	boomActor = Cast<AboomActor>(OtherActor);
-	UE_LOG(LogTemp, Warning, TEXT("boom"));
-	UGameplayStatics::ApplyDamage(OtherActor, 30, EnemyController, this, DamageType);
+	if (OtherActor->IsA<ASlashCharacter>())
+	{
+		target = OtherActor;
+		bPizzaboom = true;
+	}
+	
+	//UE_LOG(LogTemp, Warning, TEXT("boom"));
+	
 	
 }
 

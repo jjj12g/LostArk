@@ -31,7 +31,11 @@
 #include <../../../../../../../Source/Runtime/Engine/Classes/Engine/World.h>
 #include "textnibox.h" // 테스트
 #include "slowhitActor.h"
+#include "boomActor.h"
 #include <../../../../../../../Source/Runtime/Engine/Classes/Animation/AnimInstance.h>
+#include <../../../../../../../Source/Runtime/UMG/Public/Blueprint/UserWidget.h>
+#include "vidWidget.h"
+
 
 
 
@@ -254,6 +258,7 @@ void AEnemy::Tick(float DeltaTime)
 			}
 		}
 
+		// 피자
 		if (btonado)
 		{
 			UGameplayStatics::PlaySound2D(GetWorld(),tonaedoSound);
@@ -276,7 +281,7 @@ void AEnemy::Tick(float DeltaTime)
 			SpawnParams.Instigator = this;
 			//FRotator enemyRoc = GetActorRotation() + FRotator(0, 90, 0);
 			
-			AActor* pizza = GetWorld()->SpawnActor<AboomActor>(boomActor, GetActorLocation(), GetActorRotation(), SpawnParams);
+			AActor* pizza = GetWorld()->SpawnActor<AboomActor>(boomActor, GetActorLocation(), GetActorRotation()+FRotator(0,270,0), SpawnParams);
 			UE_LOG(LogTemp, Warning, TEXT("pizza"));
 			bPizza = false;
 		}
@@ -287,7 +292,32 @@ void AEnemy::Tick(float DeltaTime)
 			bPizzaSound =false;
 		}
 
-		
+		if (bPizzaNI1)
+		{
+			NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NI_Pizee1,GetActorLocation(), GetActorRotation()+FRotator(0,45,0));
+			bPizzaNI1 = false;
+		}
+		if (bPizzaNI2)
+		{
+			NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NI_Pizza2, GetActorLocation(), GetActorRotation() + FRotator(0, 45, 0));
+			bPizzaNI2 = false;
+		}
+		if (bPizzaNI3)
+		{
+			NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NI_Pizza3, GetActorLocation(), GetActorRotation() + FRotator(0, 45, 0));
+			bPizzaNI3 = false;
+		}
+		if (bPizzaNI4)
+		{
+			NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NI_Pizza4, GetActorLocation(), GetActorRotation() + FRotator(0, 45, 0));
+			bPizzaNI4 = false;
+		}
+
+		//if (bPizzadamage)
+		//{ 
+		//	//boomtarget->bboom = true;
+		//	bPizzadamage = false;
+		//}
 
 }	
 
@@ -369,6 +399,18 @@ void AEnemy::Die()
 	SetLifeSpan(DeathLifeSpan); // 에너미가 죽으면 n초 뒤에 사라짐
 	GetCharacterMovement()->bOrientRotationToMovement = false; // 죽은 뒤 다른방향으로 움직이지 않게 고정
 
+	if (bp_vidWidget != nullptr)
+	{
+		vidWidgetUI = CreateWidget<UvidWidget>(GetWorld(), bp_vidWidget);
+		UE_LOG(LogTemp, Warning, TEXT("create widget"));
+		if (vidWidgetUI != nullptr)
+		{
+			vidWidgetUI->AddToViewport();
+			UE_LOG(LogTemp, Warning, TEXT("add to viewport"));
+
+			//pc->PlayerCameraManager->StartCameraFade(0, 1, 1.5f, FLinearColor::Black);
+		}
+	}
 
 }
 
@@ -398,18 +440,18 @@ void AEnemy::Attack()
 		if (AnimInstance && AttackMontage)
 		{
 			AnimInstance->Montage_Play(AttackMontage);
-			const int32 Selection = FMath::RandRange(6, 6); // 0~2까지가 3개
+			const int32 Selection = FMath::RandRange(0, 3); // 0~2까지가 3개
 			FName SectionName = FName();
 			switch (Selection)
 			{
-				// 돌진
+				// 피자
 			case 0:
-				AttackMontage1();
+				AttackMontage7();
 				break;
 
-				// 브레스
+				// 바닥 3번찍기
 			case 1:
-				AttackMontage2();
+				AttackMontage5();
 				break;
 
 				// 위로 한바퀴
@@ -420,21 +462,6 @@ void AEnemy::Attack()
 				// 바닥찍고 꼬리치기
 			case 3:
 				AttackMontage4();
-				break;
-
-				// 바닥 3번찍기
-			case 4:
-				AttackMontage5();
-				break;
-
-				// 느린비 
-			case 5:
-				AttackMontage6();
-				break;
-
-				// 피자
-			case 6:
-				AttackMontage7();
 				break;
 			default:
 				break;
@@ -448,7 +475,7 @@ void AEnemy::Attack()
 		if (AnimInstance && AttackMontage)
 		{
 			AnimInstance->Montage_Play(AttackMontage);
-			const int32 Selection = FMath::RandRange(6, 6); // 0~2까지가 3개
+			const int32 Selection = FMath::RandRange(0, 2); // 0~2까지가 3개
 			FName SectionName = FName();
 			switch (Selection)
 			{
@@ -462,31 +489,13 @@ void AEnemy::Attack()
 				AttackMontage2();
 				break;
 
-				// 위로 한바퀴
+				// 느린비 
 			case 2:
-				AttackMontage3();
-				break;
-
-				// 바닥찍고 꼬리치기
-			case 3:
-				AttackMontage4();
-				break;
-
-				// 바닥 3번찍기
-			case 4:
-				AttackMontage5();
-				break;
-
-				// 느린비
-			case 5:
 				AttackMontage6();
 				break;
-
-				// 피자
-			case 6:
-				AttackMontage7();
 			default:
 				break;
+
 			}
 			threeAttack = false;
 		}
@@ -678,7 +687,7 @@ void AEnemy::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Othe
 	{
 		UE_LOG(LogTemp, Warning, TEXT("TakeDamegeEnemy"));
 		
-		UGameplayStatics::ApplyDamage(OtherActor, 30, EnemyController, this, DamageType);
+		UGameplayStatics::ApplyDamage(OtherActor, 50, EnemyController, this, DamageType);
 		enemy = Cast<AEnemy>(OtherActor);
 		EnemyoverlapOn = false;
 
