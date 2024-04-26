@@ -27,7 +27,7 @@ void UMainWidget::SetHealth(float CurrentHP, float MaxHP)
 {
 	if (HealthBar)
 	{
-		HealthBar->SetPercent(CurrentHP/MaxHP);
+		HealthBar->SetPercent(CurrentHP / MaxHP);
 	}
 }
 
@@ -35,7 +35,7 @@ void UMainWidget::SetPower(float currentMp, float MaxMP)
 {
 	if (MPBar)
 	{
-		MPBar->SetPercent(currentMp/MaxMP);
+		MPBar->SetPercent(currentMp / MaxMP);
 	}
 }
 
@@ -59,7 +59,7 @@ void UMainWidget::SetPortionNUMS(float CurrentHP, float CurrentNum, float Portio
 {
 	if (HealthBar)
 	{
-		HealthBar-> SetPercent(CurrentHP);
+		HealthBar->SetPercent(CurrentHP);
 	}
 
 	if (CurrentHealthLabel)
@@ -67,8 +67,16 @@ void UMainWidget::SetPortionNUMS(float CurrentHP, float CurrentNum, float Portio
 		CurrentHealthLabel->SetText(FText::FromString(FString::SanitizeFloat(CurrentNum)));
 	}
 
-	if(PortionNum)
+	if (PortionNum)
 	{
 		PortionNum->SetText(FText::FromString(FString::SanitizeFloat(PortionNumber--)));
+	}
+}
+
+void UMainWidget::SetCooltime(float skillCollTime, float skillCollTimer)
+{
+	if (Fire)
+	{
+		Fire->SetPercent(skillCollTime / skillCollTimer);
 	}
 }

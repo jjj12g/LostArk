@@ -2,14 +2,14 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "CoreMinimal.h"
 #include "SlashCharacter.h"
+#include <../../../../../../../Source/Runtime/UMG/Public/Blueprint/UserWidgetBlueprint.h>
+
 #include "MainWidget.generated.h"
 
-/**
- * 
- */
+
 UCLASS()
 class LOSTARK_API UMainWidget : public UUserWidget
 {
@@ -17,7 +17,7 @@ class LOSTARK_API UMainWidget : public UUserWidget
 
 		//void SetOwnerPlayer(ASlashCharacter* player) { OwnerPlayer = player;}
 
-		void  SetHealthBar(float value, FLinearColor lowHealthColor);
+		//void  SetHealthBar(float value, FLinearColor lowHealthColor);
 
 public:
 
@@ -31,6 +31,8 @@ public:
 	void SetMPNum(float MPNum, float MaxMPNum);
 
 	void SetPortionNUMS(float CurrentHP, float CurrentNum, float PortionNumber);
+
+	void SetCooltime(float skillCollTime, float skillCollTimer);
 
 	UPROPERTY(EditAnywhere ,meta = ( BindWidget ))
 	class UProgressBar* HealthBar;
@@ -55,6 +57,23 @@ public:
 
 	UPROPERTY(EditAnywhere ,meta = ( BindWidget ))
 	class UTextBlock* PortionNum;
+
+
+	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	TArray<float> percents = { 0.5f, 0.7f };*/
+
+	
+	UPROPERTY(EditAnywhere ,meta = ( BindWidget ))
+	class UProgressBar* Fire;
+
+	UPROPERTY(EditAnywhere ,meta = ( BindWidget ))
+	class UProgressBar* ice;
+
+	UPROPERTY(EditAnywhere ,meta = ( BindWidget ))
+	class UProgressBar* Energy;
+
+	UPROPERTY(EditAnywhere ,meta = ( BindWidget ))
+	class UProgressBar* Mete;
 
 
 protected:

@@ -86,6 +86,13 @@ public:
 
 	void UpdateHealth(float DamageAmount);
 
+	// 쿨타임 관련 유튜브 참고
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MySettings")
+	float firecooldown;
+
+	FTimerHandle colltimehandle;
+
+
 protected:
 	virtual void BeginPlay() override;
 	// 총알 발사 관련
@@ -119,6 +126,7 @@ protected:
 	TSubclassOf<AMybulletActor> bullettospawn9;
 
 
+	
 	// 체력 값 변수 생성 및 설정
 	UPROPERTY(EditAnywhere)
 	int32 MaxHP = 1000;
@@ -128,18 +136,26 @@ protected:
 	UPROPERTY(EditAnywhere)
 	int32 MaxMPNum = 3000;
 	UPROPERTY(EditAnywhere)
-	int MaxMP = 3000;
+	int32 MaxMP = 3000;
+
+	int32 Currentcool = 0;
+	int32 Maxcool = 1;
 
 	UPROPERTY(EditAnywhere)
-	int PortionNumber = 10;
+	int32 PortionNumber = 10;
 
 	float manaTime = 0;
 
 	FORCEINLINE int32 GetcurrentHP() { return currentHP; };
 	
-	
+	// 스킬 쿨타임 관련 버전
 	UPROPERTY()
-	float skillCollTimer = 0.0f;
+	float skillCollTimer = 10.0f;
+
+	UPROPERTY()
+	float skillCollTime = 0.f;
+
+	bool skilluse = true;
 
 	UPROPERTY()
 	class UHealthBarWidget* PlayerWidget;
@@ -359,7 +375,7 @@ private:   //나만 사용가능하다는 뜻 , 외부에서 호출할게 아니면 여기서 작성하는게
 	void R(const FInputActionValue& value);
 
 	UFUNCTION()
-	void A(const FInputActionValue& value);
+	void PortionA(const FInputActionValue& value);
 
 	UFUNCTION()
 	void S(const FInputActionValue& value);

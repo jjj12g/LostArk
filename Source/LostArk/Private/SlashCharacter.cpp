@@ -31,7 +31,7 @@
 #include <../../../../../../../Source/Runtime/Engine/Classes/Animation/AnimInstance.h>
 #include <../../../../../../../Source/Runtime/Engine/Classes/Engine/DamageEvents.h>
 #include <../../../../../../../Source/Runtime/Core/Public/Math/Color.h>
-
+#include <../../../../../../../Source/Runtime/Engine/Public/TimerManager.h>
 
 ASlashCharacter::ASlashCharacter()
 {
@@ -153,6 +153,7 @@ void ASlashCharacter::BeginPlay()
 	mainWidget_inst->SetPower(currentMP, MaxMP);
 	mainWidget_inst->SetMPNum(MPNum, MaxMPNum);
 	mainWidget_inst->SetPortionNUMS(currentHP,CurrentNum, PortionNumber);
+	mainWidget_inst->SetCooltime(Currentcool, Maxcool);
 }
 
 // 스킬 설정 및 위치 설정 -----------------------------------------------------------------------------------------------------
@@ -211,6 +212,7 @@ AActor* ASlashCharacter::ShootBullet2()
 
 AActor* ASlashCharacter::ShootBullet3()
 {
+	if (!skilluse) { return nullptr; }
 	FVector toward = targetPos - GetActorLocation();
 	FVector loc = GetActorLocation();
 
@@ -233,17 +235,10 @@ AActor* ASlashCharacter::ShootBullet3()
 	if (mainWidget_inst != nullptr)
 	{
 		mainWidget_inst->SetMPNum(MPNum, MaxMPNum);
+		mainWidget_inst->SetCooltime(skillCollTime, skillCollTimer);
 	}
 
-	// 스킬 사용 체력 회복 테스스트
-	PortionNumber -= 1;
-	currentHP += 0.1;
-	CurrentNum += 20;
-
-	if (mainWidget_inst != nullptr)
-	{
-			mainWidget_inst->SetPortionNUMS(currentHP, CurrentNum, PortionNumber);
-	}
+	skilluse = false;
 
 	return SpawandActor;
 
@@ -314,6 +309,19 @@ AActor* ASlashCharacter::ShootBullet6()
 	SpawnParams.Instigator = this;
 	AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn6, SpawnLocation->GetComponentLocation(), toward.Rotation(), SpawnParams);
 	//AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn2, SpawnLocation->GetComponentLocation(), GetActorRotation(), SpawnParams);
+
+	// 스킬 사용 체력 회복 테스스트
+	PortionNumber -= 1;
+	currentHP += 0.1;
+	CurrentNum += 20;
+
+
+	if (currentHP <= 1000 && CurrentNum <= 1000)
+	{
+		mainWidget_inst->SetPortionNUMS(currentHP, CurrentNum, PortionNumber);
+
+	}
+
 	return SpawandActor;
 }
 
@@ -326,6 +334,8 @@ AActor* ASlashCharacter::ShootBullet7()
 	SpawnParams.Instigator = this;
 	AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn7, SpawnLocation->GetComponentLocation(), toward.Rotation(), SpawnParams);
 	//AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn2, SpawnLocation->GetComponentLocation(), GetActorRotation(), SpawnParams);
+
+
 	return SpawandActor;
 }
 
@@ -557,17 +567,18 @@ void ASlashCharacter::Tick(float DeltaTime)
 	}
 
 	// 트루일때 타이머 실행-> 몇초뒤 펄스로 변경 -> 틱에서 실행
-	if (bskillCollTime)
+	if (!skilluse)
 	{
-		skillCollTimer += DeltaTime;
-		if (skillCollTimer < 10.0f)
+
+		if (skillCollTime < skillCollTimer)
 		{
-			
+			skillCollTime += DeltaTime;
+			skilluse = false;
 		}
 		else
 		{
-			skillCollTimer = 0;
-			bskillCollTime = false;
+			skillCollTime = 0.0f;
+			skilluse = true;
 		}
 	}
 
@@ -649,7 +660,7 @@ void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		enhancedInputComponent->BindAction(ia_r, ETriggerEvent::Started, this, &ASlashCharacter::R);
 		enhancedInputComponent->BindAction(ia_r, ETriggerEvent::Completed, this, &ASlashCharacter::R);
 
-		enhancedInputComponent->BindAction(ia_a, ETriggerEvent::Started, this, &ASlashCharacter::A);
+		enhancedInputComponent->BindAction(ia_a, ETriggerEvent::Started, this, &ASlashCharacter::PortionA);
 		enhancedInputComponent->BindAction(ia_s, ETriggerEvent::Started, this, &ASlashCharacter::S);
 		enhancedInputComponent->BindAction(ia_d, ETriggerEvent::Started, this, &ASlashCharacter::D);
 		enhancedInputComponent->BindAction(ia_f, ETriggerEvent::Started, this, &ASlashCharacter::F);
@@ -871,7 +882,7 @@ void ASlashCharacter::R(const FInputActionValue& value)
 	}
 }
 
-void ASlashCharacter::A(const FInputActionValue& value)
+void ASlashCharacter::PortionA(const FInputActionValue& value)
 {
 	ShootBullet6();
 	UE_LOG(LogTemp, Warning, TEXT("A"));
