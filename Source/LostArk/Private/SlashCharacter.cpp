@@ -170,10 +170,10 @@ AActor* ASlashCharacter::ShootBullet()
 	AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn, SpawnLocation->GetComponentLocation(), toward.Rotation(), SpawnParams);
 	//AActor* SpawandActor = GetWorld()->SpawnActor<AMybulletActor>(bullettospawn, SpawnLocation->GetComponentLocation(), GetActorRotation(), SpawnParams);
 	
-	if (WSound != nullptr)
+	if (BASESound != nullptr)
 	{
-		UGameplayStatics::PlaySound2D(GetWorld(), WSound);
-		UE_LOG(LogTemp,Warning,TEXT("Wsound!!"));
+		UGameplayStatics::PlaySound2D(GetWorld(), BASESound);
+		UE_LOG(LogTemp, Warning, TEXT("BASESound !!"));
 	}
 
 	return SpawandActor;
@@ -384,6 +384,16 @@ float ASlashCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 	currentHP = FMath::Clamp(currentHP - DamageAmount, 0, MaxHP);
 	CurrentNum = FMath::Clamp(CurrentNum - DamageAmount, 0, MaxHealthNum);
 
+	// ³Ë¹é
+	/*if (binknockBack)
+	{
+	hitLocation = GetActorLocation();
+	hitDirection = GetActorLocation() - enemy->GetActorLocation();
+	hitDirection.Z = 0;
+	hitDirection.Normalize();
+	targetLoc = hitLocation + hitDirection * 50.0f;
+	}*/
+
 	if (mainWidget_inst != nullptr)
 	{
 		mainWidget_inst->SetHealth(currentHP, MaxHP);
@@ -579,6 +589,25 @@ void ASlashCharacter::Tick(float DeltaTime)
 		MPNum += 5;
 
 	}
+	// ³Ë¹é
+	/*if (bknockBack)
+	{
+		bknobacktime += DeltaTime;
+		if (bknobacktime < 3.0f)
+		{
+			binknockBack = false;
+			FVector knockBackLocation = FMath::Lerp(GetActorLocation(), targetLoc, DeltaTime * 3.0f);
+			if (FVector::Distance(GetActorLocation(), targetLoc) > 10)
+			{
+				SetActorLocation(knockBackLocation, true);
+			}
+		}
+		else
+		{
+			binknockBack = true;
+			bknobacktime = 0;
+			bknockBack = false;
+		}*/
 
 
 }
@@ -605,7 +634,7 @@ void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 		enhancedInputComponent->BindAction(ia_Fire, ETriggerEvent::Started, this, &ASlashCharacter::FireBullet);
 		
-
+		enhancedInputComponent->BindAction(ia_shift, ETriggerEvent::Started, this, &ASlashCharacter::Shiftsound);
 		enhancedInputComponent->BindAction(ia_shift, ETriggerEvent::Triggered, this, &ASlashCharacter::ShiftStarted);
 
 		enhancedInputComponent->BindAction(ia_q, ETriggerEvent::Started, this, &ASlashCharacter::Q);
@@ -666,6 +695,12 @@ void ASlashCharacter::ShiftStarted(const FInputActionValue& value)
 	}
 }
 
+void ASlashCharacter::Shiftsound(const FInputActionValue& value)
+{
+	UGameplayStatics::PlaySound2D(GetWorld(), SPACESound);
+
+}
+
 
 
 // ÁÂÅ¬¸¯ ¹ÙÀÎµù µÈ ÇÔ¼ö
@@ -708,7 +743,7 @@ void ASlashCharacter::FireBullet(const FInputActionValue& value)
 			bPlayerIsAttacking = true;
 
 			// ·£´ýÀ¸·Î ¸ùÅ¸ÁÖ ½ÇÇà
-			int32 num = FMath::RandRange(1, 3);
+			int32 num = FMath::RandRange(3, 3);
 			FString sectionName = FString("Fencing") + FString::FromInt(num);
 			PlayAnimMontage(fencing_montage, 1.3, FName(sectionName));
 		}
@@ -721,7 +756,7 @@ void ASlashCharacter::FireBullet(const FInputActionValue& value)
 			bPlayerIsAttacking = true;
 
 			// ·£´ýÀ¸·Î ¸ùÅ¸ÁÖ ½ÇÇà
-			int32 num = FMath::RandRange(1, 8);
+			int32 num = FMath::RandRange(3, 3);
 			FString sectionName = FString("Straight") + FString::FromInt(num);
 			PlayAnimMontage(straight_montage, 1.3, FName(sectionName));
 		}
@@ -734,7 +769,7 @@ void ASlashCharacter::FireBullet(const FInputActionValue& value)
 			bPlayerIsAttacking = true;
 
 			// ·£´ýÀ¸·Î ¸ùÅ¸ÁÖ ½ÇÇà
-			int32 num = FMath::RandRange(1, 4);
+			int32 num = FMath::RandRange(3, 3);
 			FString sectionName = FString("HitGround") + FString::FromInt(num);
 			PlayAnimMontage(hitground_montage, 1.3, FName(sectionName));
 		}
@@ -747,7 +782,7 @@ void ASlashCharacter::FireBullet(const FInputActionValue& value)
 			bPlayerIsAttacking = true;
 
 			// ·£´ýÀ¸·Î ¸ùÅ¸ÁÖ ½ÇÇà
-			int32 num = FMath::RandRange(1, 4);
+			int32 num = FMath::RandRange(3, 3);
 			FString sectionName = FString("Sky") + FString::FromInt(num);
 			PlayAnimMontage(sky_montage, 1.3, FName(sectionName));
 		}
@@ -768,6 +803,12 @@ void ASlashCharacter::Q(const FInputActionValue& value)
 	{
 		bKeyPressed = false;
 	}
+	// »ç¿îµå
+	if (QSound != nullptr)
+	{
+		UGameplayStatics::PlaySound2D(GetWorld(), QSound);
+		UE_LOG(LogTemp, Warning, TEXT("Wsound!!"));
+	}
 }
 
 void ASlashCharacter::W(const FInputActionValue& value)
@@ -782,6 +823,11 @@ void ASlashCharacter::W(const FInputActionValue& value)
 	else
 	{
 		bKeyPressed = false;
+	}
+	if (WSound != nullptr)
+	{
+		UGameplayStatics::PlaySound2D(GetWorld(), WSound);
+		UE_LOG(LogTemp, Warning, TEXT("Wsound!!"));
 	}
 }
 
@@ -798,6 +844,11 @@ void ASlashCharacter::FireBullet2(const FInputActionValue& value)
 	{
 		bKeyPressed = false;
 	}
+	if (ESound != nullptr)
+	{
+		UGameplayStatics::PlaySound2D(GetWorld(), ESound);
+		UE_LOG(LogTemp, Warning, TEXT("Esound!!"));
+	}
 }
 
 void ASlashCharacter::R(const FInputActionValue& value)
@@ -812,6 +863,11 @@ void ASlashCharacter::R(const FInputActionValue& value)
 	else
 	{
 		bKeyPressed = false;
+	}
+	if (RSound != nullptr)
+	{
+		UGameplayStatics::PlaySound2D(GetWorld(), RSound);
+		UE_LOG(LogTemp, Warning, TEXT("Rsound!!"));
 	}
 }
 

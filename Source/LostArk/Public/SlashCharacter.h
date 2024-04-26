@@ -53,6 +53,13 @@ public:
 	
 	bool camrashake = false;
 	bool bskillCollTime = false;
+	float bknobacktime = 0;
+	
+	UPROPERTY(EditAnywhere, Category = "MySettings") // 사운드
+	class USoundBase* BASESound;
+
+	UPROPERTY(EditAnywhere, Category = "MySettings") // 사운드
+	class USoundBase* SPACESound;
 	
 	UPROPERTY(EditAnywhere, Category = "MySettings") // 사운드
 	class USoundBase* QSound;
@@ -153,6 +160,7 @@ protected:
 		AActor* DamageCauser
 	)override;
 
+	FVector targetLoc;
 
 	UPROPERTY(EditDefaultsOnly)
 	USceneComponent* SpawnLocation;
@@ -248,6 +256,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MySettings")
 	bool inputDir;
 
+	// 넉백
+	bool bknockBack = false;
+
 	// 카메라 쉐이크 변수
 	UPROPERTY(EditAnywhere, Category="MySettings|Variables")
 	TSubclassOf<class UCameraShakeBase> PlayerHitShake_bp;
@@ -308,6 +319,12 @@ private:   //나만 사용가능하다는 뜻 , 외부에서 호출할게 아니면 여기서 작성하는게
 		//UPROPERTY(EditAnyWhere, Category = "Damage)
 		//float Damage = 20.f;				
 
+	AEnemy* enemy;
+
+	FVector hitLocation;
+	FVector hitDirection;
+
+
 	UPROPERTY(VisibleAnywhere)
 	UHealthBarComponent* HealthBarWidget; //hp 바
 
@@ -325,6 +342,9 @@ private:   //나만 사용가능하다는 뜻 , 외부에서 호출할게 아니면 여기서 작성하는게
 
 	UFUNCTION()
 	void ShiftStarted(const FInputActionValue& value); // 스페이스바 인풋 액션으로 쉬프트 함수 실행하기
+
+	UFUNCTION()
+	void Shiftsound(const FInputActionValue& value);
 
 	UFUNCTION()
 	void Q(const FInputActionValue& value);
